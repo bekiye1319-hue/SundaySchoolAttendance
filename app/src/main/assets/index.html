@@ -569,20 +569,34 @@ function exportCSV(type) {
 
 function backupData() {
   const data = {
-    version:1,
-    exportedAt:new Date().toISOString(),
-    students, attendance, classes
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    students,
+    attendance,
+    classes
   };
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "sunday-school-backup-" + today() + ".json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url),1000);
-  msg("Backup ማውረድ ተጀምሯል።");
+
+  const json = JSON.stringify(data, null, 2);
+  const filename = "sunday-school-backup-" + today() + ".json";
+
+  if (window.Android &&
+      typeof Android.saveTextFile === "function") {
+    Android.saveTextFile(filename, json, "application/json");
+    msg("Backup ለማስቀመጥ የፋይል መምረጫውን ተጠቀም።");
+  } else {
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    msg("Backup ማውረድ ተጀምሯል።");
+  }
 }
 
 function restoreData() {
