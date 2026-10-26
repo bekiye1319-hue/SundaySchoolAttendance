@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="am">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>የሰንበት ትምህርት ቤት Attendance</title>
+<style>
+:root{--blue:#174ea6;--light:#eef4ff;--ink:#182230;--green:#16803c;--red:#b42318;--amber:#a15c00}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Ethiopic",sans-serif;background:#f4f7fb;color:var(--ink);-webkit-tap-highlight-color:transparent}
+input,select,button{min-height:46px;font-size:16px}
+button{touch-action:manipulation}
+main{padding:10px}
+.card{padding:14px}
+.tablewrap{max-width:100%;-webkit-overflow-scrolling:touch}
+@media(max-width:480px){header{padding:16px 10px}header h1{font-size:20px}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat{padding:9px 4px}.stat b{font-size:20px}th,td{padding:8px 5px;font-size:13px}nav{position:sticky;top:0;z-index:5;background:#f4f7fb;padding:6px 0}nav button{padding:10px 5px;font-size:14px}}
+header{background:var(--blue);color:white;padding:18px 16px;text-align:center}header h1{margin:0;font-size:22px}header p{margin:6px 0 0;font-size:13px}
+main{max-width:900px;margin:auto;padding:14px}.card{background:white;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 12px #10204012}
+h2{font-size:19px;margin:0 0 12px}label{display:block;font-weight:600;font-size:14px;margin:10px 0 5px}
+input,select,button{font:inherit;width:100%;padding:11px;border-radius:9px;border:1px solid #ccd5e2;background:white}
+button{border:0;background:var(--blue);color:white;font-weight:700;cursor:pointer;margin-top:9px}
+button.secondary{background:#e7edf7;color:#18345d}button.danger{background:#b42318}button.green{background:#16803c}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.hidden{display:none!important}
+.note{font-size:13px;color:#526176;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--light);padding:12px;border-radius:10px;text-align:center}.stat b{font-size:22px;display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:9px 6px;border-bottom:1px solid #e5eaf1}th{background:#f4f7fb}
+.tablewrap{overflow:auto}.badge{display:inline-block;padding:4px 7px;border-radius:20px;background:#eef4ff;font-size:12px}
+nav{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}nav button{margin:0}
+#message{padding:10px;border-radius:8px;margin-top:10px;font-size:14px}
+@media(min-width:650px){nav{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>የሰንበት ትምህርት ቤት</h1><p>የተማሪ ምዝገባ · አቴንዳንስ · ሪፖርት</p></header>
+<main>
+<section id="login" class="card">
+<h2>🔐 Login</h2>
+<p class="note">የመጀመሪያ መግቢያ: admin / 1234። ይህ መግቢያ መቆጣጠሪያ ብቻ ነው፤ ሚስጥራዊ መረጃ ለመጠበቅ በቂ አይደለም።</p>
+<label>Username</label><input id="username" autocomplete="username" value="admin">
+<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter password">
+<button onclick="login()">Login</button><div id="loginmsg" class="note"></div>
+</section>
+<section id="app" class="hidden">
+<nav>
+<button onclick="show('dashboard')">Dashboard</button><button onclick="show('students')">Students</button><button onclick="show('attendance')">Attendance</button><button onclick="show('reports')">Reports</button>
+</nav>
+<section id="dashboard" class="card">
+<h2>📊 Dashboard</h2><div class="stats"><div class="stat"><b id="total">0</b>Students</div><div class="stat"><b id="todaycount">0</b>Marked today</div><div class="stat"><b id="presentcount">0</b>Present today</div></div>
+<p class="note">መረጃው በዚህ ስልክ ብራውዘር ውስጥ ይቀመጣል። በየጊዜው Backup ያውጡ። ይህ ገና APK አይደለም።</p>
+<button class="secondary" onclick="exportBackup()">Export data backup (JSON)</button>
+<label>Restore backup</label><input type="file" id="backupfile" accept=".json,application/json" onchange="importBackup(event)">
+</section>
+<section id="students" class="card hidden">
+<h2>👨‍🎓 Student registration</h2>
+<div class="row"><div><label>Student ID</label><input id="sid" placeholder="e.g. SS001"></div><div><label>Full name</label><input id="sname" placeholder="Student full name"></div></div>
+<label>Group</label><select id="sgroup"><option>Children</option><option>Youth</option><option>Adults</option></select>
+<button onclick="addStudent()">Save student</button>
+<div class="row"><button class="secondary" onclick="exportStudents()">Export students CSV</button><button class="secondary" onclick="exportCards()">Export ID/QR cards</button></div>
+<p class="note">የተማሪ ID ካርዶች ይወጣሉ። QR ኮድ ማንበብ አልተካተተም።</p>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Name</th><th>Group</th><th>Action</th></tr></thead><tbody id="studentrows"></tbody></table></div>
+</section>
+<section id="attendance" class="card hidden">
+<h2>📅 Attendance</h2>
+<label>Date</label><input type="date" id="attdate">
+<label>Choose student</label><select id="attstudent"></select>
+<div class="row"><button class="green" onclick="mark('Present')">Present</button><button class="secondary" onclick="mark('Absent')">Absent</button><button onclick="mark('Late')">Late</button></div>
+<button class="green" onclick="markAllPresent()">Mark all students Present</button>
+<p class="note">ተማሪን ይምረጡና ሁኔታውን ይመዝግቡ። ሁሉንም Present ለማድረግ ከላይ ያለውን ቁልፍ ይጠቀሙ። መረጃው በስልኩ ላይ ይቀመጣል።</p>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Name</th><th>Status</th></tr></thead><tbody id="attrows"></tbody></table></div>
+</section>
+<section id="reports" class="card hidden">
+<h2>📈 Reports</h2><label>Report date</label><input type="date" id="reportdate">
+<button onclick="renderReport()">Show report</button><button class="secondary" onclick="exportAttendance()">Export attendance CSV (all dates)</button>
+<div id="report"></div>
+</section>
+<button class="danger" onclick="logout()">Logout</button>
+</section>
+<div id="message" class="hidden"></div>
+</main>
+<script>
+const KEY='ssa_students_v2', ATT='ssa_attendance_v2';
+let students=JSON.parse(localStorage.getItem(KEY)||'[]');
+let attendance=JSON.parse(localStorage.getItem(ATT)||'{}');
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+document.getElementById('attdate').value=today();document.getElementById('reportdate').value=today();
+function login(){let u=document.getElementById('username').value.trim(),p=document.getElementById('password').value;
+if(u==='admin'&&p==='1234'){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');refresh();show('dashboard');}
+else document.getElementById('loginmsg').textContent='Incorrect username or password. Use admin / 1234 for this prototype.';}
+function logout(){document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('password').value='';}
+function show(id){['dashboard','students','attendance','reports'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id));refresh();if(id==='reports')renderReport();}
+function save(){localStorage.setItem(KEY,JSON.stringify(students));localStorage.setItem(ATT,JSON.stringify(attendance));}
+function msg(t){let el=document.getElementById('message');el.textContent=t;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),3000);}
+function addStudent(){let id=document.getElementById('sid').value.trim(),name=document.getElementById('sname').value.trim(),group=document.getElementById('sgroup').value;
+if(!id||!name){msg('Please enter student ID and full name.');return;}if(students.some(s=>s.id.toLowerCase()===id.toLowerCase())){msg('This student ID already exists.');return;}if(students.length>=200){msg('Maximum of 200 students reached.');return;}
+students.push({id,name,group});save();document.getElementById('sid').value='';document.getElementById('sname').value='';refresh();msg('Student saved.');}
+function editStudent(id){const s=students.find(x=>x.id===id);if(!s)return;const name=prompt('Edit full name:',s.name);if(name===null)return;const clean=name.trim();if(!clean){msg('Name cannot be empty.');return;}const group=prompt('Group (Children / Youth / Adults):',s.group);if(group===null)return;const g=group.trim();if(!g){msg('Group cannot be empty.');return;}s.name=clean;s.group=g;save();refresh();msg('Student updated.');}
+function removeStudent(id){if(confirm('Delete student '+id+'? Attendance history may remain in records.')){students=students.filter(s=>s.id!==id);save();refresh();}}
+function mark(status){let id=document.getElementById('attstudent').value,date=document.getElementById('attdate').value;if(!id||!date){msg('Add a student and choose a date first.');return;}attendance[date]=attendance[date]||{};attendance[date][id]=status;save();refresh();msg('Attendance marked: '+status);}
+function markAllPresent(){const date=document.getElementById('attdate').value;if(!date||!students.length){msg('Add students and choose a date first.');return;}if(!confirm('Mark all '+students.length+' students Present on '+date+'?'))return;attendance[date]=attendance[date]||{};students.forEach(s=>attendance[date][s.id]='Present');save();refresh();msg('All students marked Present.');}
+function refresh(){students=JSON.parse(localStorage.getItem(KEY)||'[]');attendance=JSON.parse(localStorage.getItem(ATT)||'{}');
+document.getElementById('total').textContent=students.length;
+let d=today(),rec=attendance[d]||{};document.getElementById('todaycount').textContent=Object.keys(rec).length;document.getElementById('presentcount').textContent=Object.values(rec).filter(x=>x==='Present').length;
+document.getElementById('studentrows').innerHTML=students.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.name)}</td><td><span class="badge">${esc(s.group)}</span></td><td><button class="secondary" style="width:auto;padding:6px;margin:2px" onclick="editStudent('${esc(s.id)}')">Edit</button><button class="danger" style="width:auto;padding:6px;margin:2px" onclick="removeStudent('${esc(s.id)}')">Delete</button></td></tr>`).join('');
+let sel=document.getElementById('attstudent'),old=sel.value;sel.innerHTML=students.map(s=>`<option value="${esc(s.id)}">${esc(s.id)} — ${esc(s.name)}</option>`).join('');if(students.some(s=>s.id===old))sel.value=old;
+renderAttendance();}
+function renderAttendance(){let d=document.getElementById('attdate').value,rec=attendance[d]||{};document.getElementById('attrows').innerHTML=students.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(rec[s.id]||'Not marked')}</td></tr>`).join('');}
+document.getElementById('attdate').addEventListener('change',renderAttendance);
+function renderReport(){let d=document.getElementById('reportdate').value,rec=attendance[d]||{};let counts={Present:0,Absent:0,Late:0};Object.values(rec).forEach(v=>{if(counts[v]!==undefined)counts[v]++;});document.getElementById('report').innerHTML=`<p><b>${esc(d)}</b></p><div class="stats"><div class="stat"><b>${counts.Present}</b>Present</div><div class="stat"><b>${counts.Absent}</b>Absent</div><div class="stat"><b>${counts.Late}</b>Late</div></div><p class="note">Marked: ${Object.keys(rec).length} / ${students.length} students</p>`;}
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function download(name,text,type='text/plain'){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function csv(rows){return rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');}
+function exportStudents(){download('students.csv',csv([['ID','Name','Group'],...students.map(s=>[s.id,s.name,s.group])]),'text/csv');}
+function exportAttendance(){let rows=[['Date','Student ID','Name','Group','Status']];Object.keys(attendance).sort().forEach(d=>Object.keys(attendance[d]).forEach(id=>{let s=students.find(x=>x.id===id);rows.push([d,id,s?.name||'Deleted student',s?.group||'',attendance[d][id]]);}));download('attendance.csv',csv(rows),'text/csv');}
+function exportBackup(){download('sunday-school-backup.json',JSON.stringify({students,attendance},null,2),'application/json');}
+function importBackup(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let o=JSON.parse(r.result);if(!Array.isArray(o.students)||typeof o.attendance!=='object')throw Error();if(o.students.length>200)throw Error();students=o.students;attendance=o.attendance;save();refresh();msg('Backup restored.');}catch(_){msg('Invalid backup file.');}};r.readAsText(f);}
+function exportCards(){if(!students.length){msg('Add students first.');return;}let w=window.open('','_blank');if(!w){msg('Allow pop-ups to export cards.');return;}w.document.write('<html><head><title>Student ID Cards</title><style>body{font-family:Arial;display:flex;flex-wrap:wrap;gap:12px}.card{border:2px solid #174ea6;border-radius:12px;padding:14px;width:250px;page-break-inside:avoid}.card img{width:110px;height:110px}h3{margin:4px 0}</style></head><body>'+students.map(s=>`<div class="card"><h3>Sunday School</h3><p>${esc(s.name)}</p><p>ID: ${esc(s.id)} | ${esc(s.group)}</p><div style="border:1px dashed #174ea6;padding:16px;text-align:center;font-size:18px;font-weight:bold">${esc(s.id)}</div></div>`).join('')+'</body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),900);}
+</script>
+</body></html>
