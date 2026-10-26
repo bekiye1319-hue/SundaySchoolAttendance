@@ -3,149 +3,627 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123b66">
 <title>Sunday School Attendance</title>
+
 <style>
+*{box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;color:#172033}
-header{background:#123b66;color:white;text-align:center;padding:18px}
-main{max-width:850px;margin:auto;padding:15px}
-.card{background:white;padding:16px;margin:12px 0;border-radius:12px;box-shadow:0 2px 8px #0001}
-input,button{padding:11px;margin:4px;border-radius:7px;border:1px solid #ccc}
+header{background:#123b66;color:white;text-align:center;padding:16px}
+main{max-width:950px;margin:auto;padding:12px}
+.card{background:white;padding:15px;margin:12px 0;border-radius:12px;box-shadow:0 2px 8px #0001}
+input,select,button{font:inherit;padding:11px;margin:4px;border-radius:7px;border:1px solid #ccc;max-width:100%}
+input,select{background:white}
 button{cursor:pointer;font-weight:bold}
 .primary{background:#123b66;color:white}
-.row{display:flex;align-items:center;justify-content:space-between;gap:5px;border-bottom:1px solid #ddd;padding:10px 0;flex-wrap:wrap}
-.status{min-width:40px;font-size:17px}
+.danger{background:#fee2e2;color:#991b1b}
+.success{background:#dcfce7;color:#166534}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:12px}
+nav button{background:white;color:#123b66;border:0}
+nav button.active{background:#fbbf24;color:#172033}
+.page{display:none}
+.page.active{display:block}
+.row{display:flex;align-items:center;justify-content:space-between;gap:6px;border-bottom:1px solid #ddd;padding:10px 0;flex-wrap:wrap}
+.row>span{flex:1;min-width:130px;overflow-wrap:anywhere}
 .P{color:green}.A{color:red}.L{color:#e67e00}.E{color:blue}
+.status{min-width:42px;font-weight:bold;background:#f8fafc}
+.status.selected{outline:2px solid #123b66;background:#dbeafe}
 .small{font-size:13px;color:#555}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+.grid input,.grid select{width:100%;margin:0}
+.stat{background:#eff6ff;padding:12px;border-radius:8px;text-align:center}
+.stat strong{display:block;font-size:24px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ddd;padding:8px;text-align:left}
+.table-wrap{overflow-x:auto}
+#message{padding:8px;color:#166534}
+@media(max-width:480px){
+ header h2{font-size:21px}
+ .card{padding:10px}
+ input,select{width:100%;margin:4px 0}
+ .row input,.row button{width:auto}
+ nav button{padding:9px}
+}
+@media print{
+ header nav,.no-print,button{display:none!important}
+ body{background:white}
+ .card{box-shadow:none;border:1px solid #ddd}
+ .page{display:none!important}
+ .page.active{display:block!important}
+}
 </style>
 </head>
+
 <body>
 <header>
-<h2>ሰንበት ትምህርት ቤት</h2>
-<h3>የተማሪዎች Attendance System</h3>
+<h2 id="schoolTitle">ሰንበት ትምህርት ቤት</h2>
+<p id="appSubtitle">የተማሪዎች Attendance System</p>
+<nav class="no-print">
+<button onclick="showPage('studentsPage',this)" id="navStudents">ተማሪዎች</button>
+<button onclick="showPage('attendancePage',this)" id="navAttendance">Attendance</button>
+<button onclick="showPage('classesPage',this)" id="navClasses">ክፍሎች</button>
+<button onclick="showPage('reportsPage',this)" id="navReports">ሪፖርት</button>
+<button onclick="showPage('settingsPage',this)" id="navSettings">Settings</button>
+</nav>
 </header>
+
 <main>
+<div id="message" aria-live="polite"></div>
+
+<section class="page active" id="studentsPage">
 <div class="card">
-<h3>➕ ተማሪ መመዝገብ</h3>
+<h3 id="studentFormTitle">➕ ተማሪ መመዝገብ</h3>
+<input type="hidden" id="studentId">
+<div class="grid">
 <input id="name" placeholder="የተማሪው ሙሉ ስም">
-<input id="group" placeholder="ክፍል / ቡድን">
-<button class="primary" onclick="addStudent()">መዝግብ</button>
+<select id="studentClass"><option value="">ክፍል ምረጥ</option></select>
+<input id="phone" placeholder="የተማሪው ስልክ">
+<input id="age" type="number" min="1" max="120" placeholder="ዕድሜ">
+<input id="parentName" placeholder="የወላጅ ስም">
+<input id="parentPhone" placeholder="የወላጅ ስልክ">
+<select id="gender">
+<option value="">ጾታ ምረጥ</option>
+<option value="Male">ወንድ</option>
+<option value="Female">ሴት</option>
+</select>
+</div>
+<p>
+<button class="primary" onclick="saveStudent()" id="saveStudentBtn">መዝግብ</button>
+<button onclick="clearStudentForm()" id="cancelEditBtn">አጽዳ</button>
+</p>
 </div>
 
 <div class="card">
-<h3>📅 የAttendance ቀን</h3>
-<input type="date" id="date">
-<button onclick="showStudents()">አሳይ</button>
-<div id="summary"></div>
+<h3>🔎 ተማሪ ፈልግ</h3>
+<input id="studentSearch" placeholder="በስም ወይም በክፍል ፈልግ" oninput="renderStudents()">
+<div id="studentsList"></div>
 </div>
+</section>
 
+<section class="page" id="attendancePage">
 <div class="card">
-<h3>👨‍🎓 የተማሪዎች ዝርዝር</h3>
+<h3>📅 የዕለት Attendance</h3>
+<label>ቀን</label>
+<input type="date" id="attendanceDate" onchange="renderAttendance()">
+<select id="attendanceClass" onchange="renderAttendance()">
+<option value="">ሁሉም ክፍሎች</option>
+</select>
 <p class="small">P = የተገኘ | A = የቀረ | L = ያረፈደ | E = ያስፈቀደ</p>
-<div id="students"></div>
+<div id="attendanceSummary"></div>
+<div id="attendanceList"></div>
+<button class="primary" onclick="window.print()">🖨️ አትም</button>
+</div>
+</section>
+
+<section class="page" id="classesPage">
+<div class="card">
+<h3>🏫 ክፍሎችን አስተዳድር</h3>
+<input id="className" placeholder="የክፍሉ ስም">
+<button class="primary" onclick="addClass()">ክፍል ጨምር</button>
+<div id="classesList"></div>
+</div>
+</section>
+
+<section class="page" id="reportsPage">
+<div class="card">
+<h3>📊 የዕለት ሪፖርት</h3>
+<input type="date" id="reportDate">
+<button class="primary" onclick="renderDailyReport()">አሳይ</button>
+<div id="dailyReport"></div>
+<button onclick="exportCSV('daily')">የዕለት CSV አውጣ</button>
 </div>
 
 <div class="card">
-<h3>📊 የቀኑ ሪፖርት</h3>
-<div id="report"></div>
-<button class="primary" onclick="exportCSV()">ወደ CSV አውጣ</button>
+<h3>📅 የወር ሪፖርት</h3>
+<input type="month" id="reportMonth">
+<button class="primary" onclick="renderMonthlyReport()">የወር ሪፖርት አሳይ</button>
+<div id="monthlyReport"></div>
+<button onclick="exportCSV('monthly')">የወር CSV አውጣ</button>
 </div>
+</section>
+
+<section class="page" id="settingsPage">
+<div class="card">
+<h3>⚙️ Settings</h3>
+<label>Language / ቋንቋ</label>
+<select id="language" onchange="setLanguage(this.value)">
+<option value="am">አማርኛ</option>
+<option value="en">English</option>
+</select>
+</div>
+
+<div class="card">
+<h3>💾 Backup & Restore</h3>
+<p class="small">የተማሪዎችን፣ ክፍሎችንና Attendance መረጃን በJSON ፋይል አስቀምጥ።</p>
+<button class="primary" onclick="backupData()">⬇️ Backup አውርድ</button>
+<p>Backup ፋይል መመለስ፦</p>
+<input type="file" id="restoreFile" accept=".json,application/json">
+<button onclick="restoreData()">Restore</button>
+</div>
+
+<div class="card">
+<h3>📄 የተማሪዎች ዝርዝር</h3>
+<button class="primary" onclick="exportCSV('students')">የተማሪዎች CSV አውጣ</button>
+</div>
+</section>
 </main>
 
 <script>
-let students=JSON.parse(localStorage.getItem("ss_students")||"[]");
-let attendance=JSON.parse(localStorage.getItem("ss_attendance")||"{}");
+"use strict";
 
-document.getElementById("date").value=
-new Date().toISOString().slice(0,10);
+/* የድሮውን የመረጃ ቁልፍ እንጠብቃለን */
+let students = readJSON("ss_students", []);
+let attendance = readJSON("ss_attendance", {});
+let classes = readJSON("ss_classes", []);
+let language = localStorage.getItem("ss_language") || "am";
 
-function save(){
- localStorage.setItem("ss_students",JSON.stringify(students));
- localStorage.setItem("ss_attendance",JSON.stringify(attendance));
+function readJSON(key, fallback) {
+  try {
+    const v = JSON.parse(localStorage.getItem(key));
+    return v === null ? fallback : v;
+  } catch(e) {
+    return fallback;
+  }
 }
 
-function addStudent(){
- let n=document.getElementById("name").value.trim();
- let g=document.getElementById("group").value.trim();
- if(!n){alert("እባክህ የተማሪውን ስም አስገባ");return;}
- students.push({id:Date.now(),name:n,group:g});
- save();
- document.getElementById("name").value="";
- document.getElementById("group").value="";
- showStudents();
+function save() {
+  try {
+    localStorage.setItem("ss_students", JSON.stringify(students));
+    localStorage.setItem("ss_attendance", JSON.stringify(attendance));
+    localStorage.setItem("ss_classes", JSON.stringify(classes));
+    localStorage.setItem("ss_language", language);
+    return true;
+  } catch(e) {
+    alert("መረጃውን ማስቀመጥ አልተቻለም። Backup አድርግ።");
+    return false;
+  }
 }
 
-function setStatus(id,status){
- let d=document.getElementById("date").value;
- if(!attendance[d])attendance[d]={};
- attendance[d][id]=status;
- save();
- showStudents();
+function today() {
+  const d = new Date();
+  return d.getFullYear() + "-" +
+    String(d.getMonth()+1).padStart(2,"0") + "-" +
+    String(d.getDate()).padStart(2,"0");
 }
 
-function showStudents(){
- let d=document.getElementById("date").value;
- let box=document.getElementById("students");
- box.innerHTML="";
- students.forEach(s=>{
-  let st=(attendance[d]||{})[s.id]||"";
-  let div=document.createElement("div");
-  div.className="row";
-  let info=document.createElement("span");
-  info.textContent=s.name+(s.group?" ("+s.group+")":"");
-  div.appendChild(info);
+document.getElementById("attendanceDate").value = today();
+document.getElementById("reportDate").value = today();
+document.getElementById("reportMonth").value = today().slice(0,7);
+document.getElementById("language").value = language;
 
-  ["P","A","L","E"].forEach(code=>{
-   let b=document.createElement("button");
-   b.textContent=code;
-   b.className="status "+code;
-   if(st===code)b.style.background="#dbeafe";
-   b.onclick=()=>setStatus(s.id,code);
-   div.appendChild(b);
+function msg(text) {
+  document.getElementById("message").textContent = text;
+}
+
+function showPage(id, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  refresh();
+}
+
+function refresh() {
+  renderClassOptions();
+  renderStudents();
+  renderAttendance();
+  renderClasses();
+  renderDailyReport();
+  renderMonthlyReport();
+}
+
+function addClass() {
+  const input = document.getElementById("className");
+  const name = input.value.trim();
+  if(!name) return alert("የክፍሉን ስም አስገባ።");
+  if(classes.some(c => c.toLowerCase() === name.toLowerCase()))
+    return alert("ይህ ክፍል አስቀድሞ አለ።");
+  classes.push(name);
+  if(save()) {
+    input.value = "";
+    refresh();
+    msg("ክፍሉ ተጨምሯል።");
+  }
+}
+
+function renderClassOptions() {
+  ["studentClass","attendanceClass"].forEach(id => {
+    const el = document.getElementById(id);
+    const old = el.value;
+    const allOption = id === "attendanceClass";
+    el.innerHTML = "";
+    const first = document.createElement("option");
+    first.value = "";
+    first.textContent = allOption ? "ሁሉም ክፍሎች" : "ክፍል ምረጥ";
+    el.appendChild(first);
+    classes.forEach(c => {
+      const op = document.createElement("option");
+      op.value = c;
+      op.textContent = c;
+      el.appendChild(op);
+    });
+    if(classes.includes(old)) el.value = old;
+  });
+}
+
+function renderClasses() {
+  const box = document.getElementById("classesList");
+  box.innerHTML = "";
+  classes.forEach(c => {
+    const row = document.createElement("div");
+    row.className = "row";
+    const label = document.createElement("span");
+    label.textContent = c + " (" + students.filter(s => s.group === c).length + ")";
+    const edit = document.createElement("button");
+    edit.textContent = "✏️";
+    edit.onclick = () => {
+      const next = prompt("የአዲሱን የክፍል ስም አስገባ፦", c);
+      if(!next || !next.trim()) return;
+      const name = next.trim();
+      if(name !== c && classes.some(x => x.toLowerCase() === name.toLowerCase()))
+        return alert("ይህ ክፍል አስቀድሞ አለ።");
+      classes = classes.map(x => x === c ? name : x);
+      students.forEach(s => { if(s.group === c) s.group = name; });
+      if(save()) refresh();
+    };
+    const del = document.createElement("button");
+    del.textContent = "🗑️";
+    del.className = "danger";
+    del.onclick = () => {
+      if(!confirm("ክፍሉን መሰረዝ ትፈልጋለህ? ተማሪዎች ከዚህ ክፍል ይወጣሉ።")) return;
+      classes = classes.filter(x => x !== c);
+      students.forEach(s => { if(s.group === c) s.group = ""; });
+      if(save()) refresh();
+    };
+    row.append(label, edit, del);
+    box.appendChild(row);
+  });
+}
+
+function saveStudent() {
+  const id = document.getElementById("studentId").value;
+  const name = document.getElementById("name").value.trim();
+  const group = document.getElementById("studentClass").value;
+  const phone = document.getElementById("phone").value.trim();
+  const ageValue = document.getElementById("age").value;
+  const age = ageValue ? Number(ageValue) : "";
+  const parentName = document.getElementById("parentName").value.trim();
+  const parentPhone = document.getElementById("parentPhone").value.trim();
+  const gender = document.getElementById("gender").value;
+
+  if(!name) return alert("የተማሪውን ሙሉ ስም አስገባ።");
+  if(ageValue && (!Number.isInteger(age) || age < 1 || age > 120))
+    return alert("ትክክለኛ ዕድሜ አስገባ።");
+
+  const data = {name, group, phone, age, parentName, parentPhone, gender};
+
+  if(id) {
+    const old = students.find(s => String(s.id) === id);
+    if(old) Object.assign(old, data);
+  } else {
+    data.id = Date.now().toString() + Math.random().toString(36).slice(2,6);
+    students.push(data);
+  }
+
+  if(save()) {
+    clearStudentForm();
+    refresh();
+    msg("የተማሪው መረጃ ተቀምጧል።");
+  }
+}
+
+function clearStudentForm() {
+  ["studentId","name","phone","age","parentName","parentPhone"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("studentClass").value = "";
+  document.getElementById("gender").value = "";
+  document.getElementById("studentFormTitle").textContent = "➕ ተማሪ መመዝገብ";
+  document.getElementById("saveStudentBtn").textContent = "መዝግብ";
+}
+
+function editStudent(id) {
+  const s = students.find(x => String(x.id) === String(id));
+  if(!s) return;
+  document.getElementById("studentId").value = s.id;
+  document.getElementById("name").value = s.name || "";
+  document.getElementById("phone").value = s.phone || "";
+  document.getElementById("age").value = s.age || "";
+  document.getElementById("parentName").value = s.parentName || "";
+  document.getElementById("parentPhone").value = s.parentPhone || "";
+  document.getElementById("gender").value = s.gender || "";
+  document.getElementById("studentClass").value = s.group || "";
+  document.getElementById("studentFormTitle").textContent = "✏️ ተማሪ ማስተካከያ";
+  document.getElementById("saveStudentBtn").textContent = "አዘምን";
+  showPage("studentsPage", document.getElementById("navStudents"));
+  window.scrollTo(0,0);
+}
+
+function deleteStudent(id) {
+  if(!confirm("ይህን ተማሪ መሰረዝ ትፈልጋለህ?")) return;
+  students = students.filter(s => String(s.id) !== String(id));
+  if(save()) refresh();
+}
+
+function renderStudents() {
+  const box = document.getElementById("studentsList");
+  box.innerHTML = "";
+  const q = document.getElementById("studentSearch").value.trim().toLowerCase();
+  const list = students.filter(s =>
+    (s.name || "").toLowerCase().includes(q) ||
+    (s.group || "").toLowerCase().includes(q) ||
+    (s.phone || "").includes(q)
+  );
+
+  if(!list.length) {
+    box.textContent = students.length ? "የተፈለገው ተማሪ አልተገኘም።" : "እስካሁን ተማሪ አልተመዘገበም።";
+    return;
+  }
+
+  list.forEach(s => {
+    const row = document.createElement("div");
+    row.className = "row";
+    const info = document.createElement("span");
+    info.textContent = s.name + (s.group ? " (" + s.group + ")" : "") +
+      (s.phone ? " · " + s.phone : "");
+    const edit = document.createElement("button");
+    edit.textContent = "✏️";
+    edit.setAttribute("aria-label","Edit student");
+    edit.onclick = () => editStudent(s.id);
+    const del = document.createElement("button");
+    del.textContent = "🗑️";
+    del.className = "danger";
+    del.onclick = () => deleteStudent(s.id);
+    row.append(info,edit,del);
+    box.appendChild(row);
+  });
+}
+
+function setStatus(id, status) {
+  const d = document.getElementById("attendanceDate").value;
+  if(!d) return alert("ቀን ምረጥ።");
+  if(!attendance[d]) attendance[d] = {};
+  attendance[d][id] = status;
+  if(save()) renderAttendance();
+}
+
+function renderAttendance() {
+  const box = document.getElementById("attendanceList");
+  if(!box) return;
+  box.innerHTML = "";
+  const d = document.getElementById("attendanceDate").value;
+  const group = document.getElementById("attendanceClass").value;
+  const list = students.filter(s => !group || s.group === group);
+  const counts = {P:0,A:0,L:0,E:0,Unset:0};
+
+  list.forEach(s => {
+    const st = ((attendance[d] || {})[s.id]) || "";
+    if(st && counts[st] !== undefined) counts[st]++;
+    else counts.Unset++;
+
+    const row = document.createElement("div");
+    row.className = "row";
+    const info = document.createElement("span");
+    info.textContent = s.name + (s.group ? " (" + s.group + ")" : "");
+    row.appendChild(info);
+
+    ["P","A","L","E"].forEach(code => {
+      const b = document.createElement("button");
+      b.textContent = code;
+      b.className = "status " + code + (st === code ? " selected" : "");
+      b.setAttribute("aria-label", s.name + ": " + code);
+      b.onclick = () => setStatus(s.id, code);
+      row.appendChild(b);
+    });
+    box.appendChild(row);
   });
 
-  let del=document.createElement("button");
-  del.textContent="🗑";
-  del.onclick=()=>{
-   if(confirm("ይህን ተማሪ መሰረዝ ትፈልጋለህ?")){
-    students=students.filter(x=>x.id!==s.id);
-    save();showStudents();
-   }
+  document.getElementById("attendanceSummary").textContent =
+    "ተማሪዎች: " + list.length + " | P: " + counts.P +
+    " | A: " + counts.A + " | L: " + counts.L +
+    " | E: " + counts.E + " | ያልተመዘገበ: " + counts.Unset;
+}
+
+function countsFor(date, list) {
+  const c = {P:0,A:0,L:0,E:0,Unset:0};
+  list.forEach(s => {
+    const v = (attendance[date] || {})[s.id];
+    if(v && c[v] !== undefined) c[v]++;
+    else c.Unset++;
+  });
+  return c;
+}
+
+function renderDailyReport() {
+  const box = document.getElementById("dailyReport");
+  if(!box) return;
+  const d = document.getElementById("reportDate").value;
+  const c = countsFor(d, students);
+  box.textContent = "ቀን: " + d + " | ጠቅላላ: " + students.length +
+    " | P: " + c.P + " | A: " + c.A + " | L: " + c.L +
+    " | E: " + c.E + " | ያልተመዘገበ: " + c.Unset;
+}
+
+function renderMonthlyReport() {
+  const box = document.getElementById("monthlyReport");
+  if(!box) return;
+  const month = document.getElementById("reportMonth").value;
+  if(!month) { box.textContent = "ወር ምረጥ።"; return; }
+
+  const totals = {P:0,A:0,L:0,E:0,Unset:0};
+  const perStudent = students.map(s => ({
+    name:s.name, group:s.group || "", P:0,A:0,L:0,E:0,Unset:0
+  }));
+
+  Object.keys(attendance).filter(d => d.startsWith(month)).sort().forEach(d => {
+    students.forEach((s,i) => {
+      const st = attendance[d][s.id];
+      if(st && totals[st] !== undefined) {
+        totals[st]++;
+        perStudent[i][st]++;
+      } else {
+        totals.Unset++;
+        perStudent[i].Unset++;
+      }
+    });
+  });
+
+  const wrap = document.createElement("div");
+  wrap.className = "table-wrap";
+  const table = document.createElement("table");
+  const head = document.createElement("tr");
+  ["ስም","ክፍል","P","A","L","E"].forEach(t => {
+    const th = document.createElement("th");
+    th.textContent = t;
+    head.appendChild(th);
+  });
+  table.appendChild(head);
+
+  perStudent.forEach(s => {
+    const tr = document.createElement("tr");
+    [s.name,s.group,s.P,s.A,s.L,s.E].forEach(v => {
+      const td = document.createElement("td");
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  wrap.appendChild(table);
+  box.innerHTML = "";
+  const summary = document.createElement("p");
+  summary.textContent = month + " | P: " + totals.P + " | A: " +
+    totals.A + " | L: " + totals.L + " | E: " + totals.E;
+  box.append(summary,wrap);
+}
+
+function exportCSV(type) {
+  let rows = [];
+  if(type === "students") {
+    rows.push(["ID","Name","Class","Phone","Age","Parent Name","Parent Phone","Gender"]);
+    students.forEach(s => rows.push([
+      s.id,s.name,s.group || "",s.phone || "",s.age || "",
+      s.parentName || "",s.parentPhone || "",s.gender || ""
+    ]));
+  } else {
+    const month = document.getElementById("reportMonth").value;
+    const d = document.getElementById("reportDate").value;
+    rows.push(["Date","Name","Class","Status"]);
+    const dates = type === "monthly"
+      ? Object.keys(attendance).filter(x => x.startsWith(month)).sort()
+      : [d];
+    dates.forEach(date => {
+      students.forEach(s => rows.push([
+        date,s.name,s.group || "",(attendance[date] || {})[s.id] || "Not marked"
+      ]));
+    });
+  }
+
+  const csv = "\uFEFF" + rows.map(r =>
+    r.map(v => '"' + String(v ?? "").replace(/"/g,'""') + '"').join(",")
+  ).join("\r\n");
+
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = type + "-attendance-" + today() + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url),1000);
+}
+
+function backupData() {
+  const data = {
+    version:1,
+    exportedAt:new Date().toISOString(),
+    students, attendance, classes
   };
-  div.appendChild(del);
-  box.appendChild(div);
- });
- updateReport();
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "sunday-school-backup-" + today() + ".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url),1000);
+  msg("Backup ማውረድ ተጀምሯል።");
 }
 
-function updateReport(){
- let d=document.getElementById("date").value;
- let counts={P:0,A:0,L:0,E:0,Unset:0};
- students.forEach(s=>{
-  let st=(attendance[d]||{})[s.id];
-  if(st)counts[st]++;else counts.Unset++;
- });
- document.getElementById("summary").textContent=
- "ተማሪዎች: "+students.length;
- document.getElementById("report").textContent=
- "P: "+counts.P+" | A: "+counts.A+" | L: "+counts.L+
- " | E: "+counts.E+" | ያልተመዘገበ: "+counts.Unset;
+function restoreData() {
+  const file = document.getElementById("restoreFile").files[0];
+  if(!file) return alert("መጀመሪያ JSON Backup ፋይል ምረጥ።");
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if(!Array.isArray(data.students) || !data.attendance ||
+         typeof data.attendance !== "object")
+        throw new Error("Invalid backup");
+
+      if(!confirm("Restore ማድረግ አሁን ያለውን መረጃ ይተካል። መቀጠል ትፈልጋለህ?"))
+        return;
+
+      students = data.students;
+      attendance = data.attendance;
+      classes = Array.isArray(data.classes) ? data.classes : [];
+
+      if(save()) {
+        refresh();
+        msg("Backup ተመልሷል።");
+      }
+    } catch(e) {
+      alert("Backup ፋይሉ ትክክል አይደለም።");
+    }
+  };
+  reader.readAsText(file);
 }
 
-function exportCSV(){
- let d=document.getElementById("date").value;
- let lines=[["Date","Name","Group","Status"]];
- students.forEach(s=>{
-  lines.push([d,s.name,s.group,(attendance[d]||{})[s.id]||"Not marked"]);
- });
- let csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
- let blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
- let a=document.createElement("a");
- a.href=URL.createObjectURL(blob);
- a.download="attendance-"+d+".csv";
- a.click();
- URL.revokeObjectURL(a.href);
+function setLanguage(lang) {
+  language = lang;
+  save();
+  const en = lang === "en";
+  document.documentElement.lang = lang;
+  document.getElementById("schoolTitle").textContent =
+    en ? "Sunday School" : "ሰንበት ትምህርት ቤት";
+  document.getElementById("appSubtitle").textContent =
+    en ? "Student Attendance System" : "የተማሪዎች Attendance System";
+
+  const labels = en
+    ? ["Students","Attendance","Classes","Reports","Settings"]
+    : ["ተማሪዎች","Attendance","ክፍሎች","ሪፖርት","Settings"];
+
+  ["navStudents","navAttendance","navClasses","navReports","navSettings"]
+    .forEach((id,i) => document.getElementById(id).textContent = labels[i]);
+
+  msg(en ? "Language changed to English." : "ቋንቋው ወደ አማርኛ ተቀይሯል።");
 }
-showStudents();
+
+setLanguage(language);
+refresh();
+showPage("studentsPage",document.getElementById("navStudents"));
 </script>
 </body>
 </html>
