@@ -111,7 +111,7 @@ th,td{border:1px solid #ddd;padding:8px;text-align:left}
 <p class="small">P = የተገኘ | A = የቀረ | L = ያረፈደ | E = ያስፈቀደ</p>
 <div id="attendanceSummary"></div>
 <div id="attendanceList"></div>
-<button class="primary" onclick="window.print()">🖨️ አትም</button>
+<button class="primary" onclick="printCurrentPage()">🖨️ አትም</button>
 </div>
 </section>
 
@@ -652,6 +652,15 @@ function setLanguage(lang) {
 setLanguage(language);
 refresh();
 showPage("studentsPage",document.getElementById("navStudents"));
+
+ function printCurrentPage() {
+  if (window.Android &&
+      typeof Android.printPage === "function") {
+    Android.printPage();
+  } else {
+    window.print();
+  }
+}
 </script>
 </body>
 </html>
