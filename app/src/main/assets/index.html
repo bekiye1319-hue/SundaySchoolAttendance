@@ -1,13 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="am">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sunday School Attendance</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunday School Attendance</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;color:#172033}
+header{background:#123b66;color:white;text-align:center;padding:18px}
+main{max-width:850px;margin:auto;padding:15px}
+.card{background:white;padding:16px;margin:12px 0;border-radius:12px;box-shadow:0 2px 8px #0001}
+input,button{padding:11px;margin:4px;border-radius:7px;border:1px solid #ccc}
+button{cursor:pointer;font-weight:bold}
+.primary{background:#123b66;color:white}
+.row{display:flex;align-items:center;justify-content:space-between;gap:5px;border-bottom:1px solid #ddd;padding:10px 0;flex-wrap:wrap}
+.status{min-width:40px;font-size:17px}
+.P{color:green}.A{color:red}.L{color:#e67e00}.E{color:blue}
+.small{font-size:13px;color:#555}
+</style>
 </head>
 <body>
-    <h1>ሰንበት ትምህርት ቤት</h1>
-    <h2>የተማሪዎች አቴንዳንስ</h2>
-    <p>Sunday School Attendance System</p>
+<header>
+<h2>ሰንበት ትምህርት ቤት</h2>
+<h3>የተማሪዎች Attendance System</h3>
+</header>
+<main>
+<div class="card">
+<h3>➕ ተማሪ መመዝገብ</h3>
+<input id="name" placeholder="የተማሪው ሙሉ ስም">
+<input id="group" placeholder="ክፍል / ቡድን">
+<button class="primary" onclick="addStudent()">መዝግብ</button>
+</div>
+
+<div class="card">
+<h3>📅 የAttendance ቀን</h3>
+<input type="date" id="date">
+<button onclick="showStudents()">አሳይ</button>
+<div id="summary"></div>
+</div>
+
+<div class="card">
+<h3>👨‍🎓 የተማሪዎች ዝርዝር</h3>
+<p class="small">P = የተገኘ | A = የቀረ | L = ያረፈደ | E = ያስፈቀደ</p>
+<div id="students"></div>
+</div>
+
+<div class="card">
+<h3>📊 የቀኑ ሪፖርት</h3>
+<div id="report"></div>
+<button class="primary" onclick="exportCSV()">ወደ CSV አውጣ</button>
+</div>
+</main>
+
+<script>
+let students=JSON.parse(localStorage.getItem("ss_students")||"[]");
+let attendance=JSON.parse(localStorage.getItem("ss_attendance")||"{}");
+
+document.getElementById("date").value=
+new Date().toISOString().slice(0,10);
+
+function save(){
+ localStorage.setItem("ss_students",JSON.stringify(students));
+ localStorage.setItem("ss_attendance",JSON.stringify(attendance));
+}
+
+function addStudent(){
+ let n=document.getElementById("name").value.trim();
+ let g=document.getElementById("group").value.trim();
+ if(!n){alert("እባክህ የተማሪውን ስም አስገባ");return;}
+ students.push({id:Date.now(),name:n,group:g});
+ save();
+ document.getElementById("name").value="";
+ document.getElementById("group").value="";
+ showStudents();
+}
+
+function setStatus(id,status){
+ let d=document.getElementById("date").value;
+ if(!attendance[d])attendance[d]={};
+ attendance[d][id]=status;
+ save();
+ showStudents();
+}
+
+function showStudents(){
+ let d=document.getElementById("date").value;
+ let box=document.getElementById("students");
+ box.innerHTML="";
+ students.forEach(s=>{
+  let st=(attendance[d]||{})[s.id]||"";
+  let div=document.createElement("div");
+  div.className="row";
+  let info=document.createElement("span");
+  info.textContent=s.name+(s.group?" ("+s.group+")":"");
+  div.appendChild(info);
+
+  ["P","A","L","E"].forEach(code=>{
+   let b=document.createElement("button");
+   b.textContent=code;
+   b.className="status "+code;
+   if(st===code)b.style.background="#dbeafe";
+   b.onclick=()=>setStatus(s.id,code);
+   div.appendChild(b);
+  });
+
+  let del=document.createElement("button");
+  del.textContent="🗑";
+  del.onclick=()=>{
+   if(confirm("ይህን ተማሪ መሰረዝ ትፈልጋለህ?")){
+    students=students.filter(x=>x.id!==s.id);
+    save();showStudents();
+   }
+  };
+  div.appendChild(del);
+  box.appendChild(div);
+ });
+ updateReport();
+}
+
+function updateReport(){
+ let d=document.getElementById("date").value;
+ let counts={P:0,A:0,L:0,E:0,Unset:0};
+ students.forEach(s=>{
+  let st=(attendance[d]||{})[s.id];
+  if(st)counts[st]++;else counts.Unset++;
+ });
+ document.getElementById("summary").textContent=
+ "ተማሪዎች: "+students.length;
+ document.getElementById("report").textContent=
+ "P: "+counts.P+" | A: "+counts.A+" | L: "+counts.L+
+ " | E: "+counts.E+" | ያልተመዘገበ: "+counts.Unset;
+}
+
+function exportCSV(){
+ let d=document.getElementById("date").value;
+ let lines=[["Date","Name","Group","Status"]];
+ students.forEach(s=>{
+  lines.push([d,s.name,s.group,(attendance[d]||{})[s.id]||"Not marked"]);
+ });
+ let csv=lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
+ let blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
+ let a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="attendance-"+d+".csv";
+ a.click();
+ URL.revokeObjectURL(a.href);
+}
+showStudents();
+</script>
 </body>
 </html>
