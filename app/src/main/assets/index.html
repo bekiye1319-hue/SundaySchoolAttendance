@@ -1,1154 +1,1106 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ሰንበት ትምህርት ቤት - Attendance</title>
 
-<html lang="am">  
-<head>  
-<meta charset="utf-8">  
-<meta name="viewport" content="width=device-width,initial-scale=1">  
-<meta name="theme-color" content="#123b66">  
-<title>ሰንበት ትምህርት ቤት</title>  <style>  
-:root {  
-  --b:#123b66;  
-  --b2:#24699e;  
-  --bg:#f2f6fa;  
-  --line:#d8e3ed;  
-  --muted:#62778a;  
-}  
-  
-* { box-sizing:border-box; }  
-  
-body {  
-  margin:0;  
-  background:var(--bg);  
-  color:#172b3a;  
-  font-family:Arial,sans-serif;  
-  padding-bottom:78px;  
-}  
-  
-header {  
-  background:linear-gradient(120deg,var(--b),var(--b2));  
-  color:white;  
-  padding:17px;  
-}  
-  
-header h1 { font-size:20px; margin:0; }  
-header p { margin:6px 0 0; font-size:13px; }  
-  
-main { max-width:950px; margin:auto; padding:14px; }  
-  
-.page { display:none; }  
-.page.active { display:block; }  
-  
-.card {  
-  background:white;  
-  border:1px solid var(--line);  
-  border-radius:15px;  
-  padding:15px;  
-  margin-bottom:13px;  
-  box-shadow:0 3px 12px #123b6609;  
-}  
-  
-.hero {  
-  background:linear-gradient(130deg,var(--b),var(--b2));  
-  color:white;  
-}  
-  
-.hero h2 { color:white; }  
-  
-.card h2,.card h3 {  
-  color:var(--b);  
-  margin:0 0 12px;  
-}  
-  
-.grid {  
-  display:grid;  
-  grid-template-columns:repeat(2,minmax(0,1fr));  
-  gap:9px;  
-}  
-  
-.stat {  
-  background:white;  
-  border:1px solid var(--line);  
-  border-radius:13px;  
-  text-align:center;  
-  padding:14px;  
-}  
-  
-.stat strong {  
-  display:block;  
-  font-size:25px;  
-  color:var(--b);  
-}  
-  
-.stat span {  
-  font-size:13px;  
-  color:var(--muted);  
-}  
-  
-label {  
-  display:block;  
-  font-weight:bold;  
-  font-size:14px;  
-  margin:10px 0 5px;  
-}  
-  
-input,select {  
-  width:100%;  
-  min-height:42px;  
-  padding:10px;  
-  border:1px solid #c9d7e4;  
-  border-radius:9px;  
-  background:white;  
-  font:inherit;  
-}  
-  
-.row {  
-  display:grid;  
-  grid-template-columns:repeat(2,minmax(0,1fr));  
-  gap:9px;  
-}  
-  
-.actions {  
-  display:flex;  
-  gap:8px;  
-  flex-wrap:wrap;  
-  margin-top:12px;  
-}  
-  
-button {  
-  border:0;  
-  border-radius:9px;  
-  padding:10px 13px;  
-  min-height:42px;  
-  background:#e7eef5;  
-  color:var(--b);  
-  font:inherit;  
-  font-weight:bold;  
-  cursor:pointer;  
-}  
-  
-button.primary {  
-  background:var(--b);  
-  color:white;  
-}  
-  
-button.danger {  
-  background:#fde8e7;  
-  color:#a32720;  
-}  
-  
-.quick {  
-  display:grid;  
-  grid-template-columns:repeat(2,minmax(0,1fr));  
-  gap:9px;  
-}  
-  
-.quick button {  
-  text-align:left;  
-  min-height:65px;  
-}  
-  
-.tablewrap {  
-  overflow-x:auto;  
-  border:1px solid var(--line);  
-  border-radius:10px;  
-  background:white;  
-}  
-  
-table {  
-  width:100%;  
-  border-collapse:collapse;  
-  min-width:540px;  
-}  
-  
-th,td {  
-  text-align:left;  
-  padding:9px;  
-  border-bottom:1px solid #e6edf3;  
-  font-size:14px;  
-}  
-  
-th {  
-  background:#edf4fa;  
-  color:var(--b);  
-}  
-  
-.muted {  
-  font-size:13px;  
-  color:var(--muted);  
-}  
-  
-.bottom {  
-  position:fixed;  
-  z-index:9;  
-  bottom:0;  
-  left:0;  
-  right:0;  
-  background:white;  
-  border-top:1px solid var(--line);  
-  display:flex;  
-  padding:5px 2px calc(5px + env(safe-area-inset-bottom));  
-  box-shadow:0 -4px 14px #123b6610;  
-}  
-  
-.bottom button {  
-  flex:1;  
-  background:transparent;  
-  color:#607386;  
-  padding:6px 1px;  
-  min-height:55px;  
-  font-size:11px;  
-  display:flex;  
-  flex-direction:column;  
-  gap:3px;  
-  align-items:center;  
-  justify-content:center;  
-}  
-  
-.bottom button.active {  
-  background:#eaf3fb;  
-  color:var(--b);  
-}  
-  
-.ico { font-size:19px; }  
-  
-.progress {  
-  height:7px;  
-  background:#e6edf3;  
-  border-radius:9px;  
-  overflow:hidden;  
-}  
-  
-.progress span {  
-  display:block;  
-  height:100%;  
-  background:#16834a;  
-}  
-  
-.hidden { display:none!important; }  
-  
-#lock {  
-  position:fixed;  
-  inset:0;  
-  z-index:20;  
-  background:linear-gradient(135deg,var(--b),var(--b2));  
-  display:flex;  
-  align-items:center;  
-  justify-content:center;  
-  padding:18px;  
-}  
-  
-.lockbox {  
-  background:white;  
-  border-radius:18px;  
-  padding:22px;  
-  width:min(100%,420px);  
-}  
-  
-/* Attendance status letters */  
-  
-.status-select {  
-  width:65px;  
-  min-width:65px;  
-  min-height:44px;  
-  padding:6px;  
-  font-size:19px;  
-  font-weight:700;  
-  text-align:center;  
-  border:2px solid #d8e3ed;  
-  border-radius:10px;  
-  background:#fff;  
-}  
-  
-.status-select.status-P {  
-  color:#16803c;  
-  background:#e7f7ec;  
-  border-color:#16803c;  
-}  
-  
-.status-select.status-A {  
-  color:#c62828;  
-  background:#fdeaea;  
-  border-color:#c62828;  
-}  
-  
-.status-select.status-L {  
-  color:#b96500;  
-  background:#fff2d9;  
-  border-color:#e69b25;  
-}  
-  
-.status-select.status-E {  
-  color:#1769aa;  
-  background:#e7f1ff;  
-  border-color:#1769aa;  
-}  
-  
-@media(min-width:700px) {  
-  .grid { grid-template-columns:repeat(4,1fr); }  
-  .quick { grid-template-columns:repeat(3,1fr); }  
-  main { padding:22px; }  
-}  
-  
-@media print {  
-  header,.bottom,.no-print,button {  
-    display:none!important;  
-  }  
-  
-  body {  
-    padding:0;  
-    background:white;  
-  }  
-  
-  .page { display:none!important; }  
-  .page.active { display:block!important; }  
-  
-  .card {  
-    box-shadow:none;  
-    border:0;  
-  }  
-  
-  .tablewrap { overflow:visible; }  
-  table { min-width:0; }  
-}  
-</style>  </head>  <body>  <header>  
-  <h1>⛪ ሰንበት ትምህርት ቤት</h1>  
-  <p>የተማሪዎችና የተሳትፎ መዝገብ</p>  
-</header>  
-  <main id="app">  <!-- HOME -->  <section class="page active" id="homePage">    <div class="card hero">  
-    <h2>እንኳን በደህና መጡ!</h2>  
-    <p>  
-      የሰንበት ትምህርት ቤት ተማሪዎችንና ተሳትፎን በቀላሉ ያስተዳድሩ።  
-    </p>  
-    <b>ዛሬ፦ <span id="today"></span></b>  
-  </div>    <div class="grid">  
-    <div class="stat">  
-      <strong id="hs">0</strong>  
-      <span>ተማሪዎች</span>  
-    </div>  <div class="stat">  
-  <strong id="hp">0</strong>  
-  <span>ዛሬ የተገኙ (P)</span>  
-</div>  
+<style>
+:root {
+  --green: #167a45;
+  --blue: #1769aa;
+  --red: #b42318;
+  --bg: #f4f7f5;
+  --ink: #182522;
+  --line: #d8e2dc;
+}
 
-<div class="stat">  
-  <strong id="ha">0</strong>  
-  <span>ዛሬ የቀሩ (A)</span>  
-</div>  
+* { box-sizing: border-box; }
 
-<div class="stat">  
-  <strong id="hc">0</strong>  
-  <span>ክፍሎች</span>  
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+}
+
+header {
+  background: var(--green);
+  color: white;
+  padding: 18px 14px;
+  text-align: center;
+}
+
+header h1 { margin: 0 0 6px; }
+header p { margin: 0; font-size: 13px; }
+
+nav {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: white;
+  padding: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+button, .btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 13px;
+  background: var(--green);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+nav button {
+  background: #e8f1eb;
+  color: #174d32;
+}
+
+nav button.active {
+  background: var(--green);
+  color: white;
+}
+
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 14px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 14px;
+}
+
+h2 {
+  font-size: 19px;
+  margin: 0 0 12px;
+  color: var(--green);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #bac9c0;
+  border-radius: 7px;
+  background: white;
+  font-size: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 9px 7px;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+th { background: #edf4ef; }
+
+.table-wrap { overflow-x: auto; }
+
+.P { color: #16803d; }
+.A { color: #c62828; }
+.L { color: #1769aa; }
+.E { color: #8657a8; }
+
+.status {
+  font-weight: bold;
+  text-align: center;
+}
+
+.small {
+  font-size: 13px;
+  color: #53635b;
+}
+
+.hidden { display: none !important; }
+
+.notice {
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff7dc;
+  margin: 10px 0;
+}
+
+.danger { background: var(--red); }
+.secondary { background: var(--blue); }
+.light { background: #eaf0ec; color: #163c29; }
+
+.stat {
+  padding: 12px;
+  background: #edf5ef;
+  border-radius: 9px;
+  text-align: center;
+}
+
+.stat b {
+  display: block;
+  font-size: 24px;
+  color: var(--green);
+}
+
+@media print {
+  nav, .no-print, button { display: none !important; }
+  body { background: white; font-size: 12px; }
+  main { max-width: none; padding: 0; }
+  .panel { border: 0; padding: 4px; margin: 0; }
+  header { background: white; color: black; }
+  .table-wrap { overflow: visible; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>ሰንበት ትምህርት ቤት</h1>
+  <p>የተማሪ መዝገብ • የቀረቤታ መዝገብ • ሪፖርት</p>
+</header>
+
+<nav class="no-print">
+  <button class="active" data-page="attendance">ቀረቤታ</button>
+  <button data-page="students">ተማሪዎች</button>
+  <button data-page="classes">ክፍሎች</button>
+  <button data-page="reports">ሪፖርት</button>
+  <button data-page="calendar">📅 Calendar</button>
+  <button data-page="backup">Backup / Restore</button>
+</nav>
+
+<main>
+
+<section id="attendance" class="page">
+  <div class="panel">
+    <h2>የቀረቤታ መዝገብ</h2>
+
+    <div class="grid">
+      <div>
+        <label>ቀን (ቀን/ወር/ዓመት)</label>
+        <input id="attDate" placeholder="01/02/2019">
+        <div class="small">ለምሳሌ፦ 01/02/2019</div>
+      </div>
+
+      <div>
+        <label>ክፍል</label>
+        <select id="attClass"></select>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="loadAtt">ተማሪዎችን አሳይ</button>
+      <button id="saveAtt">ቀረቤታ አስቀምጥ</button>
+      <button class="light" id="allPresent">ሁሉንም P አድርግ</button>
+    </div>
+
+    <div class="notice">
+      P = ተገኝቷል • A = ቀርቷል • L = ዘግይቷል • E = ፈቃድ
+    </div>
+
+    <div id="attendanceTable" class="table-wrap"></div>
+  </div>
+</section>
+
+<section id="students" class="page hidden">
+  <div class="panel">
+    <h2>ተማሪ መመዝገብ</h2>
+
+    <label>ተማሪ ፈልግ</label>
+    <input id="studentSearch" placeholder="በስም ወይም ስልክ ፈልግ">
+
+    <div class="grid">
+      <div>
+        <label>ሙሉ ስም</label>
+        <input id="studentName" placeholder="የተማሪው ስም">
+      </div>
+
+      <div>
+        <label>የክፍል ምድብ</label>
+        <select id="studentClass"></select>
+      </div>
+
+      <div>
+        <label>ስልክ (አማራጭ)</label>
+        <input id="studentPhone" placeholder="09...">
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="addStudent">ተማሪ ጨምር</button>
+    </div>
+
+    <div id="studentsTable" class="table-wrap"></div>
+  </div>
+</section>
+
+<section id="classes" class="page hidden">
+  <div class="panel">
+    <h2>ክፍሎች</h2>
+
+    <label>የክፍል ስም</label>
+    <input id="className" placeholder="ለምሳሌ አንደኛ ክፍል">
+
+    <div class="row">
+      <button id="addClass">ክፍል ጨምር</button>
+    </div>
+
+    <div id="classesTable" class="table-wrap"></div>
+  </div>
+</section>
+
+<section id="reports" class="page hidden">
+  <div class="panel">
+    <h2>📊 Attendance Statistics</h2>
+    <div id="statistics"></div>
+  </div>
+
+  <div class="panel">
+    <h2>የቀን ክልል ሪፖርት</h2>
+
+    <div class="grid">
+      <div>
+        <label>ከ (ቀን/ወር/ዓመት)</label>
+        <input id="fromDate" placeholder="01/01/2019">
+      </div>
+
+      <div>
+        <label>እስከ (ቀን/ወር/ዓመት)</label>
+        <input id="toDate" placeholder="30/13/2019">
+      </div>
+
+      <div>
+        <label>የተማሪ ሪፖርት</label>
+        <select id="reportStudent"></select>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="makeReport">ሪፖርት አውጣ</button>
+      <button class="secondary" id="printReport">Print / PDF</button>
+      <button class="light" id="csvReport">CSV አውርድ</button>
+    </div>
+
+    <div id="reportResult"></div>
+  </div>
+</section>
+
+<section id="calendar" class="page hidden">
+  <div class="panel">
+    <h2>📅 Attendance Calendar</h2>
+    <p class="small">ወር ምረጥ፤ ቀረቤታ የተመዘገበባቸው ቀናት ይታያሉ።</p>
+
+    <label>ወር (Gregorian)</label>
+    <input id="calendarMonth" type="month">
+
+    <div id="calendarResult" class="table-wrap"></div>
+  </div>
+</section>
+
+<section id="backup" class="page hidden">
+  <div class="panel">
+    <h2>Backup / Restore</h2>
+    <p>
+      መረጃዎን ለማስቀመጥ Backup ያውርዱ።
+      ወደ አዲስ ስልክ ሲቀይሩ Restore ይጠቀሙ።
+    </p>
+
+    <div class="row">
+      <button id="backupBtn">Backup አውርድ</button>
+      <label class="btn secondary" for="restoreFile">Restore ፋይል ምረጥ</label>
+      <input class="hidden" id="restoreFile" type="file" accept=".json,application/json">
+    </div>
+
+    <div id="backupMessage"></div>
+  </div>
+
+  <div class="panel">
+    <h2>የመቆለፊያ ቁልፍ</h2>
+
+    <label>አዲስ የይለፍ ቃል (አማራጭ)</label>
+    <input id="newPassword" type="password" placeholder="ቢያንስ 4 ቁምፊ">
+
+    <div class="row">
+      <button id="setPassword">የይለፍ ቃል አስቀምጥ</button>
+      <button id="lockNow" class="danger">መተግበሪያውን ቆልፍ</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="lockScreen" class="hidden"
+style="position:fixed;inset:0;background:#f4f7f5;z-index:10;align-items:center;justify-content:center;padding:20px">
+  <div class="panel" style="width:min(400px,100%)">
+    <h2>መተግበሪያው ተቆልፏል</h2>
+    <label>የይለፍ ቃል</label>
+    <input id="unlockPassword" type="password">
+    <div class="row"><button id="unlockBtn">ክፈት</button></div>
+    <p id="unlockMessage"></p>
+  </div>
 </div>
 
-  </div>    <div class="card">  
-    <h3>⚡ ፈጣን አገልግሎቶች</h3>  <div class="quick">  
-  <button onclick="showPage('studentsPage')">  
-    👨‍🎓<br>ተማሪ መዝግብ  
-  </button>  
+<script>
+(function () {
+"use strict";
 
-  <button onclick="showPage('attendancePage')">  
-    📝<br>Attendance መዝግብ  
-  </button>  
+const K = {
+  students: "ss_students",
+  attendance: "ss_attendance",
+  classes: "ss_classes",
+  password: "ss_admin_password_hash"
+};
 
-  <button onclick="showPage('classesPage')">  
-    🏫<br>ክፍሎች  
-  </button>  
+const $ = id => document.getElementById(id);
 
-  <button onclick="showPage('reportsPage')">  
-    📊<br>ሪፖርት  
-  </button>  
+const read = (key, def) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : def;
+  } catch (e) {
+    return def;
+  }
+};
 
-  <button onclick="backupData()">  
-    💾<br>Backup  
-  </button>  
+const write = (key, value) =>
+  localStorage.setItem(key, JSON.stringify(value));
 
-  <button onclick="showPage('settingsPage')">  
-    ⚙️<br>Settings  
-  </button>  
-</div>
+let students = read(K.students, []);
+let attendance = read(K.attendance, {});
+let classes = read(K.classes, []);
 
-  </div>    <p class="muted">  
-    መተግበሪያውን ከማዘመን ወይም App Data ከማጥፋት በፊት Backup ያውርዱ።  
-  </p>  
-</section>  <!-- STUDENTS -->  <section class="page" id="studentsPage">    <div class="card">  
-    <h2>👨‍🎓 ተማሪ መዝግብ</h2>  <form id="sf">  
-  <input id="sid" type="hidden">  
+if (!Array.isArray(students)) students = [];
+if (!attendance || typeof attendance !== "object") attendance = {};
+if (!Array.isArray(classes)) classes = [];
 
-  <div class="row">  
-    <div>  
-      <label>ሙሉ ስም *</label>  
-      <input id="sn" required>  
-    </div>  
+if (!classes.length) {
+  classes = ["አጠቃላይ"];
+  write(K.classes, classes);
+}
 
-    <div>  
-      <label>ክፍል</label>  
-      <select id="sg"></select>  
-    </div>  
+const statusLabels = {
+  P: "ተገኝቷል",
+  A: "ቀርቷል",
+  L: "ዘግይቷል",
+  E: "ፈቃድ"
+};
 
-    <div>  
-      <label>ስልክ</label>  
-      <input id="sp" type="tel">  
-    </div>  
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
 
-    <div>  
-      <label>ዕድሜ</label>  
-      <input id="sa" type="number" min="1">  
-    </div>  
+function saveAll() {
+  write(K.students, students);
+  write(K.attendance, attendance);
+  write(K.classes, classes);
 
-    <div>  
-      <label>ፆታ</label>  
-      <select id="sgen">  
-        <option value="">—</option>  
-        <option>ወንድ</option>  
-        <option>ሴት</option>  
-      </select>  
-    </div>  
+  try {
+    localStorage.setItem("ss_auto_backup", JSON.stringify({
+      savedAt: new Date().toISOString(),
+      students,
+      attendance,
+      classes
+    }));
+  } catch (e) {}
+}
 
-    <div>  
-      <label>የወላጅ ስም</label>  
-      <input id="sparent">  
-    </div>  
+function ethiopianParts(date) {
+  try {
+    const formatter = new Intl.DateTimeFormat(
+      "en-u-ca-ethiopic",
+      {
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+        timeZone: "UTC"
+      }
+    );
 
-    <div>  
-      <label>የወላጅ ስልክ</label>  
-      <input id="spp" type="tel">  
-    </div>  
-  </div>  
+    const parts = {};
+    formatter.formatToParts(date).forEach(part => {
+      if (part.type !== "literal") {
+        parts[part.type] = Number(part.value);
+      }
+    });
 
-  <div class="actions">  
-    <button class="primary">አስቀምጥ</button>  
-    <button type="button" onclick="resetSF()">አጽዳ</button>  
-    <button type="button" onclick="exportCSV('students')">  
-      📥 Excel/CSV  
-    </button>  
-  </div>  
-</form>
+    return {
+      d: parts.day,
+      m: parts.month,
+      y: parts.year
+    };
+  } catch (e) {
+    return null;
+  }
+}
 
-  </div>    <div class="card">  
-    <label>ተማሪ ፈልግ</label>  
-    <input id="search" placeholder="ስም፣ ክፍል፣ ስልክ...">  <p class="muted" id="sCount"></p>  
+function toISO(input) {
+  const match = String(input || "").trim().match(
+    /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/
+  );
 
-<div class="tablewrap">  
-  <table>  
-    <thead>  
-      <tr>  
-        <th>No</th>  
-        <th>ስም</th>  
-        <th>ክፍል</th>  
-        <th>ስልክ</th>  
-        <th>ዕድሜ</th>  
-        <th>ተግባር</th>  
-      </tr>  
-    </thead>  
-    <tbody id="st"></tbody>  
-  </table>  
-</div>
+  if (!match) return null;
 
-  </div>  
-</section>  <!-- ATTENDANCE -->  <section class="page" id="attendancePage">    <div class="card">  
-    <h2>📝 Attendance</h2>  <div class="row">  
-  <div>  
-    <label>ቀን</label>  
-    <input id="adate" type="date">  
-  </div>  
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
 
-  <div>  
-    <label>ክፍል</label>  
-    <select id="ag"></select>  
-  </div>  
-</div>  
+  if (day < 1 || day > 30 || month < 1 || month > 13 || year < 1) {
+    return null;
+  }
 
-<p class="muted">  
-  P = ተገኝቷል · A = ቀርቷል · L = ዘግይቷል · E = ፈቃድ  
-</p>  
+  const start = Date.UTC(year + 7, 7, 25);
+  const end = Date.UTC(year + 8, 9, 10);
 
-<div class="actions">  
-  <button class="primary" onclick="markAll()">  
-    ሁሉን P አድርግ  
-  </button>  
+  for (let time = start; time <= end; time += 86400000) {
+    const parts = ethiopianParts(new Date(time));
 
-  <button onclick="saveAttendance()">  
-    💾 አስቀምጥ  
-  </button>  
+    if (parts && parts.y === year &&
+        parts.m === month && parts.d === day) {
+      return new Date(time).toISOString().slice(0, 10);
+    }
+  }
 
-  <button onclick="exportCSV('attendance')">  
-    CSV አውርድ  
-  </button>  
-</div>
+  return null;
+}
 
-  </div>    <div class="card">  
-    <div class="tablewrap">  
-      <table>  
-        <thead>  
-          <tr>  
-            <th>ስም</th>  
-            <th>ክፍል</th>  
-            <th>ሁኔታ</th>  
-          </tr>  
-        </thead>  
-        <tbody id="at"></tbody>  
-      </table>  
-    </div>  
-  </div>  
-</section>  <!-- CLASSES -->  <section class="page" id="classesPage">    <div class="card">  
-    <h2>🏫 ክፍሎች</h2>  <form id="cf">  
-  <input id="cold" type="hidden">  
+function etDate(iso) {
+  if (!iso) return "";
 
-  <label>የክፍል ስም</label>  
-  <input id="cn" required>  
+  const parts = iso.split("-").map(Number);
+  const ethiopian = ethiopianParts(
+    new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]))
+  );
 
-  <div class="actions">  
-    <button class="primary">ክፍል አስቀምጥ</button>  
-    <button type="button" onclick="cf.reset();cold.value=''">  
-      አጽዳ  
-    </button>  
-  </div>  
-</form>
+  if (!ethiopian) return iso;
 
-  </div>    <div class="card">  
-    <div id="clist"></div>  
-  </div>  
-</section>  <!-- REPORTS -->  <section class="page" id="reportsPage">    <div class="card">  
-    <h2>📊 ወርሃዊ ሪፖርት</h2>  <div class="row">  
-  <div>  
-    <label>ወር</label>  
-    <input id="month" type="month">  
-  </div>  
+  return `${String(ethiopian.d).padStart(2, "0")}/` +
+         `${String(ethiopian.m).padStart(2, "0")}/` +
+         `${ethiopian.y}`;
+}
 
-  <div>  
-    <label>ክፍል</label>  
-    <select id="rg"></select>  
-  </div>  
-</div>  
+function todayEt() {
+  return etDate(new Date().toISOString().slice(0, 10));
+}
 
-<div class="actions">  
-  <button class="primary" onclick="report()">  
-    ሪፖርት አሳይ  
-  </button>  
+function fillClassSelects() {
+  ["attClass", "studentClass"].forEach(id => {
+    $(id).innerHTML = classes.map(c =>
+      `<option value="${esc(c)}">${esc(c)}</option>`
+    ).join("");
+  });
 
-  <button onclick="printReport()">  
-    🖨️ Print / PDF  
-  </button>  
+  $("attClass").insertAdjacentHTML(
+    "afterbegin",
+    '<option value="__ALL__">ሁሉም ክፍሎች</option>'
+  );
 
-  <button onclick="exportCSV('report')">  
-    Excel/CSV  
-  </button>  
-</div>
+  $("attClass").value = "__ALL__";
+}
 
-  </div>    <div class="card">  
-    <div class="grid" id="rsum"></div>  <div class="tablewrap">  
-  <table>  
-    <thead>  
-      <tr>  
-        <th>ስም</th>  
-        <th>P</th>  
-        <th>A</th>  
-        <th>L</th>  
-        <th>E</th>  
-        <th>ቀናት</th>  
-        <th>ተሳትፎ %</th>  
-      </tr>  
-    </thead>  
-    <tbody id="rt"></tbody>  
-  </table>  
-</div>
+function fillReportStudents() {
+  $("reportStudent").innerHTML =
+    '<option value="__ALL__">ሁሉም ተማሪዎች</option>' +
+    students.map(s =>
+      `<option value="${esc(s.id)}">${esc(s.name)}</option>`
+    ).join("");
+}
 
-  </div>  
-</section>  <!-- SETTINGS -->  <section class="page" id="settingsPage">    <div class="card">  
-    <h2>⚙️ Settings</h2>  <button class="primary" onclick="changePassword()">  
-  🔐 የይለፍ ቃል ቀይር  
-</button>  
+function showStudents() {
+  const query = ($("studentSearch").value || "").trim().toLowerCase();
 
-<button onclick="showPage('classesPage')">  
-  🏫 ክፍሎች  
-</button>
+  const visible = students.filter(s =>
+    [s.name, s.phone, s.className].some(value =>
+      String(value || "").toLowerCase().includes(query)
+    )
+  );
 
-  </div>    <div class="card">  
-    <h3>💾 Backup & Restore</h3>  <div class="actions">  
-  <button class="primary" onclick="backupData()">  
-    Backup አውርድ  
-  </button>  
+  $("studentsTable").innerHTML =
+    '<table><thead><tr>' +
+    '<th>#</th><th>ሙሉ ስም</th><th>ክፍል</th>' +
+    '<th>ስልክ</th><th>ሰርዝ</th>' +
+    '</tr></thead><tbody>' +
 
-  <button onclick="document.getElementById('restore').click()">  
-    Backup መልስ  
-  </button>  
+    visible.map((s, i) =>
+      `<tr>
+        <td>${i + 1}</td>
+        <td>${esc(s.name)}</td>
+        <td>${esc(s.className || "")}</td>
+        <td>${esc(s.phone || "")}</td>
+        <td><button class="danger" data-del-student="${esc(s.id)}">ሰርዝ</button></td>
+      </tr>`
+    ).join("") +
 
-  <input  
-    class="hidden"  
-    id="restore"  
-    type="file"  
-    accept=".json,application/json"  
-  >  
-</div>  
+    "</tbody></table>";
 
-<p class="muted">  
-  መረጃዎች በዚህ ስልክ ውስጥ ይቀመጣሉ።  
-</p>
+  fillReportStudents();
+}
 
-  </div>    <div class="card">  
-    <button class="danger" onclick="lockApp()">  
-      🔒 አሁን ቆልፍ  
-    </button>  
-  </div>  
-</section>  </main>  <!-- BOTTOM NAVIGATION -->  <nav class="bottom" id="nav">    <button class="active" data-p="homePage" onclick="showPage('homePage')">  
-    <span class="ico">🏠</span>Home  
-  </button>    <button data-p="studentsPage" onclick="showPage('studentsPage')">  
-    <span class="ico">👨‍🎓</span>ተማሪ  
-  </button>    <button data-p="attendancePage" onclick="showPage('attendancePage')">  
-    <span class="ico">📝</span>Attendance  
-  </button>    <button data-p="reportsPage" onclick="showPage('reportsPage')">  
-    <span class="ico">📊</span>Reports  
-  </button>    <button data-p="settingsPage" onclick="showPage('settingsPage')">  
-    <span class="ico">⚙️</span>Settings  
-  </button>  </nav>  <script>  
-const $ = id => document.getElementById(id);  
-  
-const K = {  
-  s:'ss_students',  
-  a:'ss_attendance',  
-  c:'ss_classes',  
-  l:'ss_language'  
-};  
-  
-function read(k,d) {  
-  try {  
-    return JSON.parse(localStorage.getItem(k)) ?? d;  
-  } catch(e) {  
-    return d;  
-  }  
-}  
-  
-let students = read(K.s,[]);  
-let attendance = read(K.a,{});  
-let classes = read(K.c,[  
-  'አንደኛ ክፍል',  
-  'ሁለተኛ ክፍል',  
-  'ሶስተኛ ክፍል'  
-]);  
-  
-if(!Array.isArray(students)) students=[];  
-if(!attendance || typeof attendance!=='object' || Array.isArray(attendance)) attendance={};  
-if(!Array.isArray(classes)) classes=[];  
-  
-classes=[...new Set(classes.filter(Boolean))];  
-  
-/* Local date: avoids UTC date shifting */  
-function localDate(d=new Date()) {  
-  const year=d.getFullYear();  
-  const month=String(d.getMonth()+1).padStart(2,'0');  
-  const day=String(d.getDate()).padStart(2,'0');  
-  return `${year}-${month}-${day}`;  
-}  
-  
-const today=localDate();  
-  
-$('today').textContent=today;  
-$('adate').value=today;  
-$('month').value=today.slice(0,7);  
-  
-/* Save data in local storage */  
-function save() {  
-  localStorage.setItem(K.s,JSON.stringify(students));  
-  localStorage.setItem(K.a,JSON.stringify(attendance));  
-  localStorage.setItem(K.c,JSON.stringify(classes));  
-}  
-  
-/* Protect text displayed in HTML */  
-function esc(x) {  
-  return String(x??'').replace(/[&<>"']/g,c=>({  
-    '&':'&amp;',  
-    '<':'&lt;',  
-    '>':'&gt;',  
-    '"':'&quot;',  
-    "'":'&#39;'  
-  }[c]));  
-}  
-  
-/* Navigation */  
-function showPage(id) {  
-  document.querySelectorAll('.page').forEach(x=>{  
-    x.classList.toggle('active',x.id===id);  
-  });  
-  
-  document.querySelectorAll('.bottom button').forEach(x=>{  
-    x.classList.toggle('active',x.dataset.p===id);  
-  });  
-  
-  refresh();  
-  window.scrollTo(0,0);  
-}  
-  
-/* Refresh app */  
-function refresh() {  
-  groups();  
-  renderStudents();  
-  renderClasses();  
-  renderAttendance();  
-  home();  
-  report();  
-}  
-  
-/* Class dropdowns */  
-function groups() {  
-  ['sg','ag','rg'].forEach(id=>{  
-    let el=$(id);  
-    let old=el.value;  
-  
-    el.innerHTML=  
-      (id==='sg'  
-        ? '<option value="">ክፍል ይምረጡ</option>'  
-        : '<option value="">ሁሉም ክፍሎች</option>'  
-      )+  
-      classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');  
-  
-    if([...el.options].some(o=>o.value===old)) {  
-      el.value=old;  
-    }  
-  });  
-}  
-  
-/* Home dashboard */  
-function home() {  
-  let d=attendance[today]||{};  
-  
-  $('hs').textContent=students.length;  
-  $('hc').textContent=classes.length;  
-  
-  $('hp').textContent=students.filter(s=>d[s.id]==='P').length;  
-  $('ha').textContent=students.filter(s=>d[s.id]==='A').length;  
-}  
-  
-/* Student form */  
-function resetSF() {  
-  $('sf').reset();  
-  $('sid').value='';  
-}  
-  
-/* Add or update student */  
-$('sf').addEventListener('submit',e=>{  
-  e.preventDefault();  
-  
-  let id=$('sid').value||String(Date.now());  
-  
-  let obj={  
-    id,  
-    name:$('sn').value.trim(),  
-    group:$('sg').value,  
-    phone:$('sp').value,  
-    age:$('sa').value,  
-    gender:$('sgen').value,  
-    parentName:$('sparent').value,  
-    parentPhone:$('spp').value  
-  };  
-  
-  let i=students.findIndex(s=>String(s.id)===String(id));  
-  
-  if(i<0) students.push(obj);  
-  else students[i]=obj;  
-  
-  save();  
-  resetSF();  
-  refresh();  
-});  
-  
-/* Student list and search */  
-function renderStudents() {  
-  let q=$('search').value.toLowerCase();  
-  
-  let a=students.filter(s=>  
-    [s.name,s.group,s.phone].some(v=>  
-      String(v||'').toLowerCase().includes(q)  
-    )  
-  );  
-  
-  $('sCount').textContent=`ጠቅላላ ${students.length} | የታዩ ${a.length}`;  
-  
-  $('st').innerHTML=a.map((s,i)=>`  
-    <tr>  
-      <td>${i+1}</td>  
-      <td>${esc(s.name)}</td>  
-      <td>${esc(s.group)}</td>  
-      <td>${esc(s.phone)}</td>  
-      <td>${esc(s.age)}</td>  
-      <td>  
-        <button onclick="editS('${esc(s.id)}')">Edit</button>  
-        <button class="danger" onclick="delS('${esc(s.id)}')">Delete</button>  
-      </td>  
-    </tr>  
-  `).join('') || '<tr><td colspan="6">ተማሪ የለም</td></tr>';  
-}  
-  
-function editS(id) {  
-  let s=students.find(x=>String(x.id)===String(id));  
-  if(!s) return;  
-  
-  $('sid').value=s.id;  
-  $('sn').value=s.name||'';  
-  $('sg').value=s.group||'';  
-  $('sp').value=s.phone||'';  
-  $('sa').value=s.age||'';  
-  $('sgen').value=s.gender||'';  
-  $('sparent').value=s.parentName||'';  
-  $('spp').value=s.parentPhone||'';  
-  
-  showPage('studentsPage');  
-}  
-  
-function delS(id) {  
-  if(confirm('ተማሪውን ማጥፋት ይፈልጋሉ?')) {  
-    students=students.filter(s=>String(s.id)!==String(id));  
-    save();  
-    refresh();  
-  }  
-}  
-  
-$('search').addEventListener('input',renderStudents);  
-  
-/* Classes */  
-$('cf').addEventListener('submit',e=>{  
-  e.preventDefault();  
-  
-  let n=$('cn').value.trim();  
-  let old=$('cold').value;  
-  
-  if(!n) return;  
-  
-  if(classes.includes(n)&&n!==old) {  
-    alert('ክፍሉ አስቀድሞ አለ');  
-    return;  
-  }  
-  
-  if(old) {  
-    classes=classes.map(c=>c===old?n:c);  
-  
-    students.forEach(s=>{  
-      if(s.group===old) s.group=n;  
-    });  
-  } else {  
-    classes.push(n);  
-  }  
-  
-  classes=[...new Set(classes)];  
-  
-  $('cf').reset();  
-  $('cold').value='';  
-  
-  save();  
-  refresh();  
-});  
-  
-function renderClasses() {  
-  $('clist').innerHTML=classes.map((c,i)=>`  
-    <p>  
-      ${esc(c)}  
-      (${students.filter(s=>s.group===c).length} ተማሪ)  
-  
-      <button onclick="editC(${i})">Edit</button>  
-  
-      <button class="danger" onclick="delC(${i})">Delete</button>  
-    </p>  
-  `).join('') || 'ክፍል የለም';  
-}  
-  
-function editC(i) {  
-  $('cold').value=classes[i];  
-  $('cn').value=classes[i];  
-}  
-  
-function delC(i) {  
-  if(confirm('ክፍሉን ማጥፋት ይፈልጋሉ?')) {  
-    classes.splice(i,1);  
-    save();  
-    refresh();  
-  }  
-}  
-  
-/* Attendance list with colored P/A/L/E letters */  
-function renderAttendance() {  
-  let date=$('adate').value||today;  
-  let g=$('ag').value;  
-  let d=attendance[date]||{};  
-  
-  let a=students.filter(s=>!g||s.group===g);  
-  
-  $('at').innerHTML=a.map(s=>{  
-    let v=d[s.id]||'';  
-  
-    return `  
-      <tr>  
-        <td>${esc(s.name)}</td>  
-        <td>${esc(s.group)}</td>  
-        <td>  
-          <select  
-            class="status-select status-${v}"  
-            data-id="${esc(s.id)}"  
-            aria-label="Attendance status for ${esc(s.name)}"  
-            onchange="this.className='status-select status-'+this.value"  
-          >  
-            <option value="" ${v===''?'selected':''}>—</option>  
-            <option value="P" ${v==='P'?'selected':''}>P</option>  
-            <option value="A" ${v==='A'?'selected':''}>A</option>  
-            <option value="L" ${v==='L'?'selected':''}>L</option>  
-            <option value="E" ${v==='E'?'selected':''}>E</option>  
-          </select>  
-        </td>  
-      </tr>  
-    `;  
-  }).join('') || '<tr><td colspan="3">ተማሪ አልተመዘገበም</td></tr>';  
-}  
-  
-$('adate').addEventListener('change',renderAttendance);  
-$('ag').addEventListener('change',renderAttendance);  
-  
-/* Save attendance */  
-function saveAttendance() {  
-  let date=$('adate').value;  
-  
-  if(!date) {  
-    alert('ቀን ይምረጡ');  
-    return;  
-  }  
-  
-  attendance[date]=attendance[date]||{};  
-  
-  document.querySelectorAll('#at select').forEach(x=>{  
-    if(x.value) {  
-      attendance[date][x.dataset.id]=x.value;  
-    } else {  
-      delete attendance[date][x.dataset.id];  
-    }  
-  });  
-  
-  save();  
-  refresh();  
-  
-  alert('Attendance ተቀምጧል');  
-}  
-  
-/* Mark all students in selected class as present */  
-function markAll() {  
-  document.querySelectorAll('#at select').forEach(x=>{  
-    x.value='P';  
-    x.className='status-select status-P';  
-  });  
-  
-  saveAttendance();  
-}  
-  
-/* Monthly report calculations */  
-function getCounts(s,month) {  
-  let c={P:0,A:0,L:0,E:0};  
-  
-  Object.keys(attendance)  
-    .filter(d=>d.startsWith(month))  
-    .forEach(d=>{  
-      let v=attendance[d]&&attendance[d][s.id];  
-  
-      if(c[v]!==undefined) c[v]++;  
-    });  
-  
-  return c;  
-}  
-  
-function report() {  
-  let m=$('month').value||today.slice(0,7);  
-  let g=$('rg').value;  
-  let all={P:0,A:0,L:0,E:0};  
-  
-  let a=students.filter(s=>!g||s.group===g);  
-  
-  $('rt').innerHTML=a.map(s=>{  
-    let c=getCounts(s,m);  
-  
-    Object.keys(all).forEach(k=>all[k]+=c[k]);  
-  
-    let n=c.P+c.A+c.L+c.E;  
-  
-    /* Present and Late count as attendance */  
-    let p=n?Math.round((c.P+c.L)*100/n):0;  
-  
-    return `  
-      <tr>  
-        <td>${esc(s.name)}</td>  
-        <td>${c.P}</td>  
-        <td>${c.A}</td>  
-        <td>${c.L}</td>  
-        <td>${c.E}</td>  
-        <td>${n}</td>  
-        <td>  
-          <b>${p}%</b>  
-          <div class="progress">  
-            <span style="width:${p}%"></span>  
-          </div>  
-        </td>  
-      </tr>  
-    `;  
-  }).join('') || '<tr><td colspan="7">መረጃ የለም</td></tr>';  
-  
-  $('rsum').innerHTML=Object.keys(all).map(k=>`  
-    <div class="stat">  
-      <strong>${all[k]}</strong>  
-      <span>${k}</span>  
-    </div>  
-  `).join('');  
-}  
-  
-$('month').addEventListener('change',report);  
-$('rg').addEventListener('change',report);  
-  
-/* Print report */  
-function printReport() {  
-  window.print();  
-}  
-  
-/* Download files through Android bridge or browser */  
-function dl(name,text,type) {  
-  if(window.Android && typeof Android.saveTextFile==='function') {  
-    Android.saveTextFile(name,text,type);  
-    return;  
-  }  
-  
-  let u=URL.createObjectURL(  
-    new Blob(['\ufeff',text],{type})  
-  );  
-  
-  let a=document.createElement('a');  
-  a.href=u;  
-  a.download=name;  
-  a.click();  
-  
-  setTimeout(()=>URL.revokeObjectURL(u),1000);  
-}  
-  
-function csv(v) {  
-  return '"'+String(v??'').replace(/"/g,'""')+'"';  
-}  
-  
-/* Export CSV files */  
-function exportCSV(type) {  
-  let rows=[];  
-  let name;  
-  
-  if(type==='students') {  
-    name='students.csv';  
-  
-    rows=[  
-      ['No','ID','Name','Class','Phone','Age','Gender','Parent Name','Parent Phone'],  
-  
-      ...students.map((s,i)=>[  
-        i+1,s.id,s.name,s.group,s.phone,s.age,  
-        s.gender,s.parentName,s.parentPhone  
-      ])  
-    ];  
-  
-  } else if(type==='attendance') {  
-    let d=$('adate').value||today;  
-    let day=attendance[d]||{};  
-  
-    name='attendance_'+d+'.csv';  
-  
-    rows=[  
-      ['Date','ID','Name','Class','Status'],  
-  
-      ...students.map(s=>[  
-        d,s.id,s.name,s.group,day[s.id]||'Not marked'  
-      ])  
-    ];  
-  
-  } else {  
-    let m=$('month').value||today.slice(0,7);  
-  
-    name='report_'+m+'.csv';  
-  
-    rows=[  
-      ['Name','Class','Present','Absent','Late','Permission','Marked Days','Attendance %'],  
-  
-      ...students  
-        .filter(s=>!$('rg').value||s.group===$('rg').value)  
-        .map(s=>{  
-          let c=getCounts(s,m);  
-          let n=c.P+c.A+c.L+c.E;  
-  
-          return [  
-            s.name,  
-            s.group,  
-            c.P,  
-            c.A,  
-            c.L,  
-            c.E,  
-            n,  
-            (n?Math.round((c.P+c.L)*100/n):0)+'%'  
-          ];  
-        })  
-    ];  
-  }  
-  
-  dl(  
-    name,  
-    rows.map(r=>r.map(csv).join(',')).join('\r\n'),  
-    'text/csv;charset=utf-8'  
-  );  
-}  
-  
-/* Backup all app data */  
-function backupData() {  
-  dl(  
-    'sunday_school_backup.json',  
-    JSON.stringify({  
-      version:2,  
-      students,  
-      attendance,  
-      classes  
-    },null,2),  
-    'application/json'  
-  );  
-}  
-  
-/* Restore backup */  
-$('restore').addEventListener('change',e=>{  
-  let f=e.target.files[0];  
-  
-  if(!f) return;  
-  
-  let r=new FileReader();  
-  
-  r.onload=()=>{  
-    try {  
-      let d=JSON.parse(r.result);  
-  
-      if(  
-        !Array.isArray(d.students) ||  
-        !d.attendance ||  
-        !Array.isArray(d.classes)  
-      ) {  
-        throw new Error('Invalid backup');  
-      }  
-  
-      if(!confirm('Backup አሁን ያለውን መረጃ ይተካል። ቀጥል?')) {  
-        return;  
-      }  
-  
-      students=d.students;  
-      attendance=d.attendance;  
-      classes=d.classes;  
-  
-      save();  
-      refresh();  
-  
-      alert('Backup ተመልሷል');  
-  
-    } catch(e) {  
-      alert('Backup ፋይሉ ትክክል አይደለም');  
-    }  
-  };  
-  
-  r.readAsText(f);  
-  e.target.value='';  
-});  
-  
+function showClasses() {
+  $("classesTable").innerHTML =
+    '<table><thead><tr><th>የክፍል ስም</th>' +
+    '<th>ተማሪዎች</th><th>ሰርዝ</th></tr></thead><tbody>' +
 
-  
-/* Start application */  
-refresh();  
+    classes.map(c =>
+      `<tr>
+        <td>${esc(c)}</td>
+        <td>${students.filter(s => s.className === c).length}</td>
+        <td><button class="danger" data-del-class="${esc(c)}">ሰርዝ</button></td>
+      </tr>`
+    ).join("") +
 
-</script>  </body>  
+    "</tbody></table>";
+}
+
+function drawAttendance() {
+  const selectedClass = $("attClass").value;
+  const iso = toISO($("attDate").value);
+
+  if (!iso) {
+    $("attendanceTable").innerHTML =
+      '<p class="notice">እባክዎ ቀኑን በትክክል ያስገቡ።</p>';
+    return;
+  }
+
+  const list = students.filter(s =>
+    selectedClass === "__ALL__" ||
+    s.className === selectedClass
+  );
+
+  if (!list.length) {
+    $("attendanceTable").innerHTML =
+      "<p>ተማሪ አልተመዘገበም። መጀመሪያ ተማሪ ይመዝገቡ።</p>";
+    return;
+  }
+
+  const day = attendance[iso] || {};
+
+  let html =
+    '<table><thead><tr><th>#</th><th>ስም</th><th>ክፍል</th>' +
+    '<th>P</th><th>A</th><th>L</th><th>E</th></tr></thead><tbody>';
+
+  list.forEach((s, i) => {
+    const current = day[s.id] || "";
+
+    html += `<tr>
+      <td>${i + 1}</td>
+      <td>${esc(s.name)}</td>
+      <td>${esc(s.className || "")}</td>`;
+
+    ["P", "A", "L", "E"].forEach(status => {
+      html += `<td class="status ${status}">
+        <input type="radio"
+          name="status_${esc(s.id)}"
+          value="${status}"
+          aria-label="${status}"
+          ${current === status ? "checked" : ""}>
+      </td>`;
+    });
+
+    html += "</tr>";
+  });
+
+  html += "</tbody></table>";
+  $("attendanceTable").innerHTML = html;
+}
+
+function report() {
+  const from = toISO($("fromDate").value);
+  const to = toISO($("toDate").value);
+
+  if (!from || !to || from > to) {
+    $("reportResult").innerHTML =
+      '<p class="notice">እባክዎ ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።</p>';
+    return;
+  }
+
+  const dates = Object.keys(attendance)
+    .filter(d => d >= from && d <= to &&
+      Object.keys(attendance[d] || {}).length)
+    .sort();
+
+  const studentId = $("reportStudent").value;
+
+  const list = students.filter(s =>
+    studentId === "__ALL__" || String(s.id) === studentId
+  );
+
+  const totals = { P: 0, A: 0, L: 0, E: 0 };
+
+  let html =
+    `<p>ከ ${etDate(from)} እስከ ${etDate(to)}</p>` +
+    '<div class="table-wrap"><table><thead><tr>' +
+    '<th>ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th>' +
+    '<th>L</th><th>E</th><th>ተሳትፎ %</th>' +
+    '</tr></thead><tbody>';
+
+  const csvRows = [
+    ["Name", "Class", "Present", "Absent", "Late", "Permission", "Participation %"]
+  ];
+
+  list.forEach(s => {
+    const counts = { P: 0, A: 0, L: 0, E: 0 };
+
+    dates.forEach(d => {
+      const status = attendance[d]?.[s.id];
+      if (counts[status] !== undefined) counts[status]++;
+    });
+
+    Object.keys(totals).forEach(k => totals[k] += counts[k]);
+
+    const marked = Object.values(counts).reduce((a, b) => a + b, 0);
+    const percent = marked
+      ? Math.round((counts.P + counts.L) / marked * 100)
+      : 0;
+
+    html += `<tr>
+      <td>${esc(s.name)}</td>
+      <td>${esc(s.className || "")}</td>
+      <td>${counts.P}</td>
+      <td>${counts.A}</td>
+      <td>${counts.L}</td>
+      <td>${counts.E}</td>
+      <td>${percent}%</td>
+    </tr>`;
+
+    csvRows.push([
+      s.name, s.className || "",
+      counts.P, counts.A, counts.L, counts.E, percent
+    ]);
+  });
+
+  html += "</tbody></table></div>";
+  html += "<h3>ጠቅላላ ውጤት</h3>";
+  html += '<div class="table-wrap"><table><thead><tr>' +
+          '<th>ሁኔታ</th><th>ጠቅላላ</th></tr></thead><tbody>';
+
+  Object.keys(totals).forEach(k => {
+    html += `<tr>
+      <td class="${k}">${k} - ${statusLabels[k]}</td>
+      <td>${totals[k]}</td>
+    </tr>`;
+  });
+
+  html += "</tbody></table></div>";
+
+  $("reportResult").innerHTML = html;
+  window.lastReportCSV = csvRows;
+}
+
+function renderStatistics() {
+  const counts = { P: 0, A: 0, L: 0, E: 0 };
+
+  Object.values(attendance).forEach(day => {
+    Object.values(day || {}).forEach(status => {
+      if (counts[status] !== undefined) counts[status]++;
+    });
+  });
+
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const percent = total
+    ? Math.round((counts.P + counts.L) * 100 / total)
+    : 0;
+
+  $("statistics").innerHTML = `
+    <div class="grid">
+      <div class="stat"><b>${students.length}</b>ጠቅላላ ተማሪዎች</div>
+      <div class="stat"><b>${counts.P}</b>ተገኝተዋል (P)</div>
+      <div class="stat"><b>${counts.A}</b>ቀርተዋል (A)</div>
+      <div class="stat"><b>${counts.L}</b>ዘግይተዋል (L)</div>
+      <div class="stat"><b>${counts.E}</b>ፈቃድ (E)</div>
+      <div class="stat"><b>${percent}%</b>አጠቃላይ ተሳትፎ</div>
+    </div>`;
+}
+
+function renderCalendar() {
+  const month = $("calendarMonth").value;
+
+  if (!month) {
+    $("calendarResult").innerHTML = "<p>ወር ይምረጡ።</p>";
+    return;
+  }
+
+  const dates = Object.keys(attendance)
+    .filter(d => d.startsWith(month))
+    .sort();
+
+  if (!dates.length) {
+    $("calendarResult").innerHTML =
+      "<p>በዚህ ወር የተመዘገበ ቀረቤታ የለም።</p>";
+    return;
+  }
+
+  let html =
+    '<table><thead><tr><th>ቀን</th><th>P</th><th>A</th>' +
+    '<th>L</th><th>E</th><th>ተሳትፎ %</th>' +
+    '</tr></thead><tbody>';
+
+  dates.forEach(date => {
+    const counts = { P: 0, A: 0, L: 0, E: 0 };
+
+    Object.values(attendance[date] || {}).forEach(status => {
+      if (counts[status] !== undefined) counts[status]++;
+    });
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    const percent = total
+      ? Math.round((counts.P + counts.L) * 100 / total)
+      : 0;
+
+    html += `<tr>
+      <td>${etDate(date)}</td>
+      <td>${counts.P}</td>
+      <td>${counts.A}</td>
+      <td>${counts.L}</td>
+      <td>${counts.E}</td>
+      <td>${percent}%</td>
+    </tr>`;
+  });
+
+  $("calendarResult").innerHTML = html + "</tbody></table>";
+}
+
+function downloadBlob(blob, filename) {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+
+/* Navigation */
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(b =>
+      b.classList.remove("active")
+    );
+
+    button.classList.add("active");
+
+    document.querySelectorAll(".page").forEach(page =>
+      page.classList.add("hidden")
+    );
+
+    $(button.dataset.page).classList.remove("hidden");
+
+    if (button.dataset.page === "students") showStudents();
+    if (button.dataset.page === "classes") showClasses();
+
+    if (button.dataset.page === "reports") {
+      fillReportStudents();
+      renderStatistics();
+    }
+
+    if (button.dataset.page === "calendar") renderCalendar();
+  });
+});
+
+/* Add a class */
+$("addClass").onclick = () => {
+  const name = $("className").value.trim();
+
+  if (!name) return alert("የክፍል ስም ያስገቡ");
+  if (classes.includes(name)) return alert("ይህ ክፍል አስቀድሞ አለ");
+
+  classes.push(name);
+  saveAll();
+
+  $("className").value = "";
+
+  fillClassSelects();
+  showClasses();
+};
+
+/* Register a student */
+$("addStudent").onclick = () => {
+  const name = $("studentName").value.trim();
+
+  if (!name) return alert("የተማሪ ስም ያስገቡ");
+
+  students.push({
+    id: "s" + Date.now() + Math.random().toString(16).slice(2, 6),
+    name,
+    className: $("studentClass").value,
+    phone: $("studentPhone").value.trim()
+  });
+
+  saveAll();
+
+  $("studentName").value = "";
+  $("studentPhone").value = "";
+
+  showStudents();
+  drawAttendance();
+};
+
+/* Delete students and classes */
+document.addEventListener("click", event => {
+  const studentId = event.target.dataset.delStudent;
+  const className = event.target.dataset.delClass;
+
+  if (studentId) {
+    if (!confirm("ይህን ተማሪ ከመዝገብ ልሰርዝ?")) return;
+
+    students = students.filter(s => String(s.id) !== studentId);
+
+    Object.values(attendance).forEach(day => {
+      delete day[studentId];
+    });
+
+    saveAll();
+    showStudents();
+    drawAttendance();
+  }
+
+  if (className) {
+    if (students.some(s => s.className === className)) {
+      return alert("በዚህ ክፍል ተማሪ አለ። መጀመሪያ ተማሪዎቹን ወደ ሌላ ክፍል ያዛውሩ።");
+    }
+
+    if (!confirm("ክፍሉን ልሰርዝ?")) return;
+
+    classes = classes.filter(c => c !== className);
+
+    saveAll();
+    fillClassSelects();
+    showClasses();
+  }
+});
+
+/* Search students */
+$("studentSearch").addEventListener("input", showStudents);
+
+/* Attendance controls */
+$("loadAtt").onclick = drawAttendance;
+
+$("attDate").addEventListener("change", drawAttendance);
+$("attClass").addEventListener("change", drawAttendance);
+
+$("allPresent").onclick = () => {
+  document.querySelectorAll(
+    '#attendanceTable input[type="radio"][value="P"]'
+  ).forEach(input => input.checked = true);
+};
+
+$("saveAtt").onclick = () => {
+  const iso = toISO($("attDate").value);
+
+  if (!iso) return alert("ቀኑን በትክክል ያስገቡ");
+
+  const day = attendance[iso] || {};
+
+  document.querySelectorAll(
+    '#attendanceTable input[type="radio"]:checked'
+  ).forEach(input => {
+    const id = input.name.slice(7);
+    day[id] = input.value;
+  });
+
+  attendance[iso] = day;
+
+  saveAll();
+  renderStatistics();
+  renderCalendar();
+
+  alert("ቀረቤታው ተቀምጧል።");
+};
+
+/* Reports */
+$("makeReport").onclick = report;
+
+$("printReport").onclick = () => {
+  if (!$("reportResult").innerHTML) report();
+  window.print();
+};
+
+$("csvReport").onclick = () => {
+  if (!window.lastReportCSV) report();
+  if (!window.lastReportCSV) return;
+
+  const csv = window.lastReportCSV
+    .map(row => row.map(value =>
+      '"' + String(value).replace(/"/g, '""') + '"'
+    ).join(","))
+    .join("\r\n");
+
+  downloadBlob(
+    new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" }),
+    "attendance-report.csv"
+  );
+};
+
+/* Calendar */
+$("calendarMonth").value = new Date().toISOString().slice(0, 7);
+$("calendarMonth").addEventListener("change", renderCalendar);
+
+/* Backup */
+$("backupBtn").onclick = () => {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    students,
+    attendance,
+    classes
+  };
+
+  downloadBlob(
+    new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json"
+    }),
+    "sunday-school-backup.json"
+  );
+
+  $("backupMessage").textContent = "Backup ፋይል ተዘጋጅቷል።";
+};
+
+/* Restore */
+$("restoreFile").onchange = async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    const data = JSON.parse(await file.text());
+
+    if (
+      !Array.isArray(data.students) ||
+      !data.attendance ||
+      !Array.isArray(data.classes)
+    ) {
+      throw new Error("Invalid backup");
+    }
+
+    if (!confirm("የአሁኑን መረጃ በBackup መረጃ መተካት ይፈልጋሉ?")) {
+      return;
+    }
+
+    students = data.students;
+    attendance = data.attendance;
+    classes = data.classes;
+
+    saveAll();
+    fillClassSelects();
+    showStudents();
+    showClasses();
+    drawAttendance();
+    renderStatistics();
+    renderCalendar();
+
+    $("backupMessage").textContent = "Restore ተሳክቷል።";
+  } catch (error) {
+    $("backupMessage").textContent =
+      "ፋይሉ ትክክለኛ Backup አይደለም።";
+  }
+};
+
+/* Password */
+async function hashPassword(text) {
+  if (crypto && crypto.subtle) {
+    const buffer = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(text)
+    );
+
+    return Array.from(new Uint8Array(buffer))
+      .map(byte => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  return "plain:" + text;
+}
+
+$("setPassword").onclick = async () => {
+  const password = $("newPassword").value;
+
+  if (password.length < 4) {
+    return alert("የይለፍ ቃሉ ቢያንስ 4 ቁምፊ ይሁን");
+  }
+
+  localStorage.setItem(
+    K.password,
+    await hashPassword(password)
+  );
+
+  $("newPassword").value = "";
+  alert("የይለፍ ቃሉ ተቀምጧል።");
+};
+
+$("lockNow").onclick = () => {
+  if (!localStorage.getItem(K.password)) {
+    return alert("መጀመሪያ የይለፍ ቃል ያዘጋጁ።");
+  }
+
+  $("lockScreen").classList.remove("hidden");
+  $("lockScreen").style.display = "flex";
+};
+
+$("unlockBtn").onclick = async () => {
+  const saved = localStorage.getItem(K.password);
+  const entered = $("unlockPassword").value;
+  const hashed = await hashPassword(entered);
+
+  if (saved === hashed || saved === "plain:" + entered) {
+    $("lockScreen").style.display = "none";
+    $("lockScreen").classList.add("hidden");
+    $("unlockPassword").value = "";
+    $("unlockMessage").textContent = "";
+  } else {
+    $("unlockMessage").textContent = "የይለፍ ቃሉ ትክክል አይደለም።";
+  }
+};
+
+/* Start application */
+$("attDate").value = todayEt();
+$("fromDate").value = todayEt();
+$("toDate").value = todayEt();
+
+fillClassSelects();
+showStudents();
+showClasses();
+fillReportStudents();
+drawAttendance();
+renderStatistics();
+renderCalendar();
+
+})();
+</script>
+
+</body>
 </html>
