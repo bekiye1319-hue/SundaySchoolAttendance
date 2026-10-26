@@ -518,39 +518,53 @@ function renderMonthlyReport() {
 
 function exportCSV(type) {
   let rows = [];
-  if(type === "students") {
+
+  if (type === "students") {
     rows.push(["ID","Name","Class","Phone","Age","Parent Name","Parent Phone","Gender"]);
+
     students.forEach(s => rows.push([
-      s.id,s.name,s.group || "",s.phone || "",s.age || "",
-      s.parentName || "",s.parentPhone || "",s.gender || ""
+      s.id, s.name, s.group || "", s.phone || "", s.age || "",
+      s.parentName || "", s.parentPhone || "", s.gender || ""
     ]));
   } else {
     const month = document.getElementById("reportMonth").value;
     const d = document.getElementById("reportDate").value;
+
     rows.push(["Date","Name","Class","Status"]);
+
     const dates = type === "monthly"
       ? Object.keys(attendance).filter(x => x.startsWith(month)).sort()
       : [d];
+
     dates.forEach(date => {
       students.forEach(s => rows.push([
-        date,s.name,s.group || "",(attendance[date] || {})[s.id] || "Not marked"
+        date, s.name, s.group || "",
+        (attendance[date] || {})[s.id] || "Not marked"
       ]));
     });
   }
 
   const csv = "\uFEFF" + rows.map(r =>
-    r.map(v => '"' + String(v ?? "").replace(/"/g,'""') + '"').join(",")
+    r.map(v => '"' + String(v ?? "").replace(/"/g, '""') + '"').join(",")
   ).join("\r\n");
 
-  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = type + "-attendance-" + today() + ".csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url),1000);
+  const filename = type + "-attendance-" + today() + ".csv";
+
+  if (window.Android && typeof Android.saveTextFile === "function") {
+    Android.saveTextFile(filename, csv, "text/csv");
+  } else {
+    const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+  }
 }
 
 function backupData() {
