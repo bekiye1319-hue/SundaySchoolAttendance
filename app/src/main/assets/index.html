@@ -1,881 +1,1280 @@
-<!DOCTYPE html>
-<html lang="am">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ሰንበት ትምህርት ቤት</title>
-
-<style>
-:root {
-    --green: #167a45;
-    --blue: #1769aa;
-    --red: #b42318;
-    --bg: #f4f7f5;
-    --line: #d8e2dc;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    background: var(--bg);
-    color: #182522;
-    font-family: Arial, sans-serif;
-    font-size: 15px;
-}
-
-header {
-    background: var(--green);
-    color: white;
-    padding: 18px 12px;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0 0 6px;
-}
-
-nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px;
-    background: white;
-}
-
-button {
-    border: 0;
-    border-radius: 7px;
-    padding: 10px 13px;
-    background: var(--green);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-nav button {
-    background: #e8f1eb;
-    color: #174d32;
-}
-
-nav button.active {
-    background: var(--green);
-    color: white;
-}
-
-main {
-    max-width: 1100px;
-    margin: auto;
-    padding: 12px;
-}
-
-.panel {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 14px;
-}
-
-h2 {
-    color: var(--green);
-    font-size: 20px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 10px;
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-input, select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #bac9c0;
-    border-radius: 7px;
-    background: white;
-    font-size: 16px;
-}
-
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th, td {
-    padding: 8px;
-    border: 1px solid var(--line);
-    text-align: left;
-}
-
-th {
-    background: #edf4ef;
-}
-
-.table-wrap {
-    overflow-x: auto;
-}
-
-.P { color: green; }
-.A { color: #c62828; }
-.L { color: #1769aa; }
-.E { color: #8657a8; }
-
-.hidden {
-    display: none !important;
-}
-
-.small {
-    font-size: 13px;
-    color: #53635b;
-}
-
-.notice {
-    background: #fff7dc;
-    padding: 10px;
-    border-radius: 7px;
-    margin: 10px 0;
-}
-
-.danger {
-    background: var(--red);
-}
-
-.secondary {
-    background: var(--blue);
-}
-
-.light {
-    background: #e8f1eb;
-    color: #174d32;
-}
-
-.stat {
-    padding: 12px;
-    background: #edf5ef;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.stat b {
-    display: block;
-    font-size: 24px;
-    color: var(--green);
-}
-
-@media print {
-    nav, .no-print, button {
-        display: none !important;
-    }
-
-    body {
-        background: white;
-        font-size: 12px;
-    }
-
-    main {
-        max-width: none;
-        padding: 0;
-    }
-
-    .panel {
-        border: 0;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<header>
-    <h1>ሰንበት ትምህርት ቤት</h1>
-    <p>የተማሪ መዝገብ • የቀረቤታ መዝገብ • ሪፖርት</p>
-</header>
-
-<nav class="no-print">
-    <button class="active" data-page="attendance">ቀረቤታ</button>
-    <button data-page="students">ተማሪዎች</button>
-    <button data-page="classes">ክፍሎች</button>
-    <button data-page="reports">ሪፖርት</button>
-    <button data-page="backup">Backup / Restore</button>
-</nav>
-
-<main>
-
-<!-- ATTENDANCE -->
-<section id="attendance" class="page">
-<div class="panel">
-
-<h2>የቀረቤታ መዝገብ</h2>
-
-<div class="grid">
-    <div>
-        <label>ቀን (የኢትዮጵያ ዘመን)</label>
-        <input id="attDate" placeholder="01/02/2019">
-        <div class="small">ቅርጽ፦ ቀን/ወር/ዓመት</div>
-    </div>
-
-    <div>
-        <label>ክፍል</label>
-        <select id="attClass"></select>
-    </div>
-</div>
-
-<div class="row">
-    <button id="loadAtt">ተማሪዎችን አሳይ</button>
-    <button id="saveAtt">ቀረቤታ አስቀምጥ</button>
-    <button class="light" id="allPresent">ሁሉንም P አድርግ</button>
-</div>
-
-<div class="notice">
-    P = ተገኝቷል |
-    A = ቀርቷል |
-    L = ዘግይቷል |
-    E = ፈቃድ
-</div>
-
-<div id="attendanceTable" class="table-wrap"></div>
-
-</div>
-</section>
-
-<!-- STUDENTS -->
-<section id="students" class="page hidden">
-<div class="panel">
-
-<h2>ተማሪ መመዝገብ</h2>
-
-<div class="grid">
-    <div>
-        <label>ሙሉ ስም</label>
-        <input id="studentName" placeholder="የተማሪው ስም">
-    </div>
-
-    <div>
-        <label>ክፍል</label>
-        <select id="studentClass"></select>
-    </div>
-
-    <div>
-        <label>ስልክ (አማራጭ)</label>
-        <input id="studentPhone" placeholder="09...">
-    </div>
-</div>
-
-<div class="row">
-    <button id="addStudent">ተማሪ ጨምር</button>
-</div>
-
-<div id="studentsTable" class="table-wrap"></div>
-
-</div>
-</section>
-
-<!-- CLASSES -->
-<section id="classes" class="page hidden">
-<div class="panel">
-
-<h2>የክፍል አያያዝ</h2>
-
-<label>የክፍል ስም</label>
-<input id="className" placeholder="ለምሳሌ አንደኛ ክፍል">
-
-<div class="row">
-    <button id="addClass">ክፍል ጨምር</button>
-</div>
-
-<div id="classesTable" class="table-wrap"></div>
-
-</div>
-</section>
-
-<!-- REPORTS -->
-<section id="reports" class="page hidden">
-<div class="panel">
-
-<h2>የቀን ክልል ሪፖርት</h2>
-
-<div class="grid">
-    <div>
-        <label>ከ (የኢትዮጵያ ቀን)</label>
-        <input id="fromDate" placeholder="01/01/2019">
-    </div>
-
-    <div>
-        <label>እስከ (የኢትዮጵያ ቀን)</label>
-        <input id="toDate" placeholder="30/13/2019">
-    </div>
-
-    <div>
-        <label>ተማሪ</label>
-        <select id="reportStudent"></select>
-    </div>
-</div>
-
-<div class="row">
-    <button id="makeReport">ሪፖርት አውጣ</button>
-    <button class="secondary" id="printReport">Print / PDF</button>
-    <button class="light" id="csvReport">CSV አውርድ</button>
-</div>
-
-<div id="reportResult"></div>
-
-</div>
-</section>
-
-<!-- BACKUP -->
-<section id="backup" class="page hidden">
-<div class="panel">
-
-<h2>Backup / Restore</h2>
-
-<p>
-የተማሪዎችንና የቀረቤታ መረጃዎችን ለማስቀመጥ Backup ያውርዱ።
+<!doctype html>
+
+<html lang="am">  
+<head>  
+<meta charset="utf-8">  
+<meta name="viewport" content="width=device-width,initial-scale=1">  
+<meta name="theme-color" content="#123b66">  
+<title>ሰንበት ትምህርት ቤት</title>  <style>  
+:root {  
+  --b:#123b66;  
+  --b2:#24699e;  
+  --bg:#f2f6fa;  
+  --line:#d8e3ed;  
+  --muted:#62778a;  
+}  
+  
+* { box-sizing:border-box; }  
+  
+body {  
+  margin:0;  
+  background:var(--bg);  
+  color:#172b3a;  
+  font-family:Arial,sans-serif;  
+  padding-bottom:78px;  
+}  
+  
+header {  
+  background:linear-gradient(120deg,var(--b),var(--b2));  
+  color:white;  
+  padding:17px;  
+}  
+  
+header h1 { font-size:20px; margin:0; }  
+header p { margin:6px 0 0; font-size:13px; }  
+  
+main { max-width:950px; margin:auto; padding:14px; }  
+  
+.page { display:none; }  
+.page.active { display:block; }  
+  
+.card {  
+  background:white;  
+  border:1px solid var(--line);  
+  border-radius:15px;  
+  padding:15px;  
+  margin-bottom:13px;  
+  box-shadow:0 3px 12px #123b6609;  
+}  
+  
+.hero {  
+  background:linear-gradient(130deg,var(--b),var(--b2));  
+  color:white;  
+}  
+  
+.hero h2 { color:white; }  
+  
+.card h2,.card h3 {  
+  color:var(--b);  
+  margin:0 0 12px;  
+}  
+  
+.grid {  
+  display:grid;  
+  grid-template-columns:repeat(2,minmax(0,1fr));  
+  gap:9px;  
+}  
+  
+.stat {  
+  background:white;  
+  border:1px solid var(--line);  
+  border-radius:13px;  
+  text-align:center;  
+  padding:14px;  
+}  
+  
+.stat strong {  
+  display:block;  
+  font-size:25px;  
+  color:var(--b);  
+}  
+  
+.stat span {  
+  font-size:13px;  
+  color:var(--muted);  
+}  
+  
+label {  
+  display:block;  
+  font-weight:bold;  
+  font-size:14px;  
+  margin:10px 0 5px;  
+}  
+  
+input,select {  
+  width:100%;  
+  min-height:42px;  
+  padding:10px;  
+  border:1px solid #c9d7e4;  
+  border-radius:9px;  
+  background:white;  
+  font:inherit;  
+}  
+  
+.row {  
+  display:grid;  
+  grid-template-columns:repeat(2,minmax(0,1fr));  
+  gap:9px;  
+}  
+  
+.actions {  
+  display:flex;  
+  gap:8px;  
+  flex-wrap:wrap;  
+  margin-top:12px;  
+}  
+  
+button {  
+  border:0;  
+  border-radius:9px;  
+  padding:10px 13px;  
+  min-height:42px;  
+  background:#e7eef5;  
+  color:var(--b);  
+  font:inherit;  
+  font-weight:bold;  
+  cursor:pointer;  
+}  
+  
+button.primary {  
+  background:var(--b);  
+  color:white;  
+}  
+  
+button.danger {  
+  background:#fde8e7;  
+  color:#a32720;  
+}  
+  
+.quick {  
+  display:grid;  
+  grid-template-columns:repeat(2,minmax(0,1fr));  
+  gap:9px;  
+}  
+  
+.quick button {  
+  text-align:left;  
+  min-height:65px;  
+}  
+  
+.tablewrap {  
+  overflow-x:auto;  
+  border:1px solid var(--line);  
+  border-radius:10px;  
+  background:white;  
+}  
+  
+table {  
+  width:100%;  
+  border-collapse:collapse;  
+  min-width:540px;  
+}  
+  
+th,td {  
+  text-align:left;  
+  padding:9px;  
+  border-bottom:1px solid #e6edf3;  
+  font-size:14px;  
+}  
+  
+th {  
+  background:#edf4fa;  
+  color:var(--b);  
+}  
+  
+.muted {  
+  font-size:13px;  
+  color:var(--muted);  
+}  
+  
+.bottom {  
+  position:fixed;  
+  z-index:9;  
+  bottom:0;  
+  left:0;  
+  right:0;  
+  background:white;  
+  border-top:1px solid var(--line);  
+  display:flex;  
+  padding:5px 2px calc(5px + env(safe-area-inset-bottom));  
+  box-shadow:0 -4px 14px #123b6610;  
+}  
+  
+.bottom button {  
+  flex:1;  
+  background:transparent;  
+  color:#607386;  
+  padding:6px 1px;  
+  min-height:55px;  
+  font-size:11px;  
+  display:flex;  
+  flex-direction:column;  
+  gap:3px;  
+  align-items:center;  
+  justify-content:center;  
+}  
+  
+.bottom button.active {  
+  background:#eaf3fb;  
+  color:var(--b);  
+}  
+  
+.ico { font-size:19px; }  
+  
+.progress {  
+  height:7px;  
+  background:#e6edf3;  
+  border-radius:9px;  
+  overflow:hidden;  
+}  
+  
+.progress span {  
+  display:block;  
+  height:100%;  
+  background:#16834a;  
+}  
+  
+.hidden { display:none!important; }  
+  
+#lock {  
+  position:fixed;  
+  inset:0;  
+  z-index:20;  
+  background:linear-gradient(135deg,var(--b),var(--b2));  
+  display:flex;  
+  align-items:center;  
+  justify-content:center;  
+  padding:18px;  
+}  
+  
+.lockbox {  
+  background:white;  
+  border-radius:18px;  
+  padding:22px;  
+  width:min(100%,420px);  
+}  
+  
+/* Attendance status letters */  
+  
+.status-select {  
+  width:65px;  
+  min-width:65px;  
+  min-height:44px;  
+  padding:6px;  
+  font-size:19px;  
+  font-weight:700;  
+  text-align:center;  
+  border:2px solid #d8e3ed;  
+  border-radius:10px;  
+  background:#fff;  
+}  
+  
+.status-select.status-P {  
+  color:#16803c;  
+  background:#e7f7ec;  
+  border-color:#16803c;  
+}  
+  
+.status-select.status-A {  
+  color:#c62828;  
+  background:#fdeaea;  
+  border-color:#c62828;  
+}  
+  
+.status-select.status-L {  
+  color:#b96500;  
+  background:#fff2d9;  
+  border-color:#e69b25;  
+}  
+  
+.status-select.status-E {  
+  color:#1769aa;  
+  background:#e7f1ff;  
+  border-color:#1769aa;  
+}  
+  
+@media(min-width:700px) {  
+  .grid { grid-template-columns:repeat(4,1fr); }  
+  .quick { grid-template-columns:repeat(3,1fr); }  
+  main { padding:22px; }  
+}  
+  
+@media print {  
+  header,.bottom,.no-print,button {  
+    display:none!important;  
+  }  
+  
+  body {  
+    padding:0;  
+    background:white;  
+  }  
+  
+  .page { display:none!important; }  
+  .page.active { display:block!important; }  
+  
+  .card {  
+    box-shadow:none;  
+    border:0;  
+  }  
+  
+  .tablewrap { overflow:visible; }  
+  table { min-width:0; }  
+}  
+</style>  </head>  <body>  <header>  
+  <h1>⛪ ሰንበት ትምህርት ቤት</h1>  
+  <p>የተማሪዎችና የተሳትፎ መዝገብ</p>  
+</header>  <!-- Password screen -->  <div id="lock">  
+  <div class="lockbox">  
+    <h2 id="lockTitle">🔐 የአስተዳዳሪ መግቢያ</h2>  <p id="lockDesc">  
+  የይለፍ ቃል ያስገቡ። የመጀመሪያ ጊዜ ከሆነ አዲስ ይፍጠሩ።  
+</p>  
+
+<form id="lockForm">  
+  <label>የይለፍ ቃል</label>  
+  <input id="pw" type="password" required minlength="4">  
+
+  <div id="confirmWrap" class="hidden">  
+    <label>ደግመው ያስገቡ</label>  
+    <input id="pw2" type="password" minlength="4">  
+  </div>  
+
+  <p id="lockMsg" class="muted"></p>  
+
+  <button class="primary" id="lockBtn" style="width:100%">  
+    ግባ  
+  </button>  
+</form>  
+
+<p class="muted">  
+  ይህ መሠረታዊ የApp መቆለፊያ ነው፤ ከፍተኛ ደህንነት አይደለም።  
 </p>
 
-<div class="row">
-    <button id="backupBtn">Backup አውርድ</button>
+  </div>  
+</div>  <main id="app" class="hidden">  <!-- HOME -->  <section class="page active" id="homePage">    <div class="card hero">  
+    <h2>እንኳን በደህና መጡ!</h2>  
+    <p>  
+      የሰንበት ትምህርት ቤት ተማሪዎችንና ተሳትፎን በቀላሉ ያስተዳድሩ።  
+    </p>  
+    <b>ዛሬ፦ <span id="today"></span></b>  
+  </div>    <div class="grid">  
+    <div class="stat">  
+      <strong id="hs">0</strong>  
+      <span>ተማሪዎች</span>  
+    </div>  <div class="stat">  
+  <strong id="hp">0</strong>  
+  <span>ዛሬ የተገኙ (P)</span>  
+</div>  
 
-    <label class="btn secondary" for="restoreFile">
-        Restore ፋይል ምረጥ
-    </label>
+<div class="stat">  
+  <strong id="ha">0</strong>  
+  <span>ዛሬ የቀሩ (A)</span>  
+</div>  
 
-    <input class="hidden" id="restoreFile"
-           type="file" accept=".json,application/json">
+<div class="stat">  
+  <strong id="hc">0</strong>  
+  <span>ክፍሎች</span>  
 </div>
 
-<div id="backupMessage"></div>
+  </div>    <div class="card">  
+    <h3>⚡ ፈጣን አገልግሎቶች</h3>  <div class="quick">  
+  <button onclick="showPage('studentsPage')">  
+    👨‍🎓<br>ተማሪ መዝግብ  
+  </button>  
 
+  <button onclick="showPage('attendancePage')">  
+    📝<br>Attendance መዝግብ  
+  </button>  
+
+  <button onclick="showPage('classesPage')">  
+    🏫<br>ክፍሎች  
+  </button>  
+
+  <button onclick="showPage('reportsPage')">  
+    📊<br>ሪፖርት  
+  </button>  
+
+  <button onclick="backupData()">  
+    💾<br>Backup  
+  </button>  
+
+  <button onclick="showPage('settingsPage')">  
+    ⚙️<br>Settings  
+  </button>  
 </div>
 
-<div class="panel">
-<h2>የይለፍ ቃል</h2>
+  </div>    <p class="muted">  
+    መተግበሪያውን ከማዘመን ወይም App Data ከማጥፋት በፊት Backup ያውርዱ።  
+  </p>  
+</section>  <!-- STUDENTS -->  <section class="page" id="studentsPage">    <div class="card">  
+    <h2>👨‍🎓 ተማሪ መዝግብ</h2>  <form id="sf">  
+  <input id="sid" type="hidden">  
 
-<label>አዲስ የይለፍ ቃል</label>
-<input id="newPassword" type="password"
-       placeholder="ቢያንስ 4 ቁምፊ">
+  <div class="row">  
+    <div>  
+      <label>ሙሉ ስም *</label>  
+      <input id="sn" required>  
+    </div>  
 
-<div class="row">
-    <button id="setPassword">የይለፍ ቃል አስቀምጥ</button>
-    <button id="lockNow" class="danger">መተግበሪያውን ቆልፍ</button>
+    <div>  
+      <label>ክፍል</label>  
+      <select id="sg"></select>  
+    </div>  
+
+    <div>  
+      <label>ስልክ</label>  
+      <input id="sp" type="tel">  
+    </div>  
+
+    <div>  
+      <label>ዕድሜ</label>  
+      <input id="sa" type="number" min="1">  
+    </div>  
+
+    <div>  
+      <label>ፆታ</label>  
+      <select id="sgen">  
+        <option value="">—</option>  
+        <option>ወንድ</option>  
+        <option>ሴት</option>  
+      </select>  
+    </div>  
+
+    <div>  
+      <label>የወላጅ ስም</label>  
+      <input id="sparent">  
+    </div>  
+
+    <div>  
+      <label>የወላጅ ስልክ</label>  
+      <input id="spp" type="tel">  
+    </div>  
+  </div>  
+
+  <div class="actions">  
+    <button class="primary">አስቀምጥ</button>  
+    <button type="button" onclick="resetSF()">አጽዳ</button>  
+    <button type="button" onclick="exportCSV('students')">  
+      📥 Excel/CSV  
+    </button>  
+  </div>  
+</form>
+
+  </div>    <div class="card">  
+    <label>ተማሪ ፈልግ</label>  
+    <input id="search" placeholder="ስም፣ ክፍል፣ ስልክ...">  <p class="muted" id="sCount"></p>  
+
+<div class="tablewrap">  
+  <table>  
+    <thead>  
+      <tr>  
+        <th>No</th>  
+        <th>ስም</th>  
+        <th>ክፍል</th>  
+        <th>ስልክ</th>  
+        <th>ዕድሜ</th>  
+        <th>ተግባር</th>  
+      </tr>  
+    </thead>  
+    <tbody id="st"></tbody>  
+  </table>  
 </div>
+
+  </div>  
+</section>  <!-- ATTENDANCE -->  <section class="page" id="attendancePage">    <div class="card">  
+    <h2>📝 Attendance</h2>  <div class="row">  
+  <div>  
+    <label>ቀን</label>  
+    <input id="adate" type="date">  
+  </div>  
+
+  <div>  
+    <label>ክፍል</label>  
+    <select id="ag"></select>  
+  </div>  
+</div>  
+
+<p class="muted">  
+  P = ተገኝቷል · A = ቀርቷል · L = ዘግይቷል · E = ፈቃድ  
+</p>  
+
+<div class="actions">  
+  <button class="primary" onclick="markAll()">  
+    ሁሉን P አድርግ  
+  </button>  
+
+  <button onclick="saveAttendance()">  
+    💾 አስቀምጥ  
+  </button>  
+
+  <button onclick="exportCSV('attendance')">  
+    CSV አውርድ  
+  </button>  
 </div>
-</section>
 
-</main>
+  </div>    <div class="card">  
+    <div class="tablewrap">  
+      <table>  
+        <thead>  
+          <tr>  
+            <th>ስም</th>  
+            <th>ክፍል</th>  
+            <th>ሁኔታ</th>  
+          </tr>  
+        </thead>  
+        <tbody id="at"></tbody>  
+      </table>  
+    </div>  
+  </div>  
+</section>  <!-- CLASSES -->  <section class="page" id="classesPage">    <div class="card">  
+    <h2>🏫 ክፍሎች</h2>  <form id="cf">  
+  <input id="cold" type="hidden">  
 
-<div id="lockScreen" class="hidden"
-     style="position:fixed;inset:0;background:#f4f7f5;z-index:10;align-items:center;justify-content:center;padding:20px">
+  <label>የክፍል ስም</label>  
+  <input id="cn" required>  
 
-<div class="panel" style="width:min(400px,100%)">
-    <h2>መተግበሪያው ተቆልፏል</h2>
-    <label>የይለፍ ቃል</label>
-    <input id="unlockPassword" type="password">
+  <div class="actions">  
+    <button class="primary">ክፍል አስቀምጥ</button>  
+    <button type="button" onclick="cf.reset();cold.value=''">  
+      አጽዳ  
+    </button>  
+  </div>  
+</form>
 
-    <div class="row">
-        <button id="unlockBtn">ክፈት</button>
-    </div>
+  </div>    <div class="card">  
+    <div id="clist"></div>  
+  </div>  
+</section>  <!-- REPORTS -->  <section class="page" id="reportsPage">    <div class="card">  
+    <h2>📊 ወርሃዊ ሪፖርት</h2>  <div class="row">  
+  <div>  
+    <label>ወር</label>  
+    <input id="month" type="month">  
+  </div>  
 
-    <p id="unlockMessage"></p>
+  <div>  
+    <label>ክፍል</label>  
+    <select id="rg"></select>  
+  </div>  
+</div>  
+
+<div class="actions">  
+  <button class="primary" onclick="report()">  
+    ሪፖርት አሳይ  
+  </button>  
+
+  <button onclick="printReport()">  
+    🖨️ Print / PDF  
+  </button>  
+
+  <button onclick="exportCSV('report')">  
+    Excel/CSV  
+  </button>  
 </div>
+
+  </div>    <div class="card">  
+    <div class="grid" id="rsum"></div>  <div class="tablewrap">  
+  <table>  
+    <thead>  
+      <tr>  
+        <th>ስም</th>  
+        <th>P</th>  
+        <th>A</th>  
+        <th>L</th>  
+        <th>E</th>  
+        <th>ቀናት</th>  
+        <th>ተሳትፎ %</th>  
+      </tr>  
+    </thead>  
+    <tbody id="rt"></tbody>  
+  </table>  
 </div>
 
-<script>
-(function () {
-"use strict";
-
-/*
-  አስፈላጊ፦
-  እነዚህ የቀድሞው መተግበሪያ የመረጃ ቁልፎች ናቸው።
-  እንዳይጠፋ በተመሳሳይ ስም ተጠቅመናል።
-*/
-const K = {
-    students: "ss_students",
-    attendance: "ss_attendance",
-    classes: "ss_classes",
-    password: "ss_admin_password_hash"
-};
-
-const $ = id => document.getElementById(id);
-
-function read(key, fallback) {
-    try {
-        const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : fallback;
-    } catch (e) {
-        return fallback;
-    }
-}
-
-function write(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-}
-
-let students = read(K.students, []);
-let attendance = read(K.attendance, {});
-let classes = read(K.classes, []);
-
-if (!Array.isArray(students)) students = [];
-if (!attendance || typeof attendance !== "object") attendance = {};
-if (!Array.isArray(classes)) classes = [];
-
-if (classes.length === 0) {
-    classes = ["አጠቃላይ"];
-    write(K.classes, classes);
-}
-
-const statusLabels = {
-    P: "ተገኝቷል",
-    A: "ቀርቷል",
-    L: "ዘግይቷል",
-    E: "ፈቃድ"
-};
-
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-    })[char]);
-}
-
-function saveAll() {
-    write(K.students, students);
-    write(K.attendance, attendance);
-    write(K.classes, classes);
-}
-
-/*
-  የኢትዮጵያ ዘመን ለማንበብ Intl API ይጠቀማል።
-  የቀድሞ የቀረቤታ ቁልፎች ግን Gregorian ISO ቀኖች
-  (YYYY-MM-DD) ሆነው ይቀመጣሉ።
-*/
-function ethiopianParts(date) {
-    try {
-        const formatter = new Intl.DateTimeFormat(
-            "en-u-ca-ethiopic",
-            {
-                day: "numeric",
-                month: "numeric",
-                year: "numeric",
-                timeZone: "UTC"
-            }
-        );
-
-        const parts = {};
-
-        formatter.formatToParts(date).forEach(part => {
-            if (part.type !== "literal") {
-                parts[part.type] = Number(part.value);
-            }
-        });
-
-        return {
-            d: parts.day,
-            m: parts.month,
-            y: parts.year
-        };
-    } catch (error) {
-        return null;
-    }
-}
-
-function toISO(input) {
-    const match = String(input || "").trim().match(
-        /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/
-    );
-
-    if (!match) return null;
-
-    const day = Number(match[1]);
-    const month = Number(match[2]);
-    const year = Number(match[3]);
-
-    if (
-        day < 1 || day > 30 ||
-        month < 1 || month > 13 ||
-        year < 1
-    ) {
-        return null;
-    }
-
-    /*
-      በተሰጠው የኢትዮጵያ ቀን የሚዛመደውን
-      Gregorian ቀን ይፈልጋል።
-    */
-    const start = Date.UTC(year + 7, 7, 25);
-    const end = Date.UTC(year + 8, 9, 10);
-
-    for (let time = start; time <= end; time += 86400000) {
-        const parts = ethiopianParts(new Date(time));
-
-        if (
-            parts &&
-            parts.y === year &&
-            parts.m === month &&
-            parts.d === day
-        ) {
-            return new Date(time).toISOString().slice(0, 10);
-        }
-    }
-
-    return null;
-}
-
-function etDate(iso) {
-    if (!iso) return "";
-
-    const [year, month, day] = iso.split("-").map(Number);
-
-    const parts = ethiopianParts(
-        new Date(Date.UTC(year, month - 1, day))
-    );
-
-    if (!parts) return iso;
-
-    return (
-        String(parts.d).padStart(2, "0") + "/" +
-        String(parts.m).padStart(2, "0") + "/" +
-        parts.y
-    );
-}
-
-function todayEt() {
-    return etDate(new Date().toISOString().slice(0, 10));
-}
-
-function fillClassSelects() {
-    $("attClass").innerHTML =
-        '<option value="__ALL__">ሁሉም ክፍሎች</option>' +
-        classes.map(c =>
-            `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`
-        ).join("");
-
-    $("studentClass").innerHTML = classes.map(c =>
-        `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`
-    ).join("");
-}
-
-function fillReportStudents() {
-    $("reportStudent").innerHTML =
-        '<option value="__ALL__">ሁሉም ተማሪዎች</option>' +
-        students.map(s =>
-            `<option value="${escapeHTML(s.id)}">${escapeHTML(s.name)}</option>`
-        ).join("");
-}
-
-function showStudents() {
-    $("studentsTable").innerHTML =
-        `<table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>ሙሉ ስም</th>
-                <th>ክፍል</th>
-                <th>ስልክ</th>
-                <th class="no-print">ሰርዝ</th>
-            </tr>
-        </thead>
-        <tbody>` +
-        students.map((s, i) => `
-            <tr>
-                <td>${i + 1}</td>
-                <td>${escapeHTML(s.name)}</td>
-                <td>${escapeHTML(s.className || "")}</td>
-                <td>${escapeHTML(s.phone || "")}</td>
-                <td class="no-print">
-                    <button class="danger"
-                        data-del-student="${escapeHTML(s.id)}">
-                        ሰርዝ
-                    </button>
-                </td>
-            </tr>
-        `).join("") +
-        `</tbody></table>`;
-
-    fillReportStudents();
-}
-
-function showClasses() {
-    $("classesTable").innerHTML =
-        `<table>
-        <thead>
-            <tr>
-                <th>የክፍል ስም</th>
-                <th>ተማሪዎች</th>
-                <th>ሰርዝ</th>
-            </tr>
-        </thead>
-        <tbody>` +
-        classes.map(c => `
-            <tr>
-                <td>${escapeHTML(c)}</td>
-                <td>${students.filter(s => s.className === c).length}</td>
-                <td>
-                    <button class="danger"
-                        data-del-class="${escapeHTML(c)}">
-                        ሰርዝ
-                    </button>
-                </td>
-            </tr>
-        `).join("") +
-        `</tbody></table>`;
-}
-
-function drawAttendance() {
-    const iso = toISO($("attDate").value);
-
-    if (!iso) {
-        $("attendanceTable").innerHTML =
-            '<p class="small">ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';
-        return;
-    }
-
-    const selectedClass = $("attClass").value;
-
-    const list = students.filter(s =>
-        selectedClass === "__ALL__" ||
-        s.className === selectedClass
-    );
-
-    const day = attendance[iso] || {};
-
-    $("attendanceTable").innerHTML =
-        `<p><b>ቀን፦ ${etDate(iso)}</b> | ተማሪዎች፦ ${list.length}</p>
-        <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>ሙሉ ስም</th>
-                <th>ክፍል</th>
-                <th>P</th>
-                <th>A</th>
-                <th>L</th>
-                <th>E</th>
-            </tr>
-        </thead>
-        <tbody>` +
-        list.map((s, i) => `
-            <tr>
-                <td>${i + 1}</td>
-                <td>${escapeHTML(s.name)}</td>
-                <td>${escapeHTML(s.className || "")}</td>
-                ${["P", "A", "L", "E"].map(status => `
-                    <td class="${status}">
-                        <input
-                            type="radio"
-                            aria-label="${escapeHTML(s.name)} ${status}"
-                            name="status-${escapeHTML(s.id)}"
-                            value="${status}"
-                            ${day[s.id] === status ? "checked" : ""}
-                        >
-                    </td>
-                `).join("")}
-            </tr>
-        `).join("") +
-        `</tbody></table>`;
-}
-
-function makeReport() {
-    const from = toISO($("fromDate").value);
-    const to = toISO($("toDate").value);
-
-    if (!from || !to || from > to) {
-        $("reportResult").innerHTML =
-            '<p class="notice">ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።</p>';
-        return;
-    }
-
-    const dates = Object.keys(attendance)
-        .filter(date =>
-            date >= from &&
-            date <= to &&
-            attendance[date] &&
-            Object.keys(attendance[date]).length > 0
-        )
-        .sort();
-
-    const studentId = $("reportStudent").value;
-
-    const list = students.filter(s =>
-        studentId === "__ALL__" ||
-        String(s.id) === studentId
-    );
-
-    let html = `
-        <div class="grid">
-            <div class="stat">
-                <b>${dates.length}</b>
-                ቀረቤታ የተመዘገበባቸው ቀናት
-            </div>
-            <div class="stat">
-                <b>${list.length}</b>
-                ተማሪዎች
-            </div>
-        </div>
-
-        <p>
-            ከ ${etDate(from)} እስከ ${etDate(to)}
-        </p>
-
-        <div class="table-wrap">
-        <table>
-        <thead>
-            <tr>
-                <th>ተማሪ</th>
-                <th>ክፍል</th>
-                <th>P</th>
-                <th>A</th>
-                <th>L</th>
-                <th>E</th>
-                <th>ተሳትፎ %</th>
-            </tr>
-        </thead>
-        <tbody>`;
-
-    const csvRows = [
-        [
-            "Name",
-            "Class",
-            "Present",
-            "Absent",
-            "Late",
-            "Permission",
-            "Participation %"
-        ]
-    ];
-
-    list.forEach(student => {
-        const counts = { P: 0, A: 0, L: 0, E: 0 };
-
-        dates.forEach(date => {
-            const status = attendance[date]?.[student.id];
-
-            if (counts[status] !== undefined) {
-                counts[status]++;
-            }
-        });
-
-        const total = Object.values(counts)
-            .reduce((sum, count) => sum + count, 0);
-
-        const percentage = total
-            ? Math.round((counts.P + counts.L) / total * 100)
-            : 0;
-
-        html += `
-            <tr>
-                <td>${escapeHTML(student.name)}</td>
-                <td>${escapeHTML(student.className || "")}</td>
-                <td>${counts.P}</td>
-                <td>${counts.A}</td>
-                <td>${counts.L}</td>
-                <td>${counts.E}</td>
-                <td>${percentage}%</td>
-            </tr>`;
-
-        csvRows.push([
-            student.name,
-            student.className || "",
-            counts.P,
-            counts.A,
-            counts.L,
-            counts.E,
-            percentage
-        ]);
-    });
-
-    html += "</tbody></table></div>";
-
-    if (studentId !== "__ALL__" && list.length) {
-        const student = list[0];
-
-        html += `
-            <h3>የዕለት ዝርዝር፦ ${escapeHTML(student.name)}</h3>
-            <div class="table-wrap">
-            <table>
-            <thead>
-                <tr>
-                    <th>ቀን (ኢትዮጵያ)</th>
-                    <th>ሁኔታ</th>
-                </tr>
-            </thead>
-            <tbody>`;
-
-        dates.forEach(date => {
-            const status = attendance[date]?.[student.id];
-
-            html += `
-                <tr>
-                    <td>${etDate(date)}</td>
-                    <td class="${escapeHTML(status || "")}">
-                        ${status
-                            ? status + " - " + statusLabels[status]
-                            : "አልተመዘገበም"}
-                    </td>
-                </tr>`;
-        });
-
-        html += "</tbody></table></div>";
-    }
-
-    $("reportResult").innerHTML = html;
-    window.lastReportCSV = csvRows;
-}
-
-/* የገጽ ማስተላለፊያ */
-document.querySelectorAll("nav button").forEach(button => {
-    button.addEventListener("click", () => {
-        document.querySelectorAll("nav button")
-            .forEach(b => b.classList.remove("active"));
-
-        button.classList.add("active");
-
-        document.querySelectorAll(".page")
-            .forEach(page => page.classList.add("hidden"));
-
-        $(button.dataset.page).classList.remove("hidden");
-
-        if (button.dataset.page === "students") showStudents();
-        if (button.dataset.page === "classes") showClasses();
-        if (button.dataset.page === "reports") fillReportStudents();
-    });
-});
-
-/* ክፍል መጨመር */
-$("addClass").onclick = () => {
-    const name = $("className").value.trim();
-
-    if (!name) {
-        alert("የክፍል ስም ያስገቡ።");
-        return;
-    }
-
-    if (classes.includes(name)) {
-        alert("ይህ ክፍል አስቀድሞ አለ።");
-        return;
-    }
-
-    classes.push(name);
-    saveAll();
-
-    $("
+  </div>  
+</section>  <!-- SETTINGS -->  <section class="page" id="settingsPage">    <div class="card">  
+    <h2>⚙️ Settings</h2>  <button class="primary" onclick="changePassword()">  
+  🔐 የይለፍ ቃል ቀይር  
+</button>  
+
+<button onclick="showPage('classesPage')">  
+  🏫 ክፍሎች  
+</button>
+
+  </div>    <div class="card">  
+    <h3>💾 Backup & Restore</h3>  <div class="actions">  
+  <button class="primary" onclick="backupData()">  
+    Backup አውርድ  
+  </button>  
+
+  <button onclick="document.getElementById('restore').click()">  
+    Backup መልስ  
+  </button>  
+
+  <input  
+    class="hidden"  
+    id="restore"  
+    type="file"  
+    accept=".json,application/json"  
+  >  
+</div>  
+
+<p class="muted">  
+  መረጃዎች በዚህ ስልክ ውስጥ ይቀመጣሉ።  
+</p>
+
+  </div>    <div class="card">  
+    <button class="danger" onclick="lockApp()">  
+      🔒 አሁን ቆልፍ  
+    </button>  
+  </div>  
+</section>  </main>  <!-- BOTTOM NAVIGATION -->  <nav class="bottom hidden" id="nav">    <button class="active" data-p="homePage" onclick="showPage('homePage')">  
+    <span class="ico">🏠</span>Home  
+  </button>    <button data-p="studentsPage" onclick="showPage('studentsPage')">  
+    <span class="ico">👨‍🎓</span>ተማሪ  
+  </button>    <button data-p="attendancePage" onclick="showPage('attendancePage')">  
+    <span class="ico">📝</span>Attendance  
+  </button>    <button data-p="reportsPage" onclick="showPage('reportsPage')">  
+    <span class="ico">📊</span>Reports  
+  </button>    <button data-p="settingsPage" onclick="showPage('settingsPage')">  
+    <span class="ico">⚙️</span>Settings  
+  </button>  </nav>  <script>  
+const $ = id => document.getElementById(id);  
+  
+const K = {  
+  s:'ss_students',  
+  a:'ss_attendance',  
+  c:'ss_classes',  
+  l:'ss_language'  
+};  
+  
+function read(k,d) {  
+  try {  
+    return JSON.parse(localStorage.getItem(k)) ?? d;  
+  } catch(e) {  
+    return d;  
+  }  
+}  
+  
+let students = read(K.s,[]);  
+let attendance = read(K.a,{});  
+let classes = read(K.c,[  
+  'አንደኛ ክፍል',  
+  'ሁለተኛ ክፍል',  
+  'ሶስተኛ ክፍል'  
+]);  
+  
+if(!Array.isArray(students)) students=[];  
+if(!attendance || typeof attendance!=='object' || Array.isArray(attendance)) attendance={};  
+if(!Array.isArray(classes)) classes=[];  
+  
+classes=[...new Set(classes.filter(Boolean))];  
+  
+/* Local date: avoids UTC date shifting */  
+function localDate(d=new Date()) {  
+  const year=d.getFullYear();  
+  const month=String(d.getMonth()+1).padStart(2,'0');  
+  const day=String(d.getDate()).padStart(2,'0');  
+  return `${year}-${month}-${day}`;  
+}  
+  
+const today=localDate();  
+  
+$('today').textContent=today;  
+$('adate').value=today;  
+$('month').value=today.slice(0,7);  
+  
+/* Save data in local storage */  
+function save() {  
+  localStorage.setItem(K.s,JSON.stringify(students));  
+  localStorage.setItem(K.a,JSON.stringify(attendance));  
+  localStorage.setItem(K.c,JSON.stringify(classes));  
+}  
+  
+/* Protect text displayed in HTML */  
+function esc(x) {  
+  return String(x??'').replace(/[&<>"']/g,c=>({  
+    '&':'&amp;',  
+    '<':'&lt;',  
+    '>':'&gt;',  
+    '"':'&quot;',  
+    "'":'&#39;'  
+  }[c]));  
+}  
+  
+/* Navigation */  
+function showPage(id) {  
+  document.querySelectorAll('.page').forEach(x=>{  
+    x.classList.toggle('active',x.id===id);  
+  });  
+  
+  document.querySelectorAll('.bottom button').forEach(x=>{  
+    x.classList.toggle('active',x.dataset.p===id);  
+  });  
+  
+  refresh();  
+  window.scrollTo(0,0);  
+}  
+  
+/* Refresh app */  
+function refresh() {  
+  groups();  
+  renderStudents();  
+  renderClasses();  
+  renderAttendance();  
+  home();  
+  report();  
+}  
+  
+/* Class dropdowns */  
+function groups() {  
+  ['sg','ag','rg'].forEach(id=>{  
+    let el=$(id);  
+    let old=el.value;  
+  
+    el.innerHTML=  
+      (id==='sg'  
+        ? '<option value="">ክፍል ይምረጡ</option>'  
+        : '<option value="">ሁሉም ክፍሎች</option>'  
+      )+  
+      classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');  
+  
+    if([...el.options].some(o=>o.value===old)) {  
+      el.value=old;  
+    }  
+  });  
+}  
+  
+/* Home dashboard */  
+function home() {  
+  let d=attendance[today]||{};  
+  
+  $('hs').textContent=students.length;  
+  $('hc').textContent=classes.length;  
+  
+  $('hp').textContent=students.filter(s=>d[s.id]==='P').length;  
+  $('ha').textContent=students.filter(s=>d[s.id]==='A').length;  
+}  
+  
+/* Student form */  
+function resetSF() {  
+  $('sf').reset();  
+  $('sid').value='';  
+}  
+  
+/* Add or update student */  
+$('sf').addEventListener('submit',e=>{  
+  e.preventDefault();  
+  
+  let id=$('sid').value||String(Date.now());  
+  
+  let obj={  
+    id,  
+    name:$('sn').value.trim(),  
+    group:$('sg').value,  
+    phone:$('sp').value,  
+    age:$('sa').value,  
+    gender:$('sgen').value,  
+    parentName:$('sparent').value,  
+    parentPhone:$('spp').value  
+  };  
+  
+  let i=students.findIndex(s=>String(s.id)===String(id));  
+  
+  if(i<0) students.push(obj);  
+  else students[i]=obj;  
+  
+  save();  
+  resetSF();  
+  refresh();  
+});  
+  
+/* Student list and search */  
+function renderStudents() {  
+  let q=$('search').value.toLowerCase();  
+  
+  let a=students.filter(s=>  
+    [s.name,s.group,s.phone].some(v=>  
+      String(v||'').toLowerCase().includes(q)  
+    )  
+  );  
+  
+  $('sCount').textContent=`ጠቅላላ ${students.length} | የታዩ ${a.length}`;  
+  
+  $('st').innerHTML=a.map((s,i)=>`  
+    <tr>  
+      <td>${i+1}</td>  
+      <td>${esc(s.name)}</td>  
+      <td>${esc(s.group)}</td>  
+      <td>${esc(s.phone)}</td>  
+      <td>${esc(s.age)}</td>  
+      <td>  
+        <button onclick="editS('${esc(s.id)}')">Edit</button>  
+        <button class="danger" onclick="delS('${esc(s.id)}')">Delete</button>  
+      </td>  
+    </tr>  
+  `).join('') || '<tr><td colspan="6">ተማሪ የለም</td></tr>';  
+}  
+  
+function editS(id) {  
+  let s=students.find(x=>String(x.id)===String(id));  
+  if(!s) return;  
+  
+  $('sid').value=s.id;  
+  $('sn').value=s.name||'';  
+  $('sg').value=s.group||'';  
+  $('sp').value=s.phone||'';  
+  $('sa').value=s.age||'';  
+  $('sgen').value=s.gender||'';  
+  $('sparent').value=s.parentName||'';  
+  $('spp').value=s.parentPhone||'';  
+  
+  showPage('studentsPage');  
+}  
+  
+function delS(id) {  
+  if(confirm('ተማሪውን ማጥፋት ይፈልጋሉ?')) {  
+    students=students.filter(s=>String(s.id)!==String(id));  
+    save();  
+    refresh();  
+  }  
+}  
+  
+$('search').addEventListener('input',renderStudents);  
+  
+/* Classes */  
+$('cf').addEventListener('submit',e=>{  
+  e.preventDefault();  
+  
+  let n=$('cn').value.trim();  
+  let old=$('cold').value;  
+  
+  if(!n) return;  
+  
+  if(classes.includes(n)&&n!==old) {  
+    alert('ክፍሉ አስቀድሞ አለ');  
+    return;  
+  }  
+  
+  if(old) {  
+    classes=classes.map(c=>c===old?n:c);  
+  
+    students.forEach(s=>{  
+      if(s.group===old) s.group=n;  
+    });  
+  } else {  
+    classes.push(n);  
+  }  
+  
+  classes=[...new Set(classes)];  
+  
+  $('cf').reset();  
+  $('cold').value='';  
+  
+  save();  
+  refresh();  
+});  
+  
+function renderClasses() {  
+  $('clist').innerHTML=classes.map((c,i)=>`  
+    <p>  
+      ${esc(c)}  
+      (${students.filter(s=>s.group===c).length} ተማሪ)  
+  
+      <button onclick="editC(${i})">Edit</button>  
+  
+      <button class="danger" onclick="delC(${i})">Delete</button>  
+    </p>  
+  `).join('') || 'ክፍል የለም';  
+}  
+  
+function editC(i) {  
+  $('cold').value=classes[i];  
+  $('cn').value=classes[i];  
+}  
+  
+function delC(i) {  
+  if(confirm('ክፍሉን ማጥፋት ይፈልጋሉ?')) {  
+    classes.splice(i,1);  
+    save();  
+    refresh();  
+  }  
+}  
+  
+/* Attendance list with colored P/A/L/E letters */  
+function renderAttendance() {  
+  let date=$('adate').value||today;  
+  let g=$('ag').value;  
+  let d=attendance[date]||{};  
+  
+  let a=students.filter(s=>!g||s.group===g);  
+  
+  $('at').innerHTML=a.map(s=>{  
+    let v=d[s.id]||'';  
+  
+    return `  
+      <tr>  
+        <td>${esc(s.name)}</td>  
+        <td>${esc(s.group)}</td>  
+        <td>  
+          <select  
+            class="status-select status-${v}"  
+            data-id="${esc(s.id)}"  
+            aria-label="Attendance status for ${esc(s.name)}"  
+            onchange="this.className='status-select status-'+this.value"  
+          >  
+            <option value="" ${v===''?'selected':''}>—</option>  
+            <option value="P" ${v==='P'?'selected':''}>P</option>  
+            <option value="A" ${v==='A'?'selected':''}>A</option>  
+            <option value="L" ${v==='L'?'selected':''}>L</option>  
+            <option value="E" ${v==='E'?'selected':''}>E</option>  
+          </select>  
+        </td>  
+      </tr>  
+    `;  
+  }).join('') || '<tr><td colspan="3">ተማሪ አልተመዘገበም</td></tr>';  
+}  
+  
+$('adate').addEventListener('change',renderAttendance);  
+$('ag').addEventListener('change',renderAttendance);  
+  
+/* Save attendance */  
+function saveAttendance() {  
+  let date=$('adate').value;  
+  
+  if(!date) {  
+    alert('ቀን ይምረጡ');  
+    return;  
+  }  
+  
+  attendance[date]=attendance[date]||{};  
+  
+  document.querySelectorAll('#at select').forEach(x=>{  
+    if(x.value) {  
+      attendance[date][x.dataset.id]=x.value;  
+    } else {  
+      delete attendance[date][x.dataset.id];  
+    }  
+  });  
+  
+  save();  
+  refresh();  
+  
+  alert('Attendance ተቀምጧል');  
+}  
+  
+/* Mark all students in selected class as present */  
+function markAll() {  
+  document.querySelectorAll('#at select').forEach(x=>{  
+    x.value='P';  
+    x.className='status-select status-P';  
+  });  
+  
+  saveAttendance();  
+}  
+  
+/* Monthly report calculations */  
+function getCounts(s,month) {  
+  let c={P:0,A:0,L:0,E:0};  
+  
+  Object.keys(attendance)  
+    .filter(d=>d.startsWith(month))  
+    .forEach(d=>{  
+      let v=attendance[d]&&attendance[d][s.id];  
+  
+      if(c[v]!==undefined) c[v]++;  
+    });  
+  
+  return c;  
+}  
+  
+function report() {  
+  let m=$('month').value||today.slice(0,7);  
+  let g=$('rg').value;  
+  let all={P:0,A:0,L:0,E:0};  
+  
+  let a=students.filter(s=>!g||s.group===g);  
+  
+  $('rt').innerHTML=a.map(s=>{  
+    let c=getCounts(s,m);  
+  
+    Object.keys(all).forEach(k=>all[k]+=c[k]);  
+  
+    let n=c.P+c.A+c.L+c.E;  
+  
+    /* Present and Late count as attendance */  
+    let p=n?Math.round((c.P+c.L)*100/n):0;  
+  
+    return `  
+      <tr>  
+        <td>${esc(s.name)}</td>  
+        <td>${c.P}</td>  
+        <td>${c.A}</td>  
+        <td>${c.L}</td>  
+        <td>${c.E}</td>  
+        <td>${n}</td>  
+        <td>  
+          <b>${p}%</b>  
+          <div class="progress">  
+            <span style="width:${p}%"></span>  
+          </div>  
+        </td>  
+      </tr>  
+    `;  
+  }).join('') || '<tr><td colspan="7">መረጃ የለም</td></tr>';  
+  
+  $('rsum').innerHTML=Object.keys(all).map(k=>`  
+    <div class="stat">  
+      <strong>${all[k]}</strong>  
+      <span>${k}</span>  
+    </div>  
+  `).join('');  
+}  
+  
+$('month').addEventListener('change',report);  
+$('rg').addEventListener('change',report);  
+  
+/* Print report */  
+function printReport() {  
+  window.print();  
+}  
+  
+/* Download files through Android bridge or browser */  
+function dl(name,text,type) {  
+  if(window.Android && typeof Android.saveTextFile==='function') {  
+    Android.saveTextFile(name,text,type);  
+    return;  
+  }  
+  
+  let u=URL.createObjectURL(  
+    new Blob(['\ufeff',text],{type})  
+  );  
+  
+  let a=document.createElement('a');  
+  a.href=u;  
+  a.download=name;  
+  a.click();  
+  
+  setTimeout(()=>URL.revokeObjectURL(u),1000);  
+}  
+  
+function csv(v) {  
+  return '"'+String(v??'').replace(/"/g,'""')+'"';  
+}  
+  
+/* Export CSV files */  
+function exportCSV(type) {  
+  let rows=[];  
+  let name;  
+  
+  if(type==='students') {  
+    name='students.csv';  
+  
+    rows=[  
+      ['No','ID','Name','Class','Phone','Age','Gender','Parent Name','Parent Phone'],  
+  
+      ...students.map((s,i)=>[  
+        i+1,s.id,s.name,s.group,s.phone,s.age,  
+        s.gender,s.parentName,s.parentPhone  
+      ])  
+    ];  
+  
+  } else if(type==='attendance') {  
+    let d=$('adate').value||today;  
+    let day=attendance[d]||{};  
+  
+    name='attendance_'+d+'.csv';  
+  
+    rows=[  
+      ['Date','ID','Name','Class','Status'],  
+  
+      ...students.map(s=>[  
+        d,s.id,s.name,s.group,day[s.id]||'Not marked'  
+      ])  
+    ];  
+  
+  } else {  
+    let m=$('month').value||today.slice(0,7);  
+  
+    name='report_'+m+'.csv';  
+  
+    rows=[  
+      ['Name','Class','Present','Absent','Late','Permission','Marked Days','Attendance %'],  
+  
+      ...students  
+        .filter(s=>!$('rg').value||s.group===$('rg').value)  
+        .map(s=>{  
+          let c=getCounts(s,m);  
+          let n=c.P+c.A+c.L+c.E;  
+  
+          return [  
+            s.name,  
+            s.group,  
+            c.P,  
+            c.A,  
+            c.L,  
+            c.E,  
+            n,  
+            (n?Math.round((c.P+c.L)*100/n):0)+'%'  
+          ];  
+        })  
+    ];  
+  }  
+  
+  dl(  
+    name,  
+    rows.map(r=>r.map(csv).join(',')).join('\r\n'),  
+    'text/csv;charset=utf-8'  
+  );  
+}  
+  
+/* Backup all app data */  
+function backupData() {  
+  dl(  
+    'sunday_school_backup.json',  
+    JSON.stringify({  
+      version:2,  
+      students,  
+      attendance,  
+      classes  
+    },null,2),  
+    'application/json'  
+  );  
+}  
+  
+/* Restore backup */  
+$('restore').addEventListener('change',e=>{  
+  let f=e.target.files[0];  
+  
+  if(!f) return;  
+  
+  let r=new FileReader();  
+  
+  r.onload=()=>{  
+    try {  
+      let d=JSON.parse(r.result);  
+  
+      if(  
+        !Array.isArray(d.students) ||  
+        !d.attendance ||  
+        !Array.isArray(d.classes)  
+      ) {  
+        throw new Error('Invalid backup');  
+      }  
+  
+      if(!confirm('Backup አሁን ያለውን መረጃ ይተካል። ቀጥል?')) {  
+        return;  
+      }  
+  
+      students=d.students;  
+      attendance=d.attendance;  
+      classes=d.classes;  
+  
+      save();  
+      refresh();  
+  
+      alert('Backup ተመልሷል');  
+  
+    } catch(e) {  
+      alert('Backup ፋይሉ ትክክል አይደለም');  
+    }  
+  };  
+  
+  r.readAsText(f);  
+  e.target.value='';  
+});  
+  
+/* Password functions */  
+function hash(s) {  
+  let h=2166136261;  
+  
+  for(let i=0;i<s.length;i++) {  
+    h^=s.charCodeAt(i);  
+    h=Math.imul(h,16777619);  
+  }  
+  
+  return 'local-'+(h>>>0).toString(16);  
+}  
+  
+const pk='ss_admin_password_hash';  
+  
+function setupLock() {  
+  let exists=localStorage.getItem(pk);  
+  
+  $('confirmWrap').classList.toggle('hidden',!!exists);  
+  
+  $('lockTitle').textContent=exists  
+    ? '🔐 የአስተዳዳሪ መግቢያ'  
+    : '🔐 የይለፍ ቃል ፍጠር';  
+  
+  $('lockBtn').textContent=exists  
+    ? 'ግባ'  
+    : 'የይለፍ ቃል ፍጠር';  
+}  
+  
+$('lockForm').addEventListener('submit',e=>{  
+  e.preventDefault();  
+  
+  let p=$('pw').value;  
+  let old=localStorage.getItem(pk);  
+  
+  if(!old) {  
+    if(p!==$('pw2').value) {  
+      $('lockMsg').textContent='የይለፍ ቃሎቹ አይመሳሰሉም';  
+      return;  
+    }  
+  
+    localStorage.setItem(pk,hash(p));  
+    unlock();  
+  
+  } else if(hash(p)===old) {  
+    unlock();  
+  
+  } else {  
+    $('lockMsg').textContent='የይለፍ ቃሉ ትክክል አይደለም';  
+  }  
+});  
+  
+function unlock() {  
+  $('lock').classList.add('hidden');  
+  $('app').classList.remove('hidden');  
+  $('nav').classList.remove('hidden');  
+  
+  refresh();  
+}  
+  
+function lockApp() {  
+  $('app').classList.add('hidden');  
+  $('nav').classList.add('hidden');  
+  $('lock').classList.remove('hidden');  
+  
+  $('pw').value='';  
+  $('pw2').value='';  
+  $('lockMsg').textContent='';  
+  
+  setupLock();  
+}  
+  
+function changePassword() {  
+  let old=prompt('የአሁኑ የይለፍ ቃል፦');  
+  
+  if(old===null) return;  
+  
+  if(hash(old)!==localStorage.getItem(pk)) {  
+    alert('የአሁኑ የይለፍ ቃል ስህተት ነው');  
+    return;  
+  }  
+  
+  let p=prompt('አዲስ የይለፍ ቃል (4+ ቁምፊ)፦');  
+  
+  if(p===null) return;  
+  
+  if(p.length<4) {  
+    alert('ቢያንስ 4 ቁምፊ ያስፈልጋል');  
+    return;  
+  }  
+  
+  let p2=prompt('አዲሱን ደግመው ያስገቡ፦');  
+  
+  if(p!==p2) {  
+    alert('አይመሳሰሉም');  
+    return;  
+  }  
+  
+  localStorage.setItem(pk,hash(p));  
+  
+  alert('የይለፍ ቃሉ ተቀይሯል');  
+}  
+  
+/* Start application */  
+refresh();  
+setupLock();  
+</script>  </body>  
+</html>
