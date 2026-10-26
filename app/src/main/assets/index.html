@@ -313,34 +313,8 @@ th {
 </style>  </head>  <body>  <header>  
   <h1>⛪ ሰንበት ትምህርት ቤት</h1>  
   <p>የተማሪዎችና የተሳትፎ መዝገብ</p>  
-</header>  <!-- Password screen -->  <div id="lock">  
-  <div class="lockbox">  
-    <h2 id="lockTitle">🔐 የአስተዳዳሪ መግቢያ</h2>  <p id="lockDesc">  
-  የይለፍ ቃል ያስገቡ። የመጀመሪያ ጊዜ ከሆነ አዲስ ይፍጠሩ።  
-</p>  
-
-<form id="lockForm">  
-  <label>የይለፍ ቃል</label>  
-  <input id="pw" type="password" required minlength="4">  
-
-  <div id="confirmWrap" class="hidden">  
-    <label>ደግመው ያስገቡ</label>  
-    <input id="pw2" type="password" minlength="4">  
-  </div>  
-
-  <p id="lockMsg" class="muted"></p>  
-
-  <button class="primary" id="lockBtn" style="width:100%">  
-    ግባ  
-  </button>  
-</form>  
-
-<p class="muted">  
-  ይህ መሠረታዊ የApp መቆለፊያ ነው፤ ከፍተኛ ደህንነት አይደለም።  
-</p>
-
-  </div>  
-</div>  <main id="app" class="hidden">  <!-- HOME -->  <section class="page active" id="homePage">    <div class="card hero">  
+</header>  
+  <main id="app">  <!-- HOME -->  <section class="page active" id="homePage">    <div class="card hero">  
     <h2>እንኳን በደህና መጡ!</h2>  
     <p>  
       የሰንበት ትምህርት ቤት ተማሪዎችንና ተሳትፎን በቀላሉ ያስተዳድሩ።  
@@ -615,7 +589,7 @@ th {
       🔒 አሁን ቆልፍ  
     </button>  
   </div>  
-</section>  </main>  <!-- BOTTOM NAVIGATION -->  <nav class="bottom hidden" id="nav">    <button class="active" data-p="homePage" onclick="showPage('homePage')">  
+</section>  </main>  <!-- BOTTOM NAVIGATION -->  <nav class="bottom" id="nav">    <button class="active" data-p="homePage" onclick="showPage('homePage')">  
     <span class="ico">🏠</span>Home  
   </button>    <button data-p="studentsPage" onclick="showPage('studentsPage')">  
     <span class="ico">👨‍🎓</span>ተማሪ  
@@ -1171,110 +1145,10 @@ $('restore').addEventListener('change',e=>{
   e.target.value='';  
 });  
   
-/* Password functions */  
-function hash(s) {  
-  let h=2166136261;  
-  
-  for(let i=0;i<s.length;i++) {  
-    h^=s.charCodeAt(i);  
-    h=Math.imul(h,16777619);  
-  }  
-  
-  return 'local-'+(h>>>0).toString(16);  
-}  
-  
-const pk='ss_admin_password_hash';  
-  
-function setupLock() {  
-  let exists=localStorage.getItem(pk);  
-  
-  $('confirmWrap').classList.toggle('hidden',!!exists);  
-  
-  $('lockTitle').textContent=exists  
-    ? '🔐 የአስተዳዳሪ መግቢያ'  
-    : '🔐 የይለፍ ቃል ፍጠር';  
-  
-  $('lockBtn').textContent=exists  
-    ? 'ግባ'  
-    : 'የይለፍ ቃል ፍጠር';  
-}  
-  
-$('lockForm').addEventListener('submit',e=>{  
-  e.preventDefault();  
-  
-  let p=$('pw').value;  
-  let old=localStorage.getItem(pk);  
-  
-  if(!old) {  
-    if(p!==$('pw2').value) {  
-      $('lockMsg').textContent='የይለፍ ቃሎቹ አይመሳሰሉም';  
-      return;  
-    }  
-  
-    localStorage.setItem(pk,hash(p));  
-    unlock();  
-  
-  } else if(hash(p)===old) {  
-    unlock();  
-  
-  } else {  
-    $('lockMsg').textContent='የይለፍ ቃሉ ትክክል አይደለም';  
-  }  
-});  
-  
-function unlock() {  
-  $('lock').classList.add('hidden');  
-  $('app').classList.remove('hidden');  
-  $('nav').classList.remove('hidden');  
-  
-  refresh();  
-}  
-  
-function lockApp() {  
-  $('app').classList.add('hidden');  
-  $('nav').classList.add('hidden');  
-  $('lock').classList.remove('hidden');  
-  
-  $('pw').value='';  
-  $('pw2').value='';  
-  $('lockMsg').textContent='';  
-  
-  setupLock();  
-}  
-  
-function changePassword() {  
-  let old=prompt('የአሁኑ የይለፍ ቃል፦');  
-  
-  if(old===null) return;  
-  
-  if(hash(old)!==localStorage.getItem(pk)) {  
-    alert('የአሁኑ የይለፍ ቃል ስህተት ነው');  
-    return;  
-  }  
-  
-  let p=prompt('አዲስ የይለፍ ቃል (4+ ቁምፊ)፦');  
-  
-  if(p===null) return;  
-  
-  if(p.length<4) {  
-    alert('ቢያንስ 4 ቁምፊ ያስፈልጋል');  
-    return;  
-  }  
-  
-  let p2=prompt('አዲሱን ደግመው ያስገቡ፦');  
-  
-  if(p!==p2) {  
-    alert('አይመሳሰሉም');  
-    return;  
-  }  
-  
-  localStorage.setItem(pk,hash(p));  
-  
-  alert('የይለፍ ቃሉ ተቀይሯል');  
-}  
+
   
 /* Start application */  
 refresh();  
-setupLock();  
+
 </script>  </body>  
 </html>
