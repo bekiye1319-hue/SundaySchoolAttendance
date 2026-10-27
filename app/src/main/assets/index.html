@@ -97,7 +97,38 @@ function renderStudents(){let q=$('studentSearch').value.toLowerCase();let list=
 function renderClasses(){$('classesTable').innerHTML='<table><tr><th>ክፍል</th><th>ተማሪዎች</th><th></th></tr>'+classes.map(c=>`<tr><td>${esc(c)}</td><td>${students.filter(s=>s.className===c).length}</td><td>${role==='supervisor'?`<button data-delete-class="${esc(c)}">ሰርዝ</button>`:''}</td></tr>`).join('')+'</table>'}
 function drawAttendance(){let iso=dateISO($('attDate').value);if(!iso){$('attendanceTable').innerHTML='<p>ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';return}let c=$('attClass').value,list=students.filter(s=>c==='__ALL__'||s.className===c),day=attendance[iso]||{};$('attendanceTable').innerHTML=`<p>ቀን: ${dateET(iso)} | ተማሪዎች: ${list.length}</p><table><tr><th>ስም</th><th>P</th><th>A</th><th>L</th><th>E</th></tr>${list.map(s=>`<tr><td>${esc(s.name)}</td>${['P','A','L','E'].map(st=>`<td class="status ${st}"><input type="radio" name="st-${esc(s.id)}" value="${st}" ${day[s.id]===st?'checked':''}></td>`).join('')}</tr>`).join('')}</table>`}
 function renderStats(){let c={P:0,A:0,L:0,E:0};Object.values(attendance).forEach(day=>Object.values(day).forEach(v=>{if(c[v]!==undefined)c[v]++}));$('statistics').innerHTML=`<div class="grid">${Object.keys(c).map(k=>`<div class="stat"><b>${c[k]}</b>${k} - ${labels[k]}</div>`).join('')}</div>`}
-function report(){let from=dateISO($('fromDate').value),to=dateISO($('toDate').value);if(!from||!to||from>to){$('reportResult').innerHTML='<p class="notice">የቀን ክልሉን ያስተካክሉ።</p>';return}let dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort(),sid=$('reportStudent').value,list=students.filter(s=>sid==='__ALL__'||String(s.id)===sid);$('reportResult').innerHTML='<p>ከ '+dateET(from)+' እስከ '+dateET(to)+'</p><table><tr><th>ስም</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th></tr>'+list.map(s=>{let c={P:0,A:0,L:0,E:0};dates.forEach(d=>{let v=attendance[d]?.[s.id];if(c[v]!==undefined)c[v]++});return `<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${c.P}</td><td>${c.A}</td><td>${c.L}</td><td>${c.E}</td></tr>`}).join('')+'</table>'}
+function report(){
+  const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);
+  if(!from||!to||from>to){
+    $('reportResult').innerHTML='<p class="notice">የቀን ክልሉን ያስተካክሉ።</p>';
+    $('statistics').innerHTML='';
+    return;
+  }
+  const dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort();
+  const recordedDates=dates.filter(d=>Object.values(attendance[d]||{}).some(v=>['P','A','L','E'].includes(v)));
+  const sid=$('reportStudent').value;
+  const list=students.filter(s=>sid==='__ALL__'||String(s.id)===sid);
+  $('statistics').innerHTML=`<div class="grid"><div class="stat"><b>${recordedDates.length}</b>ቀረቤታ የተመዘገበባቸው ቀናት</div><div class="stat"><b>${list.length}</b>ተማሪዎች</div></div>`;
+  let html=`<p>ከ ${dateET(from)} እስከ ${dateET(to)}</p><p class="notice">የመገኘት % = (P + L) ÷ (P + A + L + E) × 100። ያልተመዘገቡ ቀናት አይቆጠሩም።</p><table><tr><th>ስም</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የተመዘገቡ ቀናት</th><th>የመገኘት %</th></tr>`;
+  let selected=null;
+  list.forEach(s=>{
+    const c={P:0,A:0,L:0,E:0},studentDates=[];
+    dates.forEach(d=>{const v=(attendance[d]||{})[String(s.id)];if(Object.prototype.hasOwnProperty.call(c,v)){c[v]++;studentDates.push({date:d,status:v});}});
+    const marked=c.P+c.A+c.L+c.E;
+    const percent=marked?Math.round(((c.P+c.L)/marked)*100):0;
+    const color=percent>=80?'#16803d':percent>=60?'#d97706':'#c62828';
+    html+=`<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td class="P">${c.P}</td><td class="A">${c.A}</td><td class="L">${c.L}</td><td class="E">${c.E}</td><td>${marked}</td><td><strong style="color:${color}">${percent}%</strong></td></tr>`;
+    if(sid!=='__ALL__')selected={student:s,counts:c,marked,percent,dates:studentDates};
+  });
+  html+='</table>';
+  if(selected){
+    html+=`<h2 style="margin-top:22px">የ${esc(selected.student.name)} የዕለት በዕለት ሪፖርት</h2><p>የተመዘገቡ ቀናት፦ ${selected.marked} | የመገኘት ፐርሰንት፦ <strong>${selected.percent}%</strong></p><table><tr><th>ቀን</th><th>የቀረቤታ ሁኔታ</th></tr>`;
+    if(!selected.dates.length){html+='<tr><td colspan="2">በዚህ የቀን ክልል ውስጥ የተመዘገበ ቀረቤታ የለም።</td></tr>';}
+    else selected.dates.forEach(item=>{html+=`<tr><td>${dateET(item.date)}</td><td class="${item.status}"><strong>${item.status} - ${labels[item.status]}</strong></td></tr>`;});
+    html+='</table>';
+  }
+  $('reportResult').innerHTML=html;
+}
 function renderAll(){fillSelects();renderStudents();renderClasses();drawAttendance();renderStats()}
 $('attDate').value=today();$('fromDate').value=today();$('toDate').value=today();
 document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$(b.dataset.page).classList.remove('hidden')}));
