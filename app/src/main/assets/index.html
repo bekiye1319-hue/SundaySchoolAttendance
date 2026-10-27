@@ -30,7 +30,50 @@ function dateISO(s){let m=String(s||'').trim().match(/^(\d{1,2})[/-](\d{1,2})[/-
 function dateET(iso){if(!iso)return '';let a=iso.split('-').map(Number);try{let p={};new Intl.DateTimeFormat('en-u-ca-ethiopic',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'}).formatToParts(new Date(Date.UTC(a[0],a[1]-1,a[2]))).forEach(x=>{if(x.type!=='literal')p[x.type]=+x.value});return String(p.day).padStart(2,'0')+'/'+String(p.month).padStart(2,'0')+'/'+p.year}catch(e){return iso}}
 function today(){return dateET(new Date().toISOString().slice(0,10))}
 function saveLocal(){try{localStorage.setItem('ss_students',JSON.stringify(students));localStorage.setItem('ss_classes',JSON.stringify(classes));localStorage.setItem('ss_attendance',JSON.stringify(attendance))}catch(e){}}
-async function cloudSave(){if(!currentUser)return;try{let batch=db.batch();students.forEach(s=>batch.set(db.collection('students').doc(String(s.id)),{...s,id:String(s.id)}));classes.forEach(c=>batch.set(db.collection('classes').doc(encodeURIComponent(c)),{name:c}));Object.keys(attendance).forEach(date=>Object.keys(attendance[date]||{}).forEach(id=>{let status=attendance[date][id];if(['P','A','L','E'].includes(status))batch.set(db.collection('attendance').doc(encodeURIComponent(date+'_'+id)),{date,studentId:String(id),status,updatedBy:currentUser.uid,updatedAt:firebase.firestore.FieldValue.serverTimestamp()})}));await batch.commit()}catch(e){console.error(e);alert('Firebase ላይ ማስቀመጥ አልተሳካም: '+e.message)}}
+async function cloudSave(scope='all'){
+ if(!currentUser){alert('መጀመሪያ Sign In ያድርጉ።');return false;}
+ try{
+   const batch=db.batch();
+   // Attendance-only saves let teachers save attendance without attempting to write
+   // the students/classes collections, which are supervisor-only in Firestore Rules.
+   if(scope==='attendance'){
+     const dates=Object.keys(attendance);
+     for(const date of dates){
+       for(const id of Object.keys(attendance[date]||{})){
+         const status=attendance[date][id];
+         if(['P','A','L','E'].includes(status)){
+           const docId=encodeURIComponent(date+'_'+id);
+           batch.set(db.collection('attendance').doc(docId),{
+             date, studentId:String(id), status,
+             updatedBy:currentUser.uid,
+             updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+           },{merge:true});
+         }
+       }
+     }
+   } else {
+     if(role!=='supervisor'){
+       alert('ተማሪዎችንና ክፍሎችን ለመቀየር Supervisor መሆን ያስፈልጋል።');
+       return false;
+     }
+     students.forEach(s=>batch.set(db.collection('students').doc(String(s.id)),{...s,id:String(s.id)}));
+     classes.forEach(c=>batch.set(db.collection('classes').doc(encodeURIComponent(c)),{name:c}));
+     Object.keys(attendance).forEach(date=>Object.keys(attendance[date]||{}).forEach(id=>{
+       const status=attendance[date][id];
+       if(['P','A','L','E'].includes(status))batch.set(db.collection('attendance').doc(encodeURIComponent(date+'_'+id)),{
+         date,studentId:String(id),status,updatedBy:currentUser.uid,
+         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+       },{merge:true});
+     }));
+   }
+   await batch.commit();
+   return true;
+ }catch(e){
+   console.error('Firebase save failed:',e);
+   alert('Firebase ላይ ማስቀመጥ አልተሳካም: '+e.message);
+   return false;
+ }
+}
 async function login(){let email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password){msg('Email እና Password ያስገቡ።');return}$('cloudLoginBtn').disabled=true;msg('በመግባት ላይ...');try{let cred=await auth.signInWithEmailAndPassword(email,password);currentUser=cred.user;let ud=await db.collection('users').doc(currentUser.uid).get();if(!ud.exists||!['supervisor','teacher'].includes(ud.data().role)){await auth.signOut();currentUser=null;role=null;msg('የመለያው role አልተገኘም። Firestore users/'+cred.user.uid+' ውስጥ role=supervisor ወይም teacher መሆኑን ይፈትሹ።');return}role=ud.data().role;await loadCloud();setLogin(false);$('cloudPassword').value='';msg('ገብተዋል።')}catch(e){console.error(e);msg('ስህተት: '+(e.message||'Firebase ግንኙነት አልተሳካም።'))}finally{$('cloudLoginBtn').disabled=false}}
 async function loadCloud(){let [ss,cc,aa]=await Promise.all([db.collection('students').get(),db.collection('classes').get(),db.collection('attendance').get()]);students=ss.docs.map(d=>({...d.data(),id:String(d.data().id||d.id)}));classes=cc.docs.map(d=>d.data().name||d.id);if(!classes.length)classes=['አጠቃላይ'];attendance={};aa.docs.forEach(d=>{let x=d.data();if(x.date&&x.studentId&&labels[x.status]){attendance[x.date]=attendance[x.date]||{};attendance[x.date][x.studentId]=x.status}});saveLocal();renderAll()}
 async function signup(){
@@ -59,7 +102,17 @@ function renderAll(){fillSelects();renderStudents();renderClasses();drawAttendan
 $('attDate').value=today();$('fromDate').value=today();$('toDate').value=today();
 document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$(b.dataset.page).classList.remove('hidden')}));
 $('loadAtt').onclick=drawAttendance;$('attClass').onchange=drawAttendance;$('studentSearch').oninput=renderStudents;$('allPresent').onclick=()=>document.querySelectorAll('#attendanceTable input[value=P]').forEach(x=>x.checked=true);
-$('saveAtt').onclick=async()=>{if(!currentUser)return alert('መጀመሪያ Sign In ያድርጉ።');let iso=dateISO($('attDate').value);if(!iso)return alert('ትክክለኛ ቀን ያስገቡ።');let day=attendance[iso]||{};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);attendance[iso]=day;await cloudSave();saveLocal();renderStats();alert('ቀረቤታው ተቀምጧል።')};
+$('saveAtt').onclick=async()=>{
+ if(!currentUser)return alert('መጀመሪያ Sign In ያድርጉ።');
+ const iso=dateISO($('attDate').value);
+ if(!iso)return alert('ትክክለኛ ቀን ያስገቡ።');
+ const day={...(attendance[iso]||{})};
+ document.querySelectorAll('#attendanceTable input:checked').forEach(x=>{day[x.name.slice(3)]=x.value});
+ attendance[iso]=day;
+ const ok=await cloudSave('attendance');
+ if(!ok)return; // Never show success after Firestore rejects the write.
+ saveLocal();renderStats();alert('ቀረቤታው በFirebase በትክክል ተቀምጧል።');
+};
 $('addStudent').onclick=async()=>{if(role!=='supervisor')return alert('Supervisor ብቻ ነው።');let name=$('studentName').value.trim();if(!name)return alert('ስም ያስገቡ።');students.push({id:'s'+Date.now(),name,className:$('studentClass').value,phone:$('studentPhone').value.trim()});await cloudSave();saveLocal();$('studentName').value='';$('studentPhone').value='';renderAll()};
 $('addClass').onclick=async()=>{if(role!=='supervisor')return alert('Supervisor ብቻ ነው።');let c=$('className').value.trim();if(!c||classes.includes(c))return alert('የክፍል ስም ያስገቡ፤ እንደገና ያለ ክፍል አይጨምሩ።');classes.push(c);await cloudSave();saveLocal();$('className').value='';renderAll()};
 document.addEventListener('click',async e=>{if(e.target.dataset.deleteStudent){if(role!=='supervisor')return;students=students.filter(s=>String(s.id)!==e.target.dataset.deleteStudent);Object.values(attendance).forEach(d=>delete d[e.target.dataset.deleteStudent]);await cloudSave();saveLocal();renderAll()}if(e.target.dataset.deleteClass){if(role!=='supervisor')return;let c=e.target.dataset.deleteClass;if(students.some(s=>s.className===c))return alert('በዚህ ክፍል ተማሪ አለ።');classes=classes.filter(x=>x!==c);await cloudSave();saveLocal();renderAll()}});
