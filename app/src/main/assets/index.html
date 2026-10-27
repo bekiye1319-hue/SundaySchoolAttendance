@@ -109,13 +109,13 @@ function report(){
   const sid=$('reportStudent').value;
   const list=students.filter(s=>sid==='__ALL__'||String(s.id)===sid);
   $('statistics').innerHTML=`<div class="grid"><div class="stat"><b>${recordedDates.length}</b>ቀረቤታ የተመዘገበባቸው ቀናት</div><div class="stat"><b>${list.length}</b>ተማሪዎች</div></div>`;
-  let html=`<p>ከ ${dateET(from)} እስከ ${dateET(to)}</p><p class="notice">የመገኘት % = (P + L) ÷ (P + A + L + E) × 100። ያልተመዘገቡ ቀናት አይቆጠሩም።</p><table><tr><th>ስም</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የተመዘገቡ ቀናት</th><th>የመገኘት %</th></tr>`;
+  let html=`<p>ከ ${dateET(from)} እስከ ${dateET(to)}</p><p class="notice">የመገኘት % = (P×100 + L×70 + E×25 + A×0) ÷ የተመዘገቡ ቀናት። ያልተመዘገቡ ቀናት አይቆጠሩም።</p><table><tr><th>ስም</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የተመዘገቡ ቀናት</th><th>የመገኘት %</th></tr>`;
   let selected=null;
   list.forEach(s=>{
     const c={P:0,A:0,L:0,E:0},studentDates=[];
     dates.forEach(d=>{const v=(attendance[d]||{})[String(s.id)];if(Object.prototype.hasOwnProperty.call(c,v)){c[v]++;studentDates.push({date:d,status:v});}});
     const marked=c.P+c.A+c.L+c.E;
-    const percent=marked?Math.round(((c.P+c.L)/marked)*100):0;
+    const percent=marked?Math.round((c.P*100+c.L*70+c.E*25)/marked):0;
     const color=percent>=80?'#16803d':percent>=60?'#d97706':'#c62828';
     html+=`<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td class="P">${c.P}</td><td class="A">${c.A}</td><td class="L">${c.L}</td><td class="E">${c.E}</td><td>${marked}</td><td><strong style="color:${color}">${percent}%</strong></td></tr>`;
     if(sid!=='__ALL__')selected={student:s,counts:c,marked,percent,dates:studentDates};
