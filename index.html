@@ -8,7 +8,7 @@
 <nav class="no-print"><button class="active" data-page="attendance">ቀረቤታ</button><button data-page="students">ተማሪዎች</button><button data-page="classes">ክፍሎች</button><button data-page="reports">ሪፖርት</button><button data-page="backup">Backup</button><button id="topLogout" type="button" style="background:#b42318;color:white">ውጣ / Logout</button></nav>
 <main>
 <section id="attendance" class="page"><div class="panel"><h2>የቀረቤታ መዝገብ</h2><div class="grid"><div><label>ቀን (DD/MM/YYYY የኢትዮጵያ ዘመን)</label><input id="attDate" placeholder="01/02/2019"></div><div><label>ክፍል</label><select id="attClass"></select></div></div><div class="row no-print"><button id="saveAtt">ቀረቤታ አስቀምጥ</button><button id="allPresent">ሁሉንም P አድርግ</button><button id="printAttendance">የቀረቤታ ወረቀት Print</button><button id="dailyReport">የዚህ ቀን ሪፖርት</button></div><p class="notice">P = ተገኝቷል • A = ቀርቷል • L = ዘግይቷል • E = ፈቃድ</p><div id="attendanceTable" class="table-wrap"></div></div></section>
-<section id="students" class="page hidden"><div class="panel"><h2>ተማሪ መመዝገብ</h2><h2 style="margin-top:20px">አዲስ ተማሪ መመዝገብ</h2><div class="grid"><div><label>ሙሉ ስም</label><input id="studentName"></div><div><label>ክፍል</label><select id="studentClass"></select></div><div><label>ስልክ (አማራጭ)</label><input id="studentPhone"></div></div><div class="row"><button id="addStudent">ተማሪ ጨምር</button></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h2>የተመዘገቡ ተማሪዎች</h2><div class="search-panel"><label for="studentSearch">🔎 ተማሪ ፈልግ</label><input id="studentSearch" placeholder="በስም፣ ስልክ፣ ID ወይም ክፍል ፈልግ"><p class="small">ሁሉም ተማሪዎች ከዚህ በታች ይታያሉ።</p></div><div id="studentsTable" class="table-wrap student-search-results"></div></div></section>
+<section id="students" class="page hidden"><div class="panel"><div id="studentRegistrationPanel"><h2>ተማሪ መመዝገብ</h2><h2 style="margin-top:20px">አዲስ ተማሪ መመዝገብ</h2><div class="grid"><div><label>ሙሉ ስም</label><input id="studentName"></div><div><label>ክፍል</label><select id="studentClass"></select></div><div><label>ስልክ (አማራጭ)</label><input id="studentPhone"></div></div><div class="row"><button id="addStudent">ተማሪ ጨምር</button></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"></div><h2>የተመዘገቡ ተማሪዎች</h2><div class="search-panel"><label for="studentSearch">🔎 ተማሪ ፈልግ</label><input id="studentSearch" placeholder="በስም፣ ስልክ፣ ID ወይም ክፍል ፈልግ"><p class="small">ሁሉም ተማሪዎች ከዚህ በታች ይታያሉ።</p></div><div id="studentsTable" class="table-wrap student-search-results"></div></div></section>
 <section id="classes" class="page hidden"><div class="panel"><h2>ክፍሎች</h2><div class="grid"><div><label>የክፍል ስም</label><input id="className"></div><div><label>የተማሪ ID ቅድመ ፊደል (Prefix)</label><input id="classPrefix" placeholder="ለምሳሌ SSAM" maxlength="8"><p class="small">እያንዳንዱ ክፍል የተለየ Prefix ይኑረው። ከክፍሉ ስም ጋር አንድ ዓይነት የሆነ Prefix ካለ በራስ-ሰር ይሞላል።</p></div></div><div class="row"><button id="addClass">ክፍል ጨምር</button></div><div id="classesTable" class="table-wrap"></div></div></section>
 <section id="reports" class="page hidden"><div class="panel"><h2>የቀረቤታ ሪፖርት</h2><div class="grid"><div><label>የሪፖርት አይነት</label><select id="reportPeriod"><option value="custom">የቀን ክልል</option><option value="daily">የቀን ሪፖርት</option><option value="monthly">ወርሃዊ ሪፖርት</option></select></div><div><label>ቀን / የወሩ ቀን (DD/MM/YYYY)</label><input id="fromDate"></div><div><label>እስከ (DD/MM/YYYY)</label><input id="toDate"></div><div><label>ክፍል</label><select id="reportClass"><option value="__ALL__">ሁሉም ክፍሎች</option></select></div><div><label>ተማሪ</label><select id="reportStudent"></select></div></div><div class="row"><button id="makeReport">ሪፖርት አውጣ</button><button id="printReport">Print / PDF</button><button id="exportExcel">Excel አውርድ (.xlsx)</button></div><div id="statistics"></div><div id="reportResult" class="table-wrap"></div></div></section>
 <section id="backup" class="page hidden"><div class="panel"><h2>Backup / Restore</h2><button id="backupBtn">Backup አውርድ</button><label class="btn" for="restoreFile">Restore ፋይል ምረጥ</label><input id="restoreFile" type="file" accept=".json" class="hidden"><p id="backupMessage"></p></div></section>
@@ -49,8 +49,10 @@ async function cloudSave(scope='all'){
          const status=attendance[date][id];
          if(['P','A','L','E'].includes(status) && (!isClassScoped()||students.some(st=>String(st.id)===String(id)&&st.className===assignedClass))){
            const docId=encodeURIComponent(date+'_'+id);
+           const student=students.find(st=>String(st.id)===String(id));
+           if(!student || !student.className) continue;
            batch.set(db.collection('attendance').doc(docId),{
-             date, studentId:String(id), status,
+             date, studentId:String(id), className:student.className, status,
              updatedBy:currentUser.uid,
              updatedAt:firebase.firestore.FieldValue.serverTimestamp()
            },{merge:true});
@@ -66,10 +68,13 @@ async function cloudSave(scope='all'){
      classes.forEach(c=>batch.set(db.collection('classes').doc(encodeURIComponent(c)),{name:c,prefix:classPrefixes[c]||''}));
      Object.keys(attendance).forEach(date=>Object.keys(attendance[date]||{}).forEach(id=>{
        const status=attendance[date][id];
-       if(['P','A','L','E'].includes(status))batch.set(db.collection('attendance').doc(encodeURIComponent(date+'_'+id)),{
-         date,studentId:String(id),status,updatedBy:currentUser.uid,
-         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-       },{merge:true});
+       if(['P','A','L','E'].includes(status)){
+         const student=students.find(st=>String(st.id)===String(id));
+         batch.set(db.collection('attendance').doc(encodeURIComponent(date+'_'+id)),{
+           date,studentId:String(id),className:student?.className||'',status,updatedBy:currentUser.uid,
+           updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+         },{merge:true});
+       }
      }));
    }
    await batch.commit();
@@ -90,14 +95,10 @@ async function loadCloud(){
      db.collection('classes').where('name','==',assignedClass).get()
    ]);
    students=ss.docs.map(d=>({...d.data(),id:String(d.data().id||d.id)}));
-   // Existing attendance documents are keyed by studentId rather than className.
-   // Read in small 'in' batches so Rules can verify each student's assigned class.
-   const ids=students.map(st=>String(st.id));
-   for(let i=0;i<ids.length;i+=10){
-     const group=ids.slice(i,i+10);
-     const snap=await db.collection('attendance').where('studentId','in',group).get();
-     attendanceDocs.push(...snap.docs);
-   }
+   // Only read attendance explicitly tagged with this assigned class.
+   // This lets Firestore Rules enforce class isolation at query time.
+   const snap=await db.collection('attendance').where('className','==',assignedClass).get();
+   attendanceDocs=snap.docs;
  }else{
    [ss,cc]=await Promise.all([db.collection('students').get(),db.collection('classes').get()]);
    students=ss.docs.map(d=>({...d.data(),id:String(d.data().id||d.id)}));
@@ -125,7 +126,7 @@ $('cloudLoginBtn').addEventListener('click',login);$('cloudPassword').addEventLi
 $('cloudLogoutBtn').addEventListener('click',async()=>{await auth.signOut();currentUser=null;role=null;setLogin(true);msg('ወጥተዋል። እንደገና ይግቡ።')});
 $('topLogout').addEventListener('click',async()=>{if(!currentUser){setLogin(true);return;}if(!confirm('ከስርዓቱ መውጣት ይፈልጋሉ?'))return;try{await auth.signOut();currentUser=null;role=null;setLogin(true);msg('በተሳካ ሁኔታ ወጥተዋል።');}catch(e){alert('Logout አልተሳካም። እንደገና ይሞክሩ።')}});
 function fillSelects(){const visibleClasses=isClassScoped()?[assignedClass]:classes;let opts=visibleClasses.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');$('studentClass').innerHTML=opts;$('attClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('attClass').value=isClassScoped()?assignedClass:'__ALL__';$('reportClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('reportClass').value=isClassScoped()?assignedClass:'__ALL__';const visibleStudents=isClassScoped()?students.filter(st=>st.className===assignedClass):students;$('reportStudent').innerHTML='<option value="__ALL__">ሁሉም ተማሪዎች</option>'+visibleStudents.map(st=>`<option value="${esc(st.id)}">${esc(st.name)}</option>`).join('');if(isClassScoped())$('studentClass').value=assignedClass}
-function applyRoleUI(){const classOnly=isClassScoped();document.querySelector('nav button[data-page="students"]').classList.toggle('hidden',classOnly);document.querySelector('nav button[data-page="classes"]').classList.toggle('hidden',classOnly);document.querySelector('nav button[data-page="backup"]').classList.toggle('hidden',classOnly);$('studentClass').disabled=classOnly;$('attClass').disabled=classOnly;$('reportClass').disabled=classOnly;if(classOnly){document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));document.querySelector('nav button[data-page="attendance"]').classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$('attendance').classList.remove('hidden');$('attClass').value=assignedClass;$('reportClass').value=assignedClass;}}
+function applyRoleUI(){const classOnly=isClassScoped();const supervisor=role==='supervisor';document.querySelector('nav button[data-page="students"]').classList.remove('hidden');document.querySelector('nav button[data-page="classes"]').classList.toggle('hidden',!supervisor);document.querySelector('nav button[data-page="backup"]').classList.toggle('hidden',!supervisor);$('studentRegistrationPanel').classList.toggle('hidden',!supervisor);$('studentClass').disabled=!supervisor;$('attClass').disabled=classOnly;$('reportClass').disabled=classOnly;if(classOnly){$('attClass').value=assignedClass;$('reportClass').value=assignedClass;}}
 
 function renderStudents(){const q=$('studentSearch').value.trim().toLowerCase();const box=$('studentsTable');const source=isClassScoped()?students.filter(st=>st.className===assignedClass):students;const list=source.filter(s=>!q||[s.name,s.phone,s.className,s.id].some(x=>String(x||'').toLowerCase().includes(q)));if(!list.length){box.innerHTML=`<p class="small" style="padding:10px">${q?'የተፈለገው ተማሪ አልተገኘም።':'ገና ተማሪ አልተመዘገበም።'}</p>`;return;}box.innerHTML='<table><tr><th>ID</th><th>ስም</th><th>ክፍል</th><th>ስልክ</th><th>አማራጮች</th></tr>'+list.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.phone||'')}</td><td>${role==='supervisor'?`<button data-edit-student="${esc(s.id)}">Edit / አስተካክል</button> <button data-delete-student="${esc(s.id)}">ሰርዝ</button>`:''}</td></tr>`).join('')+'</table>'}
 function renderClasses(){$('classesTable').innerHTML='<table><tr><th>ክፍል</th><th>ተማሪዎች</th><th></th></tr>'+classes.map(c=>`<tr><td>${esc(c)}</td><td>${students.filter(s=>s.className===c).length}</td><td>${role==='supervisor'?`<button data-delete-class="${esc(c)}">ሰርዝ</button>`:''}</td></tr>`).join('')+'</table>'}
