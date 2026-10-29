@@ -47,6 +47,57 @@ input,select{ min-height:44px; }
   .row button,.row .btn{font-size:13px}
 }
 
+
+
+/* Modern visual redesign: CSS only; existing HTML controls and JavaScript logic remain intact. */
+:root{--g:#08784f;--b:#1976d2;--r:#e53935;--bg:#f2f8f5;--line:#dce9e2;--ink:#18352b;--muted:#667b72;--card:#ffffff}
+body{background:linear-gradient(180deg,#edf8f2 0%,#f7faf8 45%,#eef6f2 100%);color:var(--ink);font-family:Arial,"Noto Sans Ethiopic",sans-serif}
+header{background:linear-gradient(135deg,#075b40,#07875a 65%,#18a66f);padding:24px 16px 22px;box-shadow:0 5px 18px #075b4024;text-align:center}
+header h1{font-size:clamp(21px,3vw,30px);letter-spacing:.1px}
+header p{margin:8px 0 0;opacity:.94;line-height:1.7}
+nav{z-index:10;background:rgba(255,255,255,.96);border-bottom:1px solid #dbe9e1;box-shadow:0 4px 14px #18352b0b;gap:8px;padding:12px}
+nav button{background:#edf6f0;color:#176044;border:1px solid #d8e9df;border-radius:12px;padding:11px 15px;transition:background .18s,transform .18s}
+nav button.active{background:linear-gradient(135deg,#08784f,#12a36c);color:white;border-color:transparent;box-shadow:0 4px 10px #08784f2a}
+main{max-width:1180px;padding:18px 16px 30px}
+.panel{background:var(--card);border:1px solid #dfebe4;border-radius:18px;padding:19px;margin-bottom:17px;box-shadow:0 7px 24px #164d3210}
+h2{color:#08784f;font-size:21px;line-height:1.45}
+label{color:#345448;font-size:14px}
+input,select{border:1px solid #d0e0d7;border-radius:11px;padding:12px 13px;color:#18352b;box-shadow:inset 0 1px 2px #18352b05;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{border-color:#159768;box-shadow:0 0 0 3px #1597681c}
+button,.btn{background:linear-gradient(135deg,#08784f,#0b9963);border-radius:11px;padding:11px 15px;box-shadow:0 3px 8px #08784f18;transition:filter .15s,transform .15s}
+button:hover,.btn:hover{filter:brightness(1.04)}button:active,.btn:active{transform:translateY(1px)}
+.row{gap:9px}
+.grid{gap:13px}
+.stat{background:linear-gradient(145deg,#eaf7ef,#f7fcf9);border:1px solid #d8ece0;border-radius:15px;padding:17px}
+.stat b{color:#08784f;font-size:28px}
+th,td{border-color:#e0ebe5;padding:11px 10px}
+th{background:#eaf5ee;color:#22533e;font-weight:700}
+tbody tr:nth-child(even){background:#fbfdfc}
+tbody tr:hover{background:#f0faf4}
+.table-wrap{border-radius:12px;max-width:100%}
+.notice{background:#fff8df;border:1px solid #f1e5b7;border-radius:12px;line-height:1.7}
+.search-panel{background:#f5faf7;border-color:#dcebe2;border-radius:14px}
+.student-search-results{border-color:#e0ebe5;border-radius:13px}
+.small{color:var(--muted)}
+.P{color:#13834c}.A{color:#d32f2f}.L{color:#1976d2}.E{color:#8154c7}
+#cloudLogin{background:linear-gradient(135deg,#e7f6ed,#f7fbf8)!important}
+#cloudLogin .panel{border-radius:20px;box-shadow:0 14px 38px #075b401a}
+#editStudentModal>.panel{border-radius:18px;box-shadow:0 18px 55px #102d201f}
+@media(max-width:700px){
+ header{padding:20px 12px 18px}
+ nav{padding:9px;gap:7px}
+ nav button{border-radius:10px;padding:10px 12px}
+ main{padding:11px 9px 24px}
+ .panel{padding:14px;border-radius:15px}
+ h2{font-size:19px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .stat{padding:12px 8px}
+ .stat b{font-size:23px}
+ .row button,.row .btn{flex:1 1 auto;width:auto}
+ th,td{padding:9px 8px}
+}
+@media(max-width:390px){.grid{grid-template-columns:minmax(0,1fr)} header h1{font-size:20px}}
+
 </style></head><body>
 <header><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • ቀረቤታ • ሪፖርት</p></header>
 <nav class="no-print"><button class="active" data-page="attendance">ቀረቤታ</button><button data-page="students">ተማሪዎች</button><button data-page="classes">ክፍሎች</button><button data-page="reports">ሪፖርት</button><button data-page="backup">Backup</button><button id="topLogout" type="button" style="background:#b42318;color:white">ውጣ / Logout</button></nav>
