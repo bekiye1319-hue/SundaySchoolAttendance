@@ -972,3 +972,23 @@ $('refreshActivityLogs').addEventListener('click',renderActivityLogs);document.q
 #students .students-ref-action[data-delete-student]:hover{background:#bd3038!important;transform:translateY(-1px)}
 @media(max-width:600px){#students .students-ref-table-wrap table{min-width:820px}#students .students-ref-table-wrap th,#students .students-ref-table-wrap td{padding:11px 8px;font-size:12px}}
 </style>
+<style id="navbar-top-and-attendance-radio-correction">
+/* Put the main navigation at the top on desktop and mobile, across every page. */
+nav.no-print{position:sticky!important;top:0!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;min-height:0!important;height:auto!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:7px!important;padding:9px 14px!important;background:#102d22!important;z-index:1000!important;overflow-x:auto!important;overflow-y:visible!important;box-shadow:0 3px 12px #173b2520!important}
+nav.no-print .sidebar-brand,nav.no-print .sidebar-user,nav.no-print .sidebar-section-label{display:none!important}
+nav.no-print button{flex:0 0 auto!important;width:auto!important;min-height:40px!important;margin:0!important;padding:9px 13px!important;text-align:center!important;white-space:nowrap!important;border-radius:9px!important}
+nav.no-print button:before{display:none!important}
+nav.no-print button.active{background:#16834d!important;color:#fff!important}
+nav.no-print #topLogout{margin:0 0 0 auto!important}
+header{padding-left:22px!important}
+/* Only the four bulk/action buttons are arranged in a 2 x 2 grid. */
+#attendance .attendance-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;max-width:520px!important}
+#attendance .attendance-actions button{width:100%!important;min-height:44px!important}
+/* Restore attendance entry controls to round radio circles; do not make them 2 x 2 buttons. */
+#attendance .attendance-status-grid{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-around!important;gap:12px!important;max-width:none!important;width:100%!important}
+#attendance .attendance-status-btn{display:inline-flex!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;min-height:38px!important;padding:5px 7px!important;background:transparent!important;border:0!important;box-shadow:none!important;color:#35483d!important}
+#attendance .attendance-status-btn input[type="radio"]{appearance:auto!important;-webkit-appearance:radio!important;width:18px!important;height:18px!important;min-height:18px!important;margin:0 5px 0 0!important;padding:0!important;border-radius:50%!important;accent-color:#16834d!important}
+#attendance .attendance-status-btn span{font-size:12px!important;white-space:nowrap!important}
+@media(max-width:760px){nav.no-print{flex-wrap:nowrap!important;justify-content:flex-start!important}nav.no-print button{flex:0 0 auto!important}nav.no-print #topLogout{margin-left:auto!important}header{padding:12px 14px!important}}
+@media(max-width:390px){#attendance .attendance-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}#attendance .attendance-status-grid{gap:5px!important}#attendance .attendance-status-btn{padding:4px 2px!important}#attendance .attendance-status-btn span{font-size:10px!important}}
+</style>
