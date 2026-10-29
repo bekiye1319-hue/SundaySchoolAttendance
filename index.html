@@ -104,17 +104,188 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
 @media(max-width:760px){.page-heading{align-items:flex-start;margin-bottom:13px}.page-heading h2{font-size:19px}.attendance-filters,.student-form-grid,.backup-grid{grid-template-columns:minmax(0,1fr)}.attendance-toolbar{align-items:flex-start;flex-direction:column}.attendance-actions button{flex:1 1 calc(50% - 8px);white-space:normal;line-height:1.45}.student-form-footer{align-items:stretch;flex-direction:column}.student-form-footer button{width:100%}.student-search-panel{align-items:stretch;flex-direction:column;gap:7px}.backup-card>p{min-height:0}.attendance-list-panel,.student-form-panel,.student-list-panel,.backup-card{padding:14px}.status-legend{gap:8px}}
 @media(max-width:390px){.attendance-actions button{flex-basis:100%}.page-heading .heading-icon{width:40px;height:40px;flex-basis:40px}.status-legend{font-size:10px}}
 
-</style></head><body>
+
+/* Screenshot-matched visual pass for attendance, mobile login and backup/restore. */
+.attendance-page .page-heading .heading-icon{background:transparent;color:#176b40;width:34px;height:34px;flex-basis:34px;font-size:25px}
+.attendance-page .page-heading h2{font-size:21px}
+.attendance-filter-panel{border-radius:18px;padding:17px 19px}
+.attendance-filters{gap:14px}
+.attendance-actions{display:flex;flex-wrap:nowrap;gap:7px;margin:12px 0}
+.attendance-actions button{flex:1 1 0;min-width:0;padding:10px 9px;font-size:12px;white-space:normal;line-height:1.35}
+.attendance-actions #saveAtt{background:#12844e}
+.attendance-actions #allPresent{background:#287db9}
+.attendance-actions #dailyReport{background:#8a55e8;color:#fff;border:0}
+.attendance-note{display:flex;gap:15px;flex-wrap:wrap;align-items:center;background:#fffbed;border:0;border-radius:12px;padding:11px 14px;color:#283b31}
+.attendance-note span{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.attendance-note .legend-dot{width:18px;height:18px}
+.attendance-table-wrap{margin-top:13px;border-radius:14px;box-shadow:0 4px 14px #193b2610}
+.attendance-table-wrap>table{min-width:650px;width:100%}
+.attendance-table-wrap th{padding:12px 10px;text-align:center;color:#1c5a3a;font-size:11px;text-transform:none;letter-spacing:0}
+.attendance-table-wrap th:nth-child(2),.attendance-table-wrap th:nth-child(3),.attendance-table-wrap th:nth-child(4),.attendance-table-wrap td:nth-child(2),.attendance-table-wrap td:nth-child(3),.attendance-table-wrap td:nth-child(4){text-align:left}
+.attendance-table-wrap td{padding:10px 10px;font-size:12px}
+.attendance-table-wrap .student-id-cell{font-weight:700;white-space:nowrap}
+.attendance-table-wrap .student-name-cell{min-width:150px}
+.attendance-table-wrap input[type=radio]{width:19px;height:19px;min-height:19px;border-radius:50%;background:#fff;border:2px solid #d5ded9}
+.attendance-table-wrap input[type=radio]::after{content:""}
+.attendance-table-wrap input[type=radio]:checked::after{content:"✓";font-size:12px;color:#fff}
+.attendance-table-wrap input[value=P]:checked{background:#20b28b;border-color:#20b28b}
+.attendance-table-wrap input[value=A]:checked{background:#e04b4b;border-color:#e04b4b}
+.attendance-table-wrap input[value=L]:checked{background:#3c82e6;border-color:#3c82e6}
+.attendance-table-wrap input[value=E]:checked{background:#a04ee4;border-color:#a04ee4}
+.attendance-summary-panel{padding:20px 18px;border-radius:18px}
+.attendance-summary-panel h3{margin:0 0 13px;color:#1c5a3a;font-size:16px}
+.attendance-summary-list{display:grid;gap:8px}
+.summary-row{display:flex;align-items:center;gap:11px;border-radius:12px;padding:9px 13px;min-height:48px}
+.summary-letter{display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:#20b28b;color:#fff;font-weight:800}
+.summary-row strong{font-size:13px;font-weight:600;color:#263b30}
+.summary-row b{margin-left:auto;font-size:21px}
+.summary-P{background:#e4f6ef;color:#20a981}.summary-A{background:#fde8e8;color:#d94a50}.summary-A .summary-letter{background:#e04b4b}.summary-L{background:#e6f1ff;color:#367bd8}.summary-L .summary-letter{background:#3c82e6}.summary-E{background:#f3e6ff;color:#9b4ed8}.summary-E .summary-letter{background:#a04ee4}
+.attendance-summary-footer{margin-top:12px;padding:10px 12px;border-radius:9px;background:#f6faf7;border:1px solid #e7eee9;color:#54715f;font-size:11px}
+/* Login: match the provided phone screenshot. */
+.auth-overlay{background:#075c3a!important;backdrop-filter:none!important;padding:26px!important}
+.auth-shell{width:min(650px,100%);min-height:0;display:block;border-radius:30px;overflow:hidden;box-shadow:0 20px 60px #002e1b45;border:1px solid #e1f8e9}
+.auth-welcome{display:none!important}
+.auth-form-panel{padding:35px 54px 30px;background:#fff;display:flex;justify-content:flex-start}
+.auth-mobile-mark{display:grid;place-items:center;align-self:center;width:142px;height:142px;flex:none;border-radius:50%;border:7px solid #d6f8e4;background:#0e6240;color:#fff;font-size:0;margin:0 auto 17px;box-shadow:0 9px 20px #0b59351a}
+.auth-mobile-mark:before{content:"✝";font-size:68px;color:white;text-shadow:0 0 1px white}
+.auth-mobile-brand{display:block;text-align:center;margin-bottom:25px;padding-bottom:22px;border-bottom:1px solid #edf1ee}
+.auth-mobile-brand h1{font-size:28px;line-height:1.5;color:#0d6240;margin:0 0 5px;font-weight:900}
+.auth-mobile-brand p{font-size:14px;color:#167452;font-weight:700;margin:0}
+.auth-label{display:none}
+.auth-form-panel h2{display:none}
+.auth-intro{display:none}
+.auth-form-panel label{font-size:14px;color:#334155;margin:12px 0 7px}
+.auth-input-wrap{border:1px solid #cbd5df;border-radius:18px;background:#f8fafc;padding:0 16px;gap:12px}
+.auth-input-wrap>span{font-size:22px;color:#94a3b8}
+.auth-input-wrap input{font-size:17px;min-height:64px}
+.password-toggle{font-size:21px!important;color:#94a3b8!important}
+.auth-actions{margin-top:24px;gap:12px}
+.auth-actions #cloudLoginBtn{min-height:68px;border-radius:18px;background:#0c6240;box-shadow:0 8px 18px #0c62402b;font-size:21px;text-align:center}
+.auth-actions #cloudLoginBtn span{display:none}
+.auth-actions .signup-link{background:transparent;color:#176b40;box-shadow:none;border:0;min-height:42px;font-size:16px}
+.auth-info-note{margin-top:18px;padding:17px;border-radius:18px;background:#fffbed;border:1px solid #f5e6a5;color:#87521e;font-size:14px;line-height:1.6}
+.auth-message{font-size:12px;margin-top:10px}
+.auth-footer{display:none}
+/* Backup / restore: large horizontal colored panels like the supplied reference. */
+.backup-page .page-heading .heading-icon{background:transparent;color:#0f7146;width:46px;height:46px;flex-basis:46px;font-size:34px}
+.backup-page .page-heading h2{font-size:30px;color:#087044}
+.backup-grid{grid-template-columns:1fr;gap:18px}
+.backup-card{display:grid;grid-template-columns:150px minmax(0,1fr);grid-template-rows:auto auto auto;align-items:center;column-gap:24px;min-height:230px;padding:30px 34px;border:0;border-radius:30px;background:#07884d;color:white;box-shadow:0 12px 25px #0d64301c}
+.backup-card .backup-card-icon{grid-column:1;grid-row:1/4;align-self:center;justify-self:center;width:146px;height:146px;border-radius:28px;background:#ffffff2a;color:#fff;font-size:54px;margin:0}
+.backup-card h3{grid-column:2;color:#fff;font-size:27px;margin:0 0 5px}
+.backup-card>p{grid-column:2;color:#e6fff0;font-size:17px;min-height:0;margin:0 0 15px}
+.backup-card button,.backup-card .restore-file-label{grid-column:2;justify-self:start;min-width:260px;min-height:65px;padding:15px 28px;border-radius:40px;background:#fff;color:#1e293b;border:0;font-size:17px;text-align:center;display:block}
+.backup-card .restore-file-input{grid-column:2;background:#ffffff20;color:white;border:1px solid #ffffff40;margin-top:8px}
+.backup-card .restore-file-label{margin:0 0 7px}
+.backup-card .backup-tip{grid-column:2;border:0;padding:0;margin:10px 0 0;color:#e4fff0;font-size:12px}
+.backup-card:nth-child(2){background:#8738f5}
+.backup-card:nth-child(2) .backup-card-icon{background:#ffffff28;color:white}
+.backup-card:nth-child(2) .backup-tip{color:#f4eaff}
+.backup-status-note{display:flex;align-items:center;gap:14px;margin-top:18px;padding:28px 35px;border-radius:28px;background:white;border:1px solid #e0e9e3;color:#1a6b5d;font-weight:800;font-size:17px;box-shadow:0 6px 18px #183c2b0d}
+.backup-status-note .status-check{display:grid;place-items:center;width:45px;height:45px;border-radius:50%;background:#147d70;color:#fff;font-size:26px;flex:none}
+@media(max-width:760px){
+ .attendance-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.attendance-actions button{width:100%;min-width:0;font-size:11px;padding:9px 7px}.attendance-actions #dailyReport{grid-column:1/-1}
+ .attendance-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.attendance-filters input,.attendance-filters select{font-size:13px;padding:9px 8px}
+ .attendance-toolbar{gap:10px}.status-legend{gap:8px}
+ .auth-overlay{padding:20px 14px!important;align-items:center!important}.auth-shell{width:100%;border-radius:30px}.auth-form-panel{padding:32px 22px 25px}.auth-mobile-mark{width:112px;height:112px;margin-bottom:13px}.auth-mobile-mark:before{font-size:57px}.auth-mobile-brand{padding-bottom:18px;margin-bottom:17px}.auth-mobile-brand h1{font-size:23px}.auth-mobile-brand p{font-size:12px}.auth-input-wrap input{min-height:58px;font-size:16px}.auth-actions #cloudLoginBtn{min-height:61px;font-size:19px}.auth-info-note{padding:14px;font-size:13px}
+ .backup-page .page-heading h2{font-size:25px}.backup-grid{grid-template-columns:1fr;gap:14px}.backup-card{grid-template-columns:74px minmax(0,1fr);column-gap:14px;min-height:0;padding:22px 16px;border-radius:25px}.backup-card .backup-card-icon{width:68px;height:68px;border-radius:20px;font-size:33px}.backup-card h3{font-size:22px}.backup-card>p{font-size:14px;line-height:1.6}.backup-card button,.backup-card .restore-file-label{min-width:0;width:100%;min-height:52px;padding:12px 10px;font-size:14px}.backup-card .backup-tip{font-size:11px}.backup-status-note{padding:20px 16px;border-radius:22px;font-size:14px}.backup-status-note .status-check{width:38px;height:38px}
+}
+@media(max-width:420px){.attendance-filters{grid-template-columns:1fr}.attendance-summary-panel{padding:15px 12px}.auth-form-panel{padding:27px 17px 20px}.auth-mobile-brand h1{font-size:21px}.backup-card{grid-template-columns:58px minmax(0,1fr);padding:18px 12px;column-gap:11px}.backup-card .backup-card-icon{width:54px;height:54px;font-size:28px}.backup-card h3{font-size:19px}}
+
+
+/* Login page: closely follows the user's supplied GUI while keeping Firebase element IDs and handlers. */
+:root{--login-primary:#0b6637;--login-primary-light:#e8f5e9;--login-primary-dark:#054021;--login-text:#2c3e50;--login-muted:#607d8b;--login-border:#e0e6ed}
+#cloudLogin.auth-overlay{background:linear-gradient(135deg,var(--login-primary-dark),#10321f)!important;padding:16px!important;backdrop-filter:none!important;font-family:'Segoe UI',Tahoma,'Noto Sans Ethiopic',sans-serif}
+#cloudLogin .login-box{background:#fff;border-radius:18px;padding:36px 28px;width:min(400px,100%);box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:center;border:0;display:block;color:var(--login-text)}
+#cloudLogin .icon-circle{width:72px;height:72px;background:var(--login-primary-light);color:var(--login-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 18px;box-shadow:0 4px 12px rgba(11,102,55,.15)}
+#cloudLogin .login-box h2{margin:0 0 6px;font-size:22px;color:var(--login-text);font-weight:700;line-height:1.4}
+#cloudLogin .login-box .small{font-size:13px;color:var(--login-muted);margin:0 0 24px}
+#cloudLogin .form-group{text-align:left;margin-bottom:18px}
+#cloudLogin .login-box label{display:block;font-size:13px;font-weight:700;color:var(--login-text);margin:0 0 6px}
+#cloudLogin .input-wrapper{position:relative;display:flex;align-items:center;width:100%;border:0;background:transparent;padding:0;gap:0}
+#cloudLogin .input-wrapper>i{position:absolute;left:14px;z-index:1;color:var(--login-muted);font-size:15px;pointer-events:none}
+#cloudLogin .input-wrapper input{width:100%;min-width:0;padding:12px 44px 12px 42px!important;border:1px solid var(--login-border)!important;border-radius:9px!important;font-size:14px!important;outline:none;background:#fafafa!important;min-height:46px!important;box-shadow:none!important;transition:all .2s ease-in-out;font-family:inherit}
+#cloudLogin .input-wrapper input:focus{border-color:var(--login-primary)!important;background:#fff!important;box-shadow:0 0 0 3px rgba(11,102,55,.12)!important}
+#cloudLogin .password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);min-height:34px!important;width:34px;padding:4px!important;background:transparent!important;border:0!important;border-radius:7px!important;color:var(--login-muted)!important;font-size:17px!important;box-shadow:none!important}
+#cloudLogin #cloudLoginBtn{border:0;border-radius:9px;padding:13px;background:var(--login-primary);color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;margin-top:24px;box-shadow:none;transition:background .2s ease-in-out;font-family:inherit}
+#cloudLogin #cloudLoginBtn:hover{background:#084d29}
+#cloudLogin #cloudLoginBtn:disabled{opacity:.7}
+#cloudLogin .signup-link{display:block;background:transparent!important;color:var(--login-primary)!important;border:0!important;box-shadow:none!important;width:100%;min-height:40px;font-size:14px;font-weight:700;padding:8px;margin:8px 0 0;font-family:inherit}
+#cloudLogin .alert-message{display:none;padding:10px;margin-top:16px;border-radius:8px;font-size:13px;text-align:center;background:#d4edda;color:#155724;border:1px solid #c3e6cb;overflow-wrap:anywhere;line-height:1.5}
+#cloudLogin .alert-message:not(:empty){display:block}
+#cloudLogin #cloudLogoutBtn{margin-top:8px;width:100%;background:#65736b}
+#cloudLogin button:focus-visible,#cloudLogin input:focus-visible{outline:3px solid #d8b84b;outline-offset:2px}
+@media(max-width:420px){#cloudLogin .login-box{padding:30px 22px}#cloudLogin .icon-circle{width:72px;height:72px;font-size:32px}}
+
+/* Attendance GUI rebuilt to match the supplied reference; IDs and Firebase handlers remain intact. */
+#attendance{--att-green:#167a45;--att-blue:#1877f2;--att-purple:#7c3aed;--att-red:#dc2626;--att-muted:#6b7280}
+#attendance .attendance-reference-title{display:flex;align-items:center;gap:10px;color:var(--att-green);font-size:22px;font-weight:800;margin:4px 0 8px}
+#attendance .attendance-reference-title i{font-size:24px}
+#attendance .panel{background:#fff;border:1px solid #eaf0ec;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+#attendance .attendance-filter-panel{margin-bottom:14px}
+#attendance .section-caption{font-size:13px;font-weight:800;color:#6b7280;margin-bottom:12px}
+#attendance .attendance-filters{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#attendance .attendance-filters label{font-size:12px;color:#6b7280;margin:0 0 6px}
+#attendance .attendance-filters input,#attendance .attendance-filters select{width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;color:#111827;background:#fff;min-height:42px}
+#attendance .attendance-list-panel{padding:16px!important}
+#attendance .attendance-toolbar{display:block;margin-bottom:12px}
+#attendance .attendance-toolbar h3,#attendance .attendance-summary-panel h3{color:var(--att-green);font-size:15px;font-weight:800;margin:0 0 8px}
+#attendance .attendance-toolbar p{margin:0 0 12px;font-size:12px;color:#6b7280}
+#attendance .status-legend,#attendance .attendance-note{background:#fffbeb;border:1px solid #fef3c7;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px;font-weight:700}
+#attendance .attendance-note{margin:12px 0 10px}
+#attendance .attendance-actions{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+#attendance .attendance-actions button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;min-height:40px}
+#attendance .att-btn-green{background:#167a45;color:white}
+#attendance .att-btn-blue{background:#1877f2;color:white}
+#attendance .att-btn-purple{background:#7c3aed;color:white}
+#attendance .att-btn-gray{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb!important}
+#attendance .attendance-table-wrap{overflow-x:auto;border-radius:12px}
+#attendance .attendance-reference-table{width:100%;min-width:650px;border-collapse:collapse;margin:0;font-size:13px;text-align:left}
+#attendance .attendance-reference-table th{background:#fff;color:var(--att-green);font-weight:800;padding:12px 10px;border:0;border-bottom:2px solid #eaf0ec;white-space:nowrap}
+#attendance .attendance-reference-table td{padding:10px;border:0;border-bottom:1px solid #f3f4f6;color:#374151;font-weight:600;vertical-align:middle}
+#attendance .attendance-reference-table tr:last-child td{border-bottom:0}
+#attendance .attendance-reference-table th.status-head,#attendance .attendance-reference-table td.status{text-align:center;width:58px}
+#attendance .attendance-reference-table th.status-head.P{color:#167a45}
+#attendance .attendance-reference-table th.status-head.A{color:#dc2626}
+#attendance .attendance-reference-table th.status-head.L{color:#1877f2}
+#attendance .attendance-reference-table th.status-head.E{color:#7c3aed}
+#attendance .student-id-cell{font-weight:800;color:#111827;white-space:nowrap}
+#attendance .student-name-cell{min-width:130px}
+#attendance .radio-container{display:inline-block;position:relative;width:22px;height:22px;cursor:pointer;margin:0;padding:0}
+#attendance .radio-container input{position:absolute;opacity:0;cursor:pointer;height:1px;width:1px;left:10px;top:10px;margin:0}
+#attendance .checkmark{position:absolute;inset:0;height:22px;width:22px;background:#fff;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .15s ease;pointer-events:none}
+#attendance .checkmark i{display:none;color:#fff;font-size:11px}
+#attendance .radio-container.status-P input:checked~.checkmark{background:#167a45;border-color:#167a45}
+#attendance .radio-container.status-A input:checked~.checkmark{background:#dc2626;border-color:#dc2626}
+#attendance .radio-container.status-L input:checked~.checkmark{background:#1877f2;border-color:#1877f2}
+#attendance .radio-container.status-E input:checked~.checkmark{background:#7c3aed;border-color:#7c3aed}
+#attendance .radio-container input:checked~.checkmark i{display:block}
+#attendance .radio-container:focus-within .checkmark{outline:3px solid #d8eafe;outline-offset:2px}
+#attendance .attendance-summary-panel{padding:20px!important}
+#attendance .attendance-summary-list{display:flex;flex-direction:column;gap:10px}
+#attendance .summary-row{border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:12px;justify-content:space-between;font-weight:700;font-size:14px}
+#attendance .summary-letter{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex:0 0 22px}
+#attendance .summary-row strong{margin-right:auto}
+#attendance .summary-row b{font-size:20px;font-weight:800}
+#attendance .summary-P{background:#e6f4ea;color:#167a45}#attendance .summary-P .summary-letter{background:#167a45}
+#attendance .summary-A{background:#fee2e2;color:#dc2626}#attendance .summary-A .summary-letter{background:#dc2626}
+#attendance .summary-L{background:#e8f1fd;color:#1877f2}#attendance .summary-L .summary-letter{background:#1877f2}
+#attendance .summary-E{background:#f3e8ff;color:#7c3aed}#attendance .summary-E .summary-letter{background:#7c3aed}
+#attendance .attendance-summary-footer{background:#f8faf9;border:1px solid #eaf0ec;border-radius:10px;padding:10px 14px;font-size:12px;color:#4b5563;font-weight:600;margin-top:14px}
+@media(max-width:700px){#attendance .panel{padding:14px!important}#attendance .attendance-filters{grid-template-columns:1fr;gap:10px}#attendance .attendance-actions button{flex:1 1 100%;width:100%;white-space:normal}#attendance .status-legend{gap:10px;padding:10px}#attendance .attendance-reference-table{min-width:650px}}
+@media print{#attendance .attendance-actions,#attendance .attendance-filter-panel .section-caption{display:none!important}#attendance .panel{box-shadow:none!important;border:0!important}#attendance .attendance-reference-table{min-width:0!important}#attendance .radio-container{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head><body>
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • ቀረቤታ • ሪፖርት</p></div><span class="header-badge">SS</span></header>
 <div id="sidebarBackdrop" class="sidebar-backdrop no-print"></div><nav class="no-print" aria-label="ዋና ምናሌ"><div class="sidebar-brand"><div class="brand-mark">✝</div><div><strong>ሰንበት ትምህርት ቤት</strong><small>ATTENDANCE SYSTEM</small></div></div><div class="sidebar-user"><div class="sidebar-avatar">S</div><div><strong>Attendance Portal</strong><small>የተማሪ መዝገብ</small></div></div><div class="sidebar-section-label">ዋና ምናሌ</div><button class="active" data-page="dashboard">ዋና ገጽ (Dashboard)</button><button data-page="attendance">ቀረቤታ</button><button data-page="students">ተማሪዎች</button><button data-page="classes">ክፍሎች</button><button data-page="reports">ሪፖርት</button><button data-page="backup">Backup / Restore</button><button id="topLogout" type="button" style="background:#b42318;color:white">ውጣ / Logout</button></nav>
 <main>
 <section id="dashboard" class="page"><div class="dashboard-title"><div><h2>ዋና ገጽ (Dashboard)</h2><p>የሰንበት ትምህርት ቤት የተማሪ እና የቀረቤታ አጠቃላይ መረጃ</p></div></div><div class="dashboard-stats"><div class="dashboard-stat"><div class="kpi-icon">♙</div><strong id="dashboardStudentCount">0</strong><span>ጠቅላላ ተማሪዎች</span></div><div class="dashboard-stat"><div class="kpi-icon">▦</div><strong id="dashboardClassCount">0</strong><span>ጠቅላላ ክፍሎች</span></div><div class="dashboard-stat"><div class="kpi-icon">✓</div><strong id="dashboardPresentCount">0</strong><span>ዛሬ የተገኙ (P)</span></div></div><div class="panel"><h2>ፈጣን እርምጃዎች</h2><div class="quick-actions"><button type="button" onclick="navigateTo('attendance')">✓ &nbsp; ቀረቤታ መዝግብ</button><button type="button" onclick="navigateTo('students')">＋ &nbsp; አዲስ ተማሪ መዝግብ</button><button type="button" onclick="navigateTo('reports')">▤ &nbsp; ሪፖርት ተመልከት</button></div></div><div class="panel"><h2>የስርዓቱ ማስታወሻ</h2><p class="small" style="line-height:1.8">ቀረቤታውን ከመዝገብዎ በፊት ቀን እና ክፍል ይምረጡ። መረጃው ለማስቀመጥ የFirebase መለያዎ መግባት አለበት።</p></div></section>
 <section id="attendance" class="page attendance-page">
- <div class="page-heading"><div class="heading-icon">✓</div><div><h2>የቀረቤታ መዝገብ</h2><p>የዕለቱን ተማሪዎች ሁኔታ ይምረጡ፤ ከዚያ መዝግበው ያስቀምጡ።</p></div></div>
+ <div class="page-title attendance-reference-title"><i class="fa-regular fa-calendar-check"></i><span>የቀረቤታ መዝገብ</span></div>
  <div class="panel attendance-filter-panel"><div class="section-caption">የቀረቤታ መረጃ</div><div class="attendance-filters"><div><label for="attDate">ቀን (DD/MM/YYYY የኢትዮጵያ ዘመን)</label><input id="attDate" placeholder="01/02/2019"></div><div><label for="attClass">ክፍል</label><select id="attClass"></select></div></div></div>
  <div class="panel attendance-list-panel"><div class="attendance-toolbar"><div><h3>የተማሪዎች ቀረቤታ</h3><p>ለእያንዳንዱ ተማሪ አንድ ሁኔታ ይምረጡ።</p></div><div class="status-legend"><span><i class="legend-dot p-dot"></i>P ተገኝቷል</span><span><i class="legend-dot a-dot"></i>A ቀርቷል</span><span><i class="legend-dot l-dot"></i>L ዘግይቷል</span><span><i class="legend-dot e-dot"></i>E ፈቃድ</span></div></div>
- <div class="row attendance-actions no-print"><button id="saveAtt">✓ ቀረቤታ አስቀምጥ</button><button id="allPresent" class="btn-blue">ሁሉንም P አድርግ</button><button id="printAttendance" class="btn-neutral">ይህን ክፍል Print</button><button id="printAllAttendance" class="btn-neutral">ሁሉንም ክፍሎች Print</button><button id="dailyReport" class="btn-outline">የዚህ ቀን ሪፖርት</button></div>
- <div class="notice attendance-note">P = ተገኝቷል &nbsp; • &nbsp; A = ቀርቷል &nbsp; • &nbsp; L = ዘግይቷል &nbsp; • &nbsp; E = ፈቃድ</div><div id="attendanceTable" class="table-wrap attendance-table-wrap"></div></div>
+ <div class="row attendance-actions no-print"><button id="saveAtt" class="att-btn-green"><i class="fa-solid fa-floppy-disk"></i> ቀረቤታ አስቀምጥ</button><button id="allPresent" class="att-btn-blue"><i class="fa-solid fa-user-check"></i> ሁሉንም P አድርግ</button><button id="printAttendance" class="att-btn-gray"><i class="fa-solid fa-print"></i> ይህን ክፍል Print</button><button id="printAllAttendance" class="att-btn-gray"><i class="fa-solid fa-print"></i> ሁሉንም ክፍሎች Print</button><button id="dailyReport" class="att-btn-purple"><i class="fa-solid fa-chart-simple"></i> የዚህ ቀን ሪፖርት</button></div>
+ <div class="notice attendance-note"><span><i class="legend-dot p-dot"></i> P = ተገኝቷል</span><span><i class="legend-dot a-dot"></i> A = ቀርቷል</span><span><i class="legend-dot l-dot"></i> L = ፈቃድ/ዘግይቷል</span><span><i class="legend-dot e-dot"></i> E = ፈቃድ</span></div><div id="attendanceTable" class="table-wrap attendance-table-wrap"></div></div><div class="panel attendance-summary-panel"><h3>የዕለቱ ቀረቤታ ማጠቃለያ</h3><div id="attendanceSummary" class="attendance-summary-list"></div><div id="attendanceSummaryFooter" class="attendance-summary-footer"></div></div>
 </section>
 <section id="students" class="page hidden students-page">
  <div class="page-heading"><div class="heading-icon students-icon">♙</div><div><h2>ተማሪዎች</h2><p>ተማሪ ይመዝግቡ፣ ይፈልጉ እና መረጃቸውን ያስተዳድሩ።</p></div></div>
@@ -126,11 +297,31 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
 <section id="backup" class="page hidden backup-page">
  <div class="page-heading"><div class="heading-icon backup-icon">☁</div><div><h2>Data Backup &amp; Restore</h2><p>የተማሪዎችን፣ ክፍሎችን እና ቀረቤታን ቅጂ ያስቀምጡ ወይም ከፋይል ይመልሱ።</p></div></div>
  <div class="backup-grid"><div class="panel backup-card"><div class="backup-card-icon">⬇</div><h3>Backup Data</h3><p>የስርዓቱን መረጃ በJSON ፋይል ወደ ስልክዎ ወይም ኮምፒውተርዎ ያውርዱ።</p><button id="backupBtn">☁ Backup አውርድ</button><div class="backup-tip">ምክር፦ የመረጃ ቅጂውን በደህና ያስቀምጡ።</div></div>
- <div class="panel backup-card"><div class="backup-card-icon restore-icon">↥</div><h3>Restore Data</h3><p>ቀደም ሲል ያስቀመጡትን JSON backup ፋይል በመምረጥ መረጃውን ይመልሱ።</p><label class="restore-file-label" for="restoreFile">📁 Restore ፋይል ምረጥ</label><input id="restoreFile" type="file" accept=".json" class="restore-file-input"><p id="backupMessage" class="backup-message" aria-live="polite"></p><div class="backup-tip warning-tip">Restore ማድረግ ያለውን መረጃ በbackup ውስጥ ባለው መረጃ ይተካል።</div></div></div>
+ <div class="panel backup-card"><div class="backup-card-icon restore-icon">↥</div><h3>Restore Data</h3><p>ቀደም ሲል ያስቀመጡትን JSON backup ፋይል በመምረጥ መረጃውን ይመልሱ።</p><label class="restore-file-label" for="restoreFile">📁 Restore ፋይል ምረጥ</label><input id="restoreFile" type="file" accept=".json" class="restore-file-input"><p id="backupMessage" class="backup-message" aria-live="polite"></p><div class="backup-tip warning-tip">Restore ማድረግ ያለውን መረጃ በbackup ውስጥ ባለው መረጃ ይተካል።</div></div></div><div class="backup-status-note"><span class="status-check">✓</span><span>Backup / Restore የሚያስቀምጡትን መረጃ ደህንነት ይጠብቃል።</span></div>
 </section>
 </main>
 <div id="editStudentModal" class="hidden" style="position:fixed;inset:0;background:#0008;z-index:30;display:none;align-items:center;justify-content:center;padding:16px;overflow:auto"><div class="panel" style="width:min(560px,100%);max-height:95%;overflow:auto"><h2>የተማሪ መረጃ አስተካክል</h2><p class="small">Student ID አይቀየርም። ስም፣ ክፍል እና ስልክ ማስተካከል ይችላሉ።</p><input id="editStudentId" type="hidden"><label>ሙሉ ስም</label><input id="editStudentName"><label>ክፍል</label><select id="editStudentClass"></select><label>ስልክ (አማራጭ)</label><input id="editStudentPhone" type="tel"><div class="row"><button id="saveStudentEdit" type="button">ለውጡን አስቀምጥ</button><button id="cancelStudentEdit" type="button" style="background:#65736b">ዝጋ</button></div><p id="editStudentMessage" class="small" aria-live="polite"></p></div></div>
-<div id="cloudLogin" class="auth-overlay" style="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto"><div class="auth-shell"><section class="auth-welcome"><div class="auth-cross">✝</div><span class="auth-eyebrow">SUNDAY SCHOOL</span><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ ቀረቤታ እና መዝገብ ስርዓት</p><div class="auth-rule"></div><p class="auth-verse">“ልጆችን ወደ እኔ ይምጡ ተዉአቸው”</p><small>ሉቃስ 18፥16</small></section><section class="auth-form-panel"><div class="auth-mobile-mark">✝</div><div class="auth-label">SECURE ACCESS</div><h2>እንኳን ደህና መጡ!</h2><p class="auth-intro">ወደ መለያዎ ለመግባት የተመዘገቡትን Email እና Password ያስገቡ።</p><label for="cloudEmail">Email አድራሻ</label><div class="auth-input-wrap"><span aria-hidden="true">✉</span><input id="cloudEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div><label for="cloudPassword">Password</label><div class="auth-input-wrap"><span aria-hidden="true">♙</span><input id="cloudPassword" type="password" autocomplete="current-password" placeholder="Password ያስገቡ" required><button type="button" id="togglePassword" class="password-toggle" aria-label="Password አሳይ" aria-pressed="false">◉</button></div><div class="auth-actions"><button id="cloudLoginBtn" type="button">ግባ <span aria-hidden="true">→</span></button><button id="cloudSignupBtn" class="hidden" type="button" aria-hidden="true" tabindex="-1">መለያ ፍጠር / Sign up</button><button id="cloudLogoutBtn" class="hidden" type="button">ውጣ / Sign out</button></div><p id="cloudLoginMessage" class="auth-message" aria-live="polite">🔒 የተፈቀደልዎትን መለያ ብቻ ይጠቀሙ።</p><div class="auth-footer">የሰንበት ትምህርት ቤት · Attendance System</div></section></div></div>
+<div id="cloudLogin" class="auth-overlay" style="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto">
+  <div class="login-box">
+    <div class="icon-circle"><i class="fa-solid fa-church" aria-hidden="true"></i></div>
+    <h2>ሰንበት ትምህርት ቤት</h2>
+    <p class="small">የሰራተኛ መግቢያ (Staff Login)</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="cloudEmail">ኢሜይል / Email</label>
+        <div class="input-wrapper"><i class="fa-solid fa-envelope" aria-hidden="true"></i><input id="cloudEmail" name="email" type="email" autocomplete="username" spellcheck="false" placeholder="admin@example.com" required></div>
+      </div>
+      <div class="form-group">
+        <label for="cloudPassword">የይለፍ ቃል / Password</label>
+        <div class="input-wrapper"><i class="fa-solid fa-lock" aria-hidden="true"></i><input id="cloudPassword" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required><button type="button" id="togglePassword" class="password-toggle" aria-label="Password አሳይ" aria-pressed="false">◉</button></div>
+      </div>
+      <button id="cloudLoginBtn" class="btn" type="submit"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> ግባ / Sign in</button>
+    </form>
+    <button id="cloudSignupBtn" class="signup-link" type="button">መለያ ፍጠር / Sign up</button>
+    <div id="cloudLoginMessage" class="alert-message" aria-live="polite"></div>
+    <button id="cloudLogoutBtn" class="hidden" type="button">ውጣ / Sign out</button>
+  </div>
+</div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
@@ -243,7 +434,8 @@ async function signup(){
  finally{$('cloudSignupBtn').disabled=false}
 }
 $('cloudSignupBtn').addEventListener('click',signup);
-$('cloudLoginBtn').addEventListener('click',login);$('cloudPassword').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('cloudEmail').addEventListener('keydown',e=>{if(e.key==='Enter')$('cloudPassword').focus()});
+$('loginForm').addEventListener('submit',e=>{e.preventDefault();login()});
+$('cloudLoginBtn').addEventListener('click',e=>{e.preventDefault();login()});$('cloudEmail').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('cloudPassword').focus()}});
 const togglePassword=$('togglePassword');if(togglePassword)togglePassword.addEventListener('click',()=>{const field=$('cloudPassword'),visible=field.type==='password';field.type=visible?'text':'password';togglePassword.textContent=visible?'◎':'◉';togglePassword.setAttribute('aria-pressed',String(visible));togglePassword.setAttribute('aria-label',visible?'Password ደብቅ':'Password አሳይ')});
 $('cloudLogoutBtn').addEventListener('click',async()=>{await auth.signOut();currentUser=null;role=null;setLogin(true);msg('ወጥተዋል። እንደገና ይግቡ።')});
 $('topLogout').addEventListener('click',async()=>{if(!currentUser){setLogin(true);return;}if(!confirm('ከስርዓቱ መውጣት ይፈልጋሉ?'))return;try{await auth.signOut();currentUser=null;role=null;setLogin(true);msg('በተሳካ ሁኔታ ወጥተዋል።');}catch(e){alert('Logout አልተሳካም። እንደገና ይሞክሩ።')}});
@@ -252,7 +444,8 @@ function applyRoleUI(){const classOnly=isClassScoped();document.querySelector('n
 
 function renderStudents(){const q=$('studentSearch').value.trim().toLowerCase();const box=$('studentsTable');const source=isClassScoped()?students.filter(st=>st.className===assignedClass):students;const list=source.filter(s=>!q||[s.name,s.phone,s.className,s.id].some(x=>String(x||'').toLowerCase().includes(q)));if(!list.length){box.innerHTML=`<p class="small" style="padding:10px">${q?'የተፈለገው ተማሪ አልተገኘም።':'ገና ተማሪ አልተመዘገበም።'}</p>`;return;}box.innerHTML='<table><tr><th>ID</th><th>ስም</th><th>ክፍል</th><th>ስልክ</th><th>አማራጮች</th></tr>'+list.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.phone||'')}</td><td>${role==='supervisor'?`<button data-edit-student="${esc(s.id)}">Edit / አስተካክል</button> <button data-delete-student="${esc(s.id)}">ሰርዝ</button>`:''}</td></tr>`).join('')+'</table>'}
 function renderClasses(){$('classesTable').innerHTML='<table><tr><th>ክፍል</th><th>ተማሪዎች</th><th></th></tr>'+classes.map(c=>`<tr><td>${esc(c)}</td><td>${students.filter(s=>s.className===c).length}</td><td>${role==='supervisor'?`<button data-delete-class="${esc(c)}">ሰርዝ</button>`:''}</td></tr>`).join('')+'</table>'}
-function drawAttendance(){let iso=dateISO($('attDate').value);if(!iso){$('attendanceTable').innerHTML='<p>ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';return}let c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(s=>c==='__ALL__'||s.className===c),day=attendance[iso]||{};$('attendanceTable').innerHTML=`<p>ቀን: ${dateET(iso)} | ተማሪዎች: ${list.length}</p><table><tr><th>ID</th><th>ስም</th><th>P</th><th>A</th><th>L</th><th>E</th></tr>${list.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.name)}</td>${['P','A','L','E'].map(st=>`<td class="status ${st}"><input type="radio" name="st-${esc(s.id)}" value="${st}" ${day[s.id]===st?'checked':''}></td>`).join('')}</tr>`).join('')}</table>`}
+function drawAttendance(){let iso=dateISO($('attDate').value);if(!iso){$('attendanceTable').innerHTML='<p style="padding:12px">ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';renderAttendanceSummary([],{},null);return}let c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(s=>c==='__ALL__'||s.className===c),day=attendance[iso]||{};$('attendanceTable').innerHTML=`<table class="attendance-reference-table"><thead><tr><th style="width:40px">#</th><th style="width:110px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th class="status-head P">P</th><th class="status-head A">A</th><th class="status-head L">L</th><th class="status-head E">E</th></tr></thead><tbody>${list.map((s,i)=>`<tr><td>${i+1}</td><td class="student-id-cell">${esc(s.id)}</td><td class="student-name-cell">${esc(s.name)}</td><td>${esc(s.className||'')}</td>${['P','A','L','E'].map(st=>`<td class="status ${st}"><label class="radio-container status-${st}" title="${st}"><input aria-label="${esc(s.name)} ${st}" type="radio" name="st-${esc(s.id)}" value="${st}" ${day[String(s.id)]===st?'checked':''}><span class="checkmark"><i class="fa-solid fa-check"></i></span></label></td>`).join('')}</tr>`).join('')}</tbody></table>`;renderAttendanceSummary(list,day,iso)}
+function renderAttendanceSummary(list,day,iso){const counts={P:0,A:0,L:0,E:0};list.forEach(st=>{const v=day[String(st.id)];if(counts[v]!==undefined)counts[v]++});const labels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};$('attendanceSummary').innerHTML=Object.keys(counts).map(k=>`<div class="summary-row summary-${k}"><span class="summary-letter">${k}</span><strong>${labels[k]}</strong><b>${counts[k]}</b></div>`).join('');$('attendanceSummaryFooter').innerHTML=iso?`📅 ቀን፦ ${dateET(iso)} &nbsp; | &nbsp; ክፍል፦ ${esc(isClassScoped()?assignedClass:($('attClass').selectedOptions[0]?.textContent||'ሁሉም ክፍሎች'))}`:''}
 function renderStats(){let c={P:0,A:0,L:0,E:0};Object.entries(attendance).forEach(([date,day])=>Object.entries(day||{}).forEach(([id,v])=>{const st=students.find(x=>String(x.id)===String(id));if((!isClassScoped()||(st&&st.className===assignedClass))&&c[v]!==undefined)c[v]++}));$('statistics').innerHTML=`<div class="grid">${Object.keys(c).map(k=>`<div class="stat"><b>${c[k]}</b>${k} - ${labels[k]}</div>`).join('')}</div>`}
 function report(){
   const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);
@@ -300,7 +493,7 @@ $('attDate').value=today();$('fromDate').value=today();$('toDate').value=today()
 function navigateTo(page){const b=document.querySelector('nav button[data-page="'+page+'"]');if(b)b.click()}
 document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$(b.dataset.page).classList.remove('hidden')}));
 const menuToggle=$('menuToggle'), sidebarBackdrop=$('sidebarBackdrop'), sideNav=document.querySelector('nav.no-print');function closeSidebar(){sideNav.classList.remove('sidebar-open');sidebarBackdrop.classList.remove('show');menuToggle.setAttribute('aria-expanded','false')}menuToggle.addEventListener('click',()=>{const open=!sideNav.classList.contains('sidebar-open');sideNav.classList.toggle('sidebar-open',open);sidebarBackdrop.classList.toggle('show',open);menuToggle.setAttribute('aria-expanded',String(open))});sidebarBackdrop.addEventListener('click',closeSidebar);document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',closeSidebar));
-$('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attDate').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;$('allPresent').onclick=()=>document.querySelectorAll('#attendanceTable input[value=P]').forEach(x=>x.checked=true);
+$('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attDate').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;$('attendanceTable').addEventListener('change',e=>{if(e.target.matches('input[type=radio]')){const iso=dateISO($('attDate').value);const c=isClassScoped()?assignedClass:$('attClass').value;const list=students.filter(st=>c==='__ALL__'||st.className===c);const day={...(attendance[iso]||{})};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);renderAttendanceSummary(list,day,iso)}});$('allPresent').onclick=()=>{document.querySelectorAll('#attendanceTable input[value=P]').forEach(x=>x.checked=true);const iso=dateISO($('attDate').value),c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(st=>c==='__ALL__'||st.className===c),day={...(attendance[iso]||{})};list.forEach(st=>day[String(st.id)]='P');renderAttendanceSummary(list,day,iso)};
 $('saveAtt').onclick=async()=>{
  if(!currentUser)return alert('መጀመሪያ Sign In ያድርጉ።');
  const iso=dateISO($('attDate').value);
