@@ -166,23 +166,27 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
 .auth-info-note{margin-top:18px;padding:17px;border-radius:18px;background:#fffbed;border:1px solid #f5e6a5;color:#87521e;font-size:14px;line-height:1.6}
 .auth-message{font-size:12px;margin-top:10px}
 .auth-footer{display:none}
-/* Backup / restore: large horizontal colored panels like the supplied reference. */
-.backup-page .page-heading .heading-icon{background:transparent;color:#0f7146;width:46px;height:46px;flex-basis:46px;font-size:34px}
-.backup-page .page-heading h2{font-size:30px;color:#087044}
-.backup-grid{grid-template-columns:1fr;gap:18px}
-.backup-card{display:grid;grid-template-columns:150px minmax(0,1fr);grid-template-rows:auto auto auto;align-items:center;column-gap:24px;min-height:230px;padding:30px 34px;border:0;border-radius:30px;background:#07884d;color:white;box-shadow:0 12px 25px #0d64301c}
-.backup-card .backup-card-icon{grid-column:1;grid-row:1/4;align-self:center;justify-self:center;width:146px;height:146px;border-radius:28px;background:#ffffff2a;color:#fff;font-size:54px;margin:0}
-.backup-card h3{grid-column:2;color:#fff;font-size:27px;margin:0 0 5px}
-.backup-card>p{grid-column:2;color:#e6fff0;font-size:17px;min-height:0;margin:0 0 15px}
-.backup-card button,.backup-card .restore-file-label{grid-column:2;justify-self:start;min-width:260px;min-height:65px;padding:15px 28px;border-radius:40px;background:#fff;color:#1e293b;border:0;font-size:17px;text-align:center;display:block}
-.backup-card .restore-file-input{grid-column:2;background:#ffffff20;color:white;border:1px solid #ffffff40;margin-top:8px}
-.backup-card .restore-file-label{margin:0 0 7px}
-.backup-card .backup-tip{grid-column:2;border:0;padding:0;margin:10px 0 0;color:#e4fff0;font-size:12px}
-.backup-card:nth-child(2){background:#8738f5}
-.backup-card:nth-child(2) .backup-card-icon{background:#ffffff28;color:white}
-.backup-card:nth-child(2) .backup-tip{color:#f4eaff}
-.backup-status-note{display:flex;align-items:center;gap:14px;margin-top:18px;padding:28px 35px;border-radius:28px;background:white;border:1px solid #e0e9e3;color:#1a6b5d;font-weight:800;font-size:17px;box-shadow:0 6px 18px #183c2b0d}
-.backup-status-note .status-check{display:grid;place-items:center;width:45px;height:45px;border-radius:50%;background:#147d70;color:#fff;font-size:26px;flex:none}
+/* Backup / Restore: compact green and purple cards matching the latest supplied design. */
+.backup-page{font-family:'Poppins','Noto Sans Ethiopic',sans-serif}
+.backup-page .page-heading{display:flex;align-items:center;gap:10px;margin:3px 0 5px}
+.backup-page .page-heading .heading-icon{background:transparent;color:#059669;width:36px;height:36px;flex-basis:36px;font-size:27px}
+.backup-page .page-heading h2{font-size:23px;color:#059669}
+.backup-page .page-heading p{display:none}
+.backup-grid{grid-template-columns:1fr;gap:20px}
+.backup-page .backup-card{display:block;min-width:0;padding:25px;border:0;border-radius:16px;background:#059669;color:white;box-shadow:0 10px 25px -5px rgba(5,150,105,.3)}
+.backup-page .backup-card .backup-card-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.2);color:white;font-size:22px;margin:0;float:left;margin-right:15px}
+.backup-page .backup-card h3{color:white;font-size:19px;font-weight:700;margin:0 0 4px;line-height:1.5}
+.backup-page .backup-card>p{color:rgba(255,255,255,.92);font-size:13px;min-height:0;margin:0 0 20px;line-height:1.6}
+.backup-page .backup-card button,.backup-page .backup-card .restore-file-label{min-width:0;width:auto;min-height:44px;padding:10px 22px;border-radius:10px;background:#fff;color:#1e293b;border:0;font-size:13px;font-weight:600;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin:0;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.backup-page .backup-card button:hover,.backup-page .backup-card .restore-file-label:hover{background:#f8fafc;transform:translateY(-1px)}
+.backup-page .backup-card .restore-file-input{display:none}
+.backup-page .backup-card .backup-message{margin:10px 0 0;color:white;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.backup-page .backup-card .backup-tip{border:0;padding:0;margin:12px 0 0;color:#e6fff0;font-size:11px;line-height:1.6}
+.backup-page .backup-card:nth-child(2){background:#8b5cf6;box-shadow:0 10px 25px -5px rgba(139,92,246,.3)}
+.backup-page .backup-card:nth-child(2) .backup-card-icon{background:rgba(255,255,255,.2);color:white}
+.backup-page .backup-card:nth-child(2) .backup-tip{color:#f4eaff}
+.backup-page .backup-status-note{display:flex;align-items:center;gap:12px;margin-top:0;padding:15px 20px;border-radius:12px;background:white;border:1px solid #e2e8f0;color:#334155;font-weight:500;font-size:13px;line-height:1.6;box-shadow:0 2px 4px rgba(0,0,0,.02)}
+.backup-page .backup-status-note .status-check{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#10b981;color:white;font-size:14px;flex:none}
 @media(max-width:760px){
  .attendance-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.attendance-actions button{width:100%;min-width:0;font-size:11px;padding:9px 7px}.attendance-actions #dailyReport{grid-column:1/-1}
  .attendance-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.attendance-filters input,.attendance-filters select{font-size:13px;padding:9px 8px}
@@ -357,6 +361,29 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
 @media(max-width:700px){#reports .report-container{padding:9px;gap:12px}#reports .report-card{padding:14px;border-radius:12px;gap:14px}#reports .report-filter-grid{grid-template-columns:minmax(0,1fr);gap:8px}#reports .report-button-group{gap:8px}#reports .report-btn{flex:1 1 100%;width:100%}#reports .report-table th,#reports .report-table td{padding:10px 8px}#reports .report-brand-title{font-size:1.05rem}}
 @media print{#reports.report-page{display:block!important;background:#fff}#reports .report-container{max-width:none;padding:0;gap:8px}#reports .report-app-header{box-shadow:none}#reports .report-card{box-shadow:none;padding:8px;border:0;break-inside:avoid}#reports .report-button-group{display:none!important}#reports .report-table-responsive{overflow:visible}#reports .report-table{min-width:0;font-size:10px}#reports .report-table th,#reports .report-table td{padding:5px 4px}}
 
+
+/* Desktop profile bar and backup cards based on the latest supplied design. */
+.backup-desktop-navbar{background:#059669;color:#fff;padding:15px 24px;display:flex;align-items:center;justify-content:flex-end;gap:22px;border-radius:14px;margin:0 0 24px;box-shadow:0 4px 12px #05966920}
+.backup-user-profile{display:flex;align-items:center;gap:12px;min-width:0}
+.backup-user-avatar{width:40px;height:40px;flex:0 0 40px;background:#fff;color:#059669;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem}
+.backup-user-details h4{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:6px;margin:0}
+.backup-user-details p{font-size:.8rem;opacity:.92;margin:2px 0 0;overflow-wrap:anywhere}
+.backup-logout-btn{background:#ef4444!important;color:#fff!important;border:0;padding:10px 17px;border-radius:8px;font-weight:700;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.backup-content-wrap{width:100%;max-width:600px;margin:0 auto}
+.backup-new-title{display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;color:#059669;margin:0 0 20px}
+.backup-new-cards{display:flex;flex-direction:column;gap:20px}
+.backup-new-card{border-radius:16px;padding:25px;color:#fff;box-shadow:0 10px 25px -5px #0002}
+.backup-new-card.green{background:#059669;box-shadow:0 10px 25px -5px #0596694d}
+.backup-new-card.purple{background:#8b5cf6;box-shadow:0 10px 25px -5px #8b5cf64d}
+.backup-new-head{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+.backup-new-icon{width:48px;height:48px;flex:0 0 48px;background:#ffffff33;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.backup-new-titles h3{color:#fff;font-size:1.2rem;font-weight:800;margin:0 0 4px}
+.backup-new-titles p{font-size:.85rem;opacity:.94;margin:0;line-height:1.6}
+.backup-new-action{background:#fff!important;color:#1e293b!important;border:0;padding:11px 20px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px #0002}
+.backup-new-info{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:15px 18px;display:flex;align-items:center;gap:12px;font-size:.9rem;color:#334155;line-height:1.6;box-shadow:0 2px 4px #00000005;margin-top:20px}
+.backup-new-info-icon{width:28px;height:28px;flex:0 0 28px;background:#10b981;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+@media(max-width:700px){.backup-desktop-navbar{padding:12px;gap:10px;justify-content:space-between;border-radius:11px;margin-bottom:18px}.backup-user-profile{gap:8px}.backup-user-avatar{width:34px;height:34px;flex-basis:34px}.backup-user-details h4{font-size:.83rem}.backup-user-details p{font-size:.7rem;max-width:135px}.backup-logout-btn{padding:9px 10px;font-size:.78rem;gap:5px}.backup-new-card{padding:20px}.backup-new-title{font-size:1.1rem}.backup-new-action{width:100%;justify-content:center}}
+
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head><body>
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • ቀረቤታ • ሪፖርት</p></div><span class="header-badge">SS</span></header>
@@ -414,9 +441,18 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
   </div>
 </section>
 <section id="backup" class="page hidden backup-page">
- <div class="page-heading"><div class="heading-icon backup-icon">☁</div><div><h2>Data Backup &amp; Restore</h2><p>የተማሪዎችን፣ ክፍሎችን እና ቀረቤታን ቅጂ ያስቀምጡ ወይም ከፋይል ይመልሱ።</p></div></div>
- <div class="backup-grid"><div class="panel backup-card"><div class="backup-card-icon">⬇</div><h3>Backup Data</h3><p>የስርዓቱን መረጃ በJSON ፋይል ወደ ስልክዎ ወይም ኮምፒውተርዎ ያውርዱ።</p><button id="backupBtn">☁ Backup አውርድ</button><div class="backup-tip">ምክር፦ የመረጃ ቅጂውን በደህና ያስቀምጡ።</div></div>
- <div class="panel backup-card"><div class="backup-card-icon restore-icon">↥</div><h3>Restore Data</h3><p>ቀደም ሲል ያስቀመጡትን JSON backup ፋይል በመምረጥ መረጃውን ይመልሱ።</p><label class="restore-file-label" for="restoreFile">📁 Restore ፋይል ምረጥ</label><input id="restoreFile" type="file" accept=".json" class="restore-file-input"><p id="backupMessage" class="backup-message" aria-live="polite"></p><div class="backup-tip warning-tip">Restore ማድረግ ያለውን መረጃ በbackup ውስጥ ባለው መረጃ ይተካል።</div></div></div><div class="backup-status-note"><span class="status-check">✓</span><span>Backup / Restore የሚያስቀምጡትን መረጃ ደህንነት ይጠብቃል።</span></div>
+ <div class="backup-desktop-navbar no-print">
+  <div class="backup-user-profile"><div class="backup-user-avatar"><i class="fa-solid fa-user"></i></div><div class="backup-user-details"><h4><span id="backupUserRole">Supervisor</span> <i class="fa-solid fa-chevron-down" style="font-size:.72rem"></i></h4><p id="backupUserEmail">admin@example.com</p></div></div>
+  <button id="backupLogout" class="backup-logout-btn" type="button"><i class="fa-solid fa-right-from-bracket"></i> ውጣ / Logout</button>
+ </div>
+ <div class="backup-content-wrap">
+  <div class="backup-new-title"><i class="fa-solid fa-calendar-days"></i> የቀረቤታ መዝገብ (Backup &amp; Restore)</div>
+  <div class="backup-new-cards">
+   <div class="backup-new-card green"><div class="backup-new-head"><div class="backup-new-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div><div class="backup-new-titles"><h3>Backup አውርድ</h3><p>የሁሉንም መረጃ ቅጂ በJSON ፋይል ወደ መሣሪያዎ ያውርዱ።</p></div></div><button id="backupBtn" class="backup-new-action" type="button"><i class="fa-solid fa-download"></i> አውርድ (Download)</button></div>
+   <div class="backup-new-card purple"><div class="backup-new-head"><div class="backup-new-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div><div class="backup-new-titles"><h3>Restore ፋይል ምርጫ</h3><p>ቀደም ሲል ያስቀመጡትን Backup ፋይል አስገባ።</p></div></div><label class="backup-new-action" for="restoreFile"><i class="fa-solid fa-upload"></i> ፋይል ምረጥ (Restore)</label><input id="restoreFile" type="file" accept=".json,application/json" class="restore-file-input"><p id="backupMessage" class="backup-message" aria-live="polite"></p></div>
+  </div>
+  <div class="backup-new-info"><div class="backup-new-info-icon"><i class="fa-solid fa-check"></i></div><div>Backup / Restore የተማሪዎችን፣ ክፍሎችን እና የቀረቤታ መረጃዎችን ለማስቀመጥና ለመመለስ ይረዳል።</div></div>
+ </div>
 </section>
 </main>
 <div id="editStudentModal" class="hidden" style="position:fixed;inset:0;background:#0008;z-index:30;display:none;align-items:center;justify-content:center;padding:16px;overflow:auto"><div class="panel" style="width:min(560px,100%);max-height:95%;overflow:auto"><h2>የተማሪ መረጃ አስተካክል</h2><p class="small">Student ID አይቀየርም። ስም፣ ክፍል እና ስልክ ማስተካከል ይችላሉ።</p><input id="editStudentId" type="hidden"><label>ሙሉ ስም</label><input id="editStudentName"><label>ክፍል</label><select id="editStudentClass"></select><label>ስልክ (አማራጭ)</label><input id="editStudentPhone" type="tel"><div class="row"><button id="saveStudentEdit" type="button">ለውጡን አስቀምጥ</button><button id="cancelStudentEdit" type="button" style="background:#65736b">ዝጋ</button></div><p id="editStudentMessage" class="small" aria-live="polite"></p></div></div>
@@ -512,7 +548,7 @@ async function cloudSave(scope='records'){
    return false;
  }
 }
-async function login(){let email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password){msg('Email እና Password ያስገቡ።');return}$('cloudLoginBtn').disabled=true;msg('በመግባት ላይ...');try{let cred=await auth.signInWithEmailAndPassword(email,password);currentUser=cred.user;let ud=await db.collection('users').doc(currentUser.uid).get();if(!ud.exists||!['supervisor','teacher','class_teacher','class_assistant'].includes(ud.data().role)){await auth.signOut();currentUser=null;role=null;msg('users/'+cred.user.uid+' ውስጥ role=supervisor፣ teacher፣ class_teacher ወይም class_assistant መሆኑን ይፈትሹ።');return}role=ud.data().role;assignedClass=String(ud.data().className||ud.data().assignedClass||'');if(isClassScoped()&&!assignedClass){await auth.signOut();currentUser=null;role=null;msg('class_teacher/class_assistant ለሆነ መለያ users ሰነዱ ውስጥ className ወይም assignedClass መሙላት አለበት።');return}await loadCloud();setLogin(false);applyRoleUI();$('cloudPassword').value='';msg('ገብተዋል።')}catch(e){console.error(e);msg('ስህተት: '+(e.message||'Firebase ግንኙነት አልተሳካም።'))}finally{$('cloudLoginBtn').disabled=false}}
+async function login(){let email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password){msg('Email እና Password ያስገቡ።');return}$('cloudLoginBtn').disabled=true;msg('በመግባት ላይ...');try{let cred=await auth.signInWithEmailAndPassword(email,password);currentUser=cred.user;let ud=await db.collection('users').doc(currentUser.uid).get();if(!ud.exists||!['supervisor','teacher','class_teacher','class_assistant'].includes(ud.data().role)){await auth.signOut();currentUser=null;role=null;msg('users/'+cred.user.uid+' ውስጥ role=supervisor፣ teacher፣ class_teacher ወይም class_assistant መሆኑን ይፈትሹ።');return}role=ud.data().role;assignedClass=String(ud.data().className||ud.data().assignedClass||'');if($('backupUserEmail'))$('backupUserEmail').textContent=currentUser.email||'';if($('backupUserRole'))$('backupUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if(isClassScoped()&&!assignedClass){await auth.signOut();currentUser=null;role=null;msg('class_teacher/class_assistant ለሆነ መለያ users ሰነዱ ውስጥ className ወይም assignedClass መሙላት አለበት።');return}await loadCloud();setLogin(false);applyRoleUI();$('cloudPassword').value='';msg('ገብተዋል።')}catch(e){console.error(e);msg('ስህተት: '+(e.message||'Firebase ግንኙነት አልተሳካም።'))}finally{$('cloudLoginBtn').disabled=false}}
 async function loadCloud(){
  let ss,cc,attendanceDocs=[];
  if(isClassScoped()){
@@ -557,6 +593,7 @@ $('loginForm').addEventListener('submit',e=>{e.preventDefault();login()});
 $('cloudLoginBtn').addEventListener('click',e=>{e.preventDefault();login()});$('cloudEmail').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('cloudPassword').focus()}});
 const togglePassword=$('togglePassword');if(togglePassword)togglePassword.addEventListener('click',()=>{const field=$('cloudPassword'),visible=field.type==='password';field.type=visible?'text':'password';togglePassword.textContent=visible?'◎':'◉';togglePassword.setAttribute('aria-pressed',String(visible));togglePassword.setAttribute('aria-label',visible?'Password ደብቅ':'Password አሳይ')});
 $('cloudLogoutBtn').addEventListener('click',async()=>{await auth.signOut();currentUser=null;role=null;setLogin(true);msg('ወጥተዋል። እንደገና ይግቡ።')});
+$('backupLogout').addEventListener('click',()=> $('topLogout').click());
 $('topLogout').addEventListener('click',async()=>{if(!currentUser){setLogin(true);return;}if(!confirm('ከስርዓቱ መውጣት ይፈልጋሉ?'))return;try{await auth.signOut();currentUser=null;role=null;setLogin(true);msg('በተሳካ ሁኔታ ወጥተዋል።');}catch(e){alert('Logout አልተሳካም። እንደገና ይሞክሩ።')}});
 function fillSelects(){const visibleClasses=isClassScoped()?[assignedClass]:classes;let opts=visibleClasses.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');$('studentClass').innerHTML=opts;$('attClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('attClass').value=isClassScoped()?assignedClass:'__ALL__';$('reportClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('reportClass').value=isClassScoped()?assignedClass:'__ALL__';const visibleStudents=isClassScoped()?students.filter(st=>st.className===assignedClass):students;$('reportStudent').innerHTML='<option value="__ALL__">ሁሉም ተማሪዎች</option>'+visibleStudents.map(st=>`<option value="${esc(st.id)}">${esc(st.name)}</option>`).join('');if(isClassScoped())$('studentClass').value=assignedClass}
 function applyRoleUI(){const classOnly=isClassScoped();document.querySelector('nav button[data-page="students"]').classList.toggle('hidden',classOnly);document.querySelector('nav button[data-page="classes"]').classList.toggle('hidden',classOnly);document.querySelector('nav button[data-page="backup"]').classList.toggle('hidden',role!=='supervisor');$('studentClass').disabled=classOnly;$('attClass').disabled=classOnly;$('reportClass').disabled=classOnly;if(classOnly){document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));document.querySelector('nav button[data-page="attendance"]').classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$('attendance').classList.remove('hidden');$('attClass').value=assignedClass;$('reportClass').value=assignedClass;}}
