@@ -274,6 +274,48 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
 #attendance .attendance-summary-footer{background:#f8faf9;border:1px solid #eaf0ec;border-radius:10px;padding:10px 14px;font-size:12px;color:#4b5563;font-weight:600;margin-top:14px}
 @media(max-width:700px){#attendance .panel{padding:14px!important}#attendance .attendance-filters{grid-template-columns:1fr;gap:10px}#attendance .attendance-actions button{flex:1 1 100%;width:100%;white-space:normal}#attendance .status-legend{gap:10px;padding:10px}#attendance .attendance-reference-table{min-width:650px}}
 @media print{#attendance .attendance-actions,#attendance .attendance-filter-panel .section-caption{display:none!important}#attendance .panel{box-shadow:none!important;border:0!important}#attendance .attendance-reference-table{min-width:0!important}#attendance .radio-container{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+/* Student registry GUI: closely follows the user-provided reference while retaining app IDs and handlers. */
+#students .students-ref-container{width:100%;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:16px;color:#1f2937}
+#students .students-ref-title{display:flex;align-items:center;gap:10px;color:#167a45;font-size:22px;font-weight:800;margin:4px 0 8px}
+#students .students-ref-title>i{font-size:26px}
+#students .students-ref-subtitle{font-weight:600;color:#4b5563;font-size:18px}
+#students .students-ref-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.03);border:1px solid #eaf0ec;margin:0 0 0}
+#students .students-ref-card-title{display:flex;align-items:center;gap:8px;color:#167a45;font-size:16px;font-weight:800;margin-bottom:16px}
+#students .students-ref-card-title i{font-size:18px}
+#students .students-ref-form-grid{display:grid;grid-template-columns:2fr 1.5fr 1.5fr;gap:14px;margin-bottom:16px}
+#students .students-ref-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+#students .students-ref-field label{font-size:12px;font-weight:700;color:#6b7280;margin:0}
+#students .students-ref-input{position:relative;display:flex;align-items:center}
+#students .students-ref-input input,#students .students-ref-input select{width:100%;min-width:0;padding:10px 14px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;color:#111827;background:#fff;outline:none;appearance:none;-webkit-appearance:none;min-height:42px}
+#students .students-ref-input select{padding-right:32px}
+#students .students-ref-input i{position:absolute;right:14px;color:#9ca3af;pointer-events:none;font-size:13px}
+#students .students-ref-input input:focus,#students .students-ref-input select:focus,#students .students-ref-search input:focus{border-color:#167a45;box-shadow:0 0 0 3px rgba(22,122,69,.1)}
+#students .students-ref-btn{border:0;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;min-height:42px}
+#students .students-ref-btn-green{background:#167a45;color:white}#students .students-ref-btn-green:hover{background:#116237}
+#students .students-ref-search{position:relative;display:flex;align-items:center}
+#students .students-ref-search input{width:100%;min-height:44px;padding:11px 16px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;outline:none;background:#fff}
+#students .students-ref-search-subtext{font-size:12px;color:#6b7280;margin-top:8px}
+#students .students-ref-table-card{padding:14px 18px}
+#students .students-ref-table-card .students-ref-card-title{margin-bottom:10px}
+#students .students-ref-table-wrap{overflow-x:auto;border-radius:10px;max-width:100%;}
+#students .students-ref-table-wrap table{width:100%;min-width:780px;border-collapse:collapse;font-size:13px;text-align:left;margin:0;table-layout:auto}
+#students .students-ref-table-wrap th{color:#167a45;font-weight:800;padding:12px 14px;border:0;border-bottom:2px solid #eaf0ec;background:#fff;white-space:nowrap}
+#students .students-ref-table-wrap td{padding:12px 14px;border:0;border-bottom:1px solid #f3f4f6;color:#374151;font-weight:600;vertical-align:middle}
+#students .students-ref-table-wrap tr:last-child td{border-bottom:0}
+#students .students-ref-table-wrap .students-ref-id{font-weight:800;color:#111827;white-space:nowrap}
+#students .students-ref-actions{display:flex;gap:6px;align-items:center;white-space:nowrap}
+#students .students-ref-action{border:0;border-radius:8px;padding:6px 12px;min-height:34px;font-size:12px;font-weight:700;cursor:pointer}
+#students .students-ref-action[data-edit-student]{background:#1877f2;color:#fff}#students .students-ref-action[data-delete-student]{background:#dc2626;color:#fff}
+#students .students-ref-footer{background:#e8f5e9;border:1px solid #c8e6c9;border-radius:12px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+#students .students-ref-stats{display:flex;align-items:center;gap:8px;color:#167a45;font-weight:800;font-size:13px}
+#students .students-ref-stats b{font-weight:800}
+#students .students-ref-pagination{display:flex;align-items:center;gap:6px}
+#students .students-ref-page-btn{width:32px;height:32px;min-height:32px;padding:0;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;cursor:pointer}
+#students .students-ref-page-btn.active{background:#167a45;color:#fff;border-color:#167a45}
+#students .students-ref-empty{text-align:center;color:#9ca3af;padding:20px!important;font-weight:500!important}
+@media(max-width:800px){#students .students-ref-form-grid{grid-template-columns:1fr}#students .students-ref-card{padding:16px}#students .students-ref-title{font-size:20px}#students .students-ref-subtitle{font-size:16px}#students .students-ref-footer{align-items:flex-start;flex-direction:column}#students .students-ref-table-wrap table{min-width:780px}}
+@media print{#students nav,#students .students-ref-form-grid,#students .students-ref-search,#students .students-ref-footer{display:none!important}#students .students-ref-card{box-shadow:none;border:0;padding:8px}#students .students-ref-table-wrap{overflow:visible}#students .students-ref-table-wrap table{min-width:0;font-size:10px}}
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head><body>
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • ቀረቤታ • ሪፖርት</p></div><span class="header-badge">SS</span></header>
@@ -288,9 +330,28 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
  <div class="notice attendance-note"><span><i class="legend-dot p-dot"></i> P = ተገኝቷል</span><span><i class="legend-dot a-dot"></i> A = ቀርቷል</span><span><i class="legend-dot l-dot"></i> L = ፈቃድ/ዘግይቷል</span><span><i class="legend-dot e-dot"></i> E = ፈቃድ</span></div><div id="attendanceTable" class="table-wrap attendance-table-wrap"></div></div><div class="panel attendance-summary-panel"><h3>የዕለቱ ቀረቤታ ማጠቃለያ</h3><div id="attendanceSummary" class="attendance-summary-list"></div><div id="attendanceSummaryFooter" class="attendance-summary-footer"></div></div>
 </section>
 <section id="students" class="page hidden students-page">
- <div class="page-heading"><div class="heading-icon students-icon">♙</div><div><h2>ተማሪዎች</h2><p>ተማሪ ይመዝግቡ፣ ይፈልጉ እና መረጃቸውን ያስተዳድሩ።</p></div></div>
- <div class="panel student-form-panel"><div class="panel-heading-row"><div><h3>አዲስ ተማሪ መመዝገብ</h3><p>የተማሪውን መረጃ ከታች ያስገቡ።</p></div><span class="soft-icon">＋</span></div><div class="student-form-grid"><div><label for="studentName">ሙሉ ስም</label><input id="studentName" placeholder="የተማሪውን ሙሉ ስም ያስገቡ"></div><div><label for="studentClass">ክፍል</label><select id="studentClass"></select></div><div><label for="studentPhone">ስልክ (አማራጭ)</label><input id="studentPhone" type="tel" placeholder="ስልክ ቁጥር"></div></div><div class="student-form-footer"><span class="small">Student ID በራስ-ሰር ይመደባል።</span><button id="addStudent">＋ ተማሪ ጨምር</button></div></div>
- <div class="panel student-list-panel"><div class="panel-heading-row"><div><h3>የተመዘገቡ ተማሪዎች</h3><p>በስም፣ ስልክ፣ ID ወይም ክፍል ፈልግ።</p></div><span class="soft-icon">☷</span></div><div class="search-panel student-search-panel"><label for="studentSearch">⌕ ተማሪ ፈልግ</label><input id="studentSearch" placeholder="በስም፣ ስልክ፣ ID ወይም ክፍል ፈልግ"></div><div id="studentsTable" class="table-wrap student-search-results"></div></div>
+ <div class="students-ref-container">
+  <div class="students-ref-title"><i class="fa-solid fa-users"></i><span>የተማሪዎች መዝገብ <span class="students-ref-subtitle">(Students)</span></span></div>
+  <div class="students-ref-card">
+   <div class="students-ref-card-title"><i class="fa-solid fa-user-plus"></i><span>አዲስ ተማሪ መመዝገብ</span></div>
+   <div class="students-ref-form-grid">
+    <div class="students-ref-field"><label for="studentName">ሙሉ ስም</label><div class="students-ref-input"><input type="text" id="studentName" placeholder="ሙሉ ስም ያስገቡ" autocomplete="name" required></div></div>
+    <div class="students-ref-field"><label for="studentClass">ክፍል</label><div class="students-ref-input"><select id="studentClass" required></select><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></div></div>
+    <div class="students-ref-field"><label for="studentPhone">ስልክ (አማራጭ)</label><div class="students-ref-input"><input type="tel" id="studentPhone" placeholder="ስልክ ቁጥር" autocomplete="tel" inputmode="tel"></div></div>
+   </div>
+   <button type="button" id="addStudent" class="students-ref-btn students-ref-btn-green"><i class="fa-solid fa-plus"></i><span>ተማሪ ጨምር</span></button>
+  </div>
+  <div class="students-ref-card">
+   <div class="students-ref-card-title"><i class="fa-solid fa-magnifying-glass"></i><span>ተማሪ ፈልግ</span></div>
+   <div class="students-ref-search"><input type="search" id="studentSearch" placeholder="በስም፣ ስልክ፣ ID ወይም ክፍል ፈልግ" aria-label="ተማሪ ፈልግ"></div>
+   <div class="students-ref-search-subtext">ሁሉም ተማሪዎች ከዚህ በታች ይታያሉ፦</div>
+  </div>
+  <div class="students-ref-card students-ref-table-card">
+   <div class="students-ref-card-title"><i class="fa-solid fa-users-gear"></i><span>የተመዘገቡ ተማሪዎች</span></div>
+   <div id="studentsTable" class="students-ref-table-wrap"></div>
+  </div>
+  <div class="students-ref-footer"><div class="students-ref-stats"><i class="fa-regular fa-calendar-days"></i><span>የተመዘገቡ ተማሪዎች: <b id="totalStudentsCount">0</b></span></div><div class="students-ref-pagination"><button type="button" class="students-ref-page-btn" id="studentsPrevPage" aria-label="Previous page"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="students-ref-page-btn active" aria-current="page">1</button><button type="button" class="students-ref-page-btn" id="studentsNextPage" aria-label="Next page"><i class="fa-solid fa-chevron-right"></i></button></div></div>
+ </div>
 </section>
 <section id="classes" class="page hidden"><div class="panel"><h2>ክፍሎች</h2><div class="grid"><div><label>የክፍል ስም</label><input id="className"></div><div><label>የተማሪ ID ቅድመ ፊደል (Prefix)</label><input id="classPrefix" placeholder="ለምሳሌ SSAM" maxlength="8"><p class="small">እያንዳንዱ ክፍል የተለየ Prefix ይኑረው። ከክፍሉ ስም ጋር አንድ ዓይነት የሆነ Prefix ካለ በራስ-ሰር ይሞላል።</p></div></div><div class="row"><button id="addClass">ክፍል ጨምር</button></div><div id="classesTable" class="table-wrap"></div></div></section>
 <section id="reports" class="page hidden"><div class="panel"><h2>የቀረቤታ ሪፖርት</h2><div class="grid"><div><label>የሪፖርት አይነት</label><select id="reportPeriod"><option value="custom">የቀን ክልል</option><option value="daily">የቀን ሪፖርት</option><option value="monthly">ወርሃዊ ሪፖርት</option></select></div><div><label>ቀን / የወሩ ቀን (DD/MM/YYYY)</label><input id="fromDate"></div><div><label>እስከ (DD/MM/YYYY)</label><input id="toDate"></div><div><label>ክፍል</label><select id="reportClass"><option value="__ALL__">ሁሉም ክፍሎች</option></select></div><div><label>ተማሪ</label><select id="reportStudent"></select></div></div><div class="row"><button id="makeReport">ሪፖርት አውጣ</button><button id="printReport">Print / PDF</button><button id="exportExcel">Excel አውርድ (.xlsx)</button></div><div id="statistics"></div><div id="reportResult" class="table-wrap"></div></div></section>
@@ -442,7 +503,15 @@ $('topLogout').addEventListener('click',async()=>{if(!currentUser){setLogin(true
 function fillSelects(){const visibleClasses=isClassScoped()?[assignedClass]:classes;let opts=visibleClasses.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');$('studentClass').innerHTML=opts;$('attClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('attClass').value=isClassScoped()?assignedClass:'__ALL__';$('reportClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('reportClass').value=isClassScoped()?assignedClass:'__ALL__';const visibleStudents=isClassScoped()?students.filter(st=>st.className===assignedClass):students;$('reportStudent').innerHTML='<option value="__ALL__">ሁሉም ተማሪዎች</option>'+visibleStudents.map(st=>`<option value="${esc(st.id)}">${esc(st.name)}</option>`).join('');if(isClassScoped())$('studentClass').value=assignedClass}
 function applyRoleUI(){const classOnly=isClassScoped();document.querySelector('nav button[data-page="students"]').classList.toggle('hidden',classOnly);document.querySelector('nav button[data-page="classes"]').classList.toggle('hidden',classOnly);document.querySelector('nav button[data-page="backup"]').classList.toggle('hidden',role!=='supervisor');$('studentClass').disabled=classOnly;$('attClass').disabled=classOnly;$('reportClass').disabled=classOnly;if(classOnly){document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));document.querySelector('nav button[data-page="attendance"]').classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$('attendance').classList.remove('hidden');$('attClass').value=assignedClass;$('reportClass').value=assignedClass;}}
 
-function renderStudents(){const q=$('studentSearch').value.trim().toLowerCase();const box=$('studentsTable');const source=isClassScoped()?students.filter(st=>st.className===assignedClass):students;const list=source.filter(s=>!q||[s.name,s.phone,s.className,s.id].some(x=>String(x||'').toLowerCase().includes(q)));if(!list.length){box.innerHTML=`<p class="small" style="padding:10px">${q?'የተፈለገው ተማሪ አልተገኘም።':'ገና ተማሪ አልተመዘገበም።'}</p>`;return;}box.innerHTML='<table><tr><th>ID</th><th>ስም</th><th>ክፍል</th><th>ስልክ</th><th>አማራጮች</th></tr>'+list.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.phone||'')}</td><td>${role==='supervisor'?`<button data-edit-student="${esc(s.id)}">Edit / አስተካክል</button> <button data-delete-student="${esc(s.id)}">ሰርዝ</button>`:''}</td></tr>`).join('')+'</table>'}
+function renderStudents(){
+ const q=$('studentSearch').value.trim().toLowerCase();
+ const box=$('studentsTable');
+ const source=isClassScoped()?students.filter(st=>st.className===assignedClass):students;
+ const list=source.filter(st=>!q||[st.name,st.phone,st.className,st.id].some(x=>String(x||'').toLowerCase().includes(q)));
+ $('totalStudentsCount').textContent=source.length;
+ if(!list.length){box.innerHTML=`<table><thead><tr><th>#</th><th>ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>ስልክ</th><th>የመመዝገቢያ ቀን</th><th>እርምጃ</th></tr></thead><tbody><tr><td colspan="7" class="students-ref-empty">${q?'ምንም ተማሪ አልተገኘም።':'ገና ተማሪ አልተመዘገበም።'}</td></tr></tbody></table>`;return;}
+ box.innerHTML='<table><thead><tr><th style="width:35px">#</th><th style="width:100px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>ስልክ</th><th>የመመዝገቢያ ቀን</th><th style="width:140px">እርምጃ</th></tr></thead><tbody>'+list.map((st,idx)=>`<tr><td>${idx+1}</td><td class="students-ref-id">${esc(st.id)}</td><td>${esc(st.name)}</td><td>${esc(st.className)}</td><td>${esc(st.phone||'-')}</td><td>${esc(st.regDate||st.createdAt||'—')}</td><td><div class="students-ref-actions">${role==='supervisor'?`<button class="students-ref-action" data-edit-student="${esc(st.id)}"><i class="fa-solid fa-pen-to-square"></i> እርም</button><button class="students-ref-action" data-delete-student="${esc(st.id)}"><i class="fa-solid fa-trash"></i> ሰርዝ</button>`:'—'}</div></td></tr>`).join('')+'</tbody></table>'
+}
 function renderClasses(){$('classesTable').innerHTML='<table><tr><th>ክፍል</th><th>ተማሪዎች</th><th></th></tr>'+classes.map(c=>`<tr><td>${esc(c)}</td><td>${students.filter(s=>s.className===c).length}</td><td>${role==='supervisor'?`<button data-delete-class="${esc(c)}">ሰርዝ</button>`:''}</td></tr>`).join('')+'</table>'}
 function drawAttendance(){let iso=dateISO($('attDate').value);if(!iso){$('attendanceTable').innerHTML='<p style="padding:12px">ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';renderAttendanceSummary([],{},null);return}let c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(s=>c==='__ALL__'||s.className===c),day=attendance[iso]||{};$('attendanceTable').innerHTML=`<table class="attendance-reference-table"><thead><tr><th style="width:40px">#</th><th style="width:110px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th class="status-head P">P</th><th class="status-head A">A</th><th class="status-head L">L</th><th class="status-head E">E</th></tr></thead><tbody>${list.map((s,i)=>`<tr><td>${i+1}</td><td class="student-id-cell">${esc(s.id)}</td><td class="student-name-cell">${esc(s.name)}</td><td>${esc(s.className||'')}</td>${['P','A','L','E'].map(st=>`<td class="status ${st}"><label class="radio-container status-${st}" title="${st}"><input aria-label="${esc(s.name)} ${st}" type="radio" name="st-${esc(s.id)}" value="${st}" ${day[String(s.id)]===st?'checked':''}><span class="checkmark"><i class="fa-solid fa-check"></i></span></label></td>`).join('')}</tr>`).join('')}</tbody></table>`;renderAttendanceSummary(list,day,iso)}
 function renderAttendanceSummary(list,day,iso){const counts={P:0,A:0,L:0,E:0};list.forEach(st=>{const v=day[String(st.id)];if(counts[v]!==undefined)counts[v]++});const labels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};$('attendanceSummary').innerHTML=Object.keys(counts).map(k=>`<div class="summary-row summary-${k}"><span class="summary-letter">${k}</span><strong>${labels[k]}</strong><b>${counts[k]}</b></div>`).join('');$('attendanceSummaryFooter').innerHTML=iso?`📅 ቀን፦ ${dateET(iso)} &nbsp; | &nbsp; ክፍል፦ ${esc(isClassScoped()?assignedClass:($('attClass').selectedOptions[0]?.textContent||'ሁሉም ክፍሎች'))}`:''}
