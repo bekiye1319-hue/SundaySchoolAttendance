@@ -1,4 +1,4 @@
-ፈ<!doctype html>
+<!doctype html>
 <html lang="am"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ሰንበት ትምህርት ቤት - Attendance</title>
 <style>
 :root{--g:#167a45;--b:#1769aa;--r:#b42318;--bg:#f4f7f5;--line:#d8e2dc}*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px Arial,"Noto Sans Ethiopic",sans-serif;color:#182522}header{background:var(--g);color:white;text-align:center;padding:18px}h1{margin:0 0 6px;font-size:23px}nav{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;background:white;padding:10px;position:sticky;top:0}button,.btn{border:0;border-radius:8px;padding:10px 13px;background:var(--g);color:white;font-weight:bold;cursor:pointer}button:disabled{opacity:.6}nav button{background:#e8f1eb;color:#174d32}nav button.active{background:var(--g);color:white}main{max-width:1100px;margin:auto;padding:14px}.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px}h2{font-size:19px;margin:0 0 12px;color:var(--g)}label{display:block;font-weight:bold;margin:8px 0 5px}input,select{width:100%;padding:10px;border:1px solid #bac9c0;border-radius:7px;font-size:16px;background:white}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:9px;border:1px solid var(--line);text-align:left}th{background:#edf4ef}.hidden{display:none!important}.notice{padding:10px;border-radius:8px;background:#fff7dc;margin:10px 0}.small{font-size:13px;color:#53635b}.P{color:#16803d}.A{color:#c62828}.L{color:#1769aa}.E{color:#8657a8}.status{text-align:center}.stat{padding:12px;background:#edf5ef;border-radius:9px;text-align:center}.stat b{display:block;font-size:24px;color:var(--g)}@media print{nav,.no-print,button{display:none!important}body{background:white}header{background:white;color:black}.panel{border:0}.page{display:none!important}body.print-attendance #attendance{display:block!important}body.print-report #reports{display:block!important}body.print-attendance #attendanceTable table,body.print-report #reportResult table{font-size:12px}body.print-attendance #attendanceTable th,body.print-attendance #attendanceTable td,body.print-report #reportResult th,body.print-report #reportResult td{padding:5px}}
@@ -1011,11 +1011,14 @@ async function loadCloud(){
    snaps.forEach(snap=>attendanceDocs.push(...snap.docs));
  }else{
    // Load all three collections together to reduce refresh waiting time.
-   [ss,cc,...attendanceDocs]=await Promise.all([
+   const [studentsSnap, classesSnap, attendanceSnap]=await Promise.all([
      db.collection('students').get(),
      db.collection('classes').get(),
      db.collection('attendance').get()
    ]);
+   ss=studentsSnap;
+   cc=classesSnap;
+   attendanceDocs=attendanceSnap.docs;
    students=ss.docs.map(d=>({...d.data(),id:String(d.data().id||d.id)}));
  }
  classes=cc.docs.map(d=>d.data().name||d.id);if(isClassScoped()&&!classes.includes(assignedClass))classes=[assignedClass];if(!classes.length)classes=['አጠቃላይ'];
