@@ -492,6 +492,28 @@ body.auth-locked main { display:none !important; }
 @media(max-width:700px){#attendance .attendance-reference-table{min-width:700px}}
 @media print{#attendance .attendance-reference-table{min-width:0!important}#attendance .attendance-circle-mark{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 
+
+/* v4: gender-aware student records, full-width desktop reports, and polished settings. */
+#students .students-ref-form-grid{grid-template-columns:1.35fr 1fr 1fr 1fr}
+#students .students-ref-form-grid .students-ref-field{min-width:0}
+#reports .report-container{width:100%;max-width:none;margin:0;padding:22px clamp(16px,2.4vw,38px);gap:18px}
+#reports .report-card{width:100%;max-width:none}
+#reports .report-table-responsive{width:100%;overflow-x:auto}
+#reports .report-table{width:100%;min-width:820px}
+#reports .report-table th,#reports .report-table td{white-space:normal;vertical-align:middle}
+#reports .report-table td:nth-child(2){min-width:150px}
+#settings{padding:8px 0 28px}
+#settings>.panel{border:1px solid #dcebe2;border-radius:16px;padding:20px 22px;margin:0 0 16px;background:linear-gradient(145deg,#ffffff 0%,#f5fbf7 100%);box-shadow:0 5px 18px rgba(22,92,56,.07)}
+#settings>.panel:first-child{background:linear-gradient(120deg,#145c39,#16804a 58%,#27a36a);color:#fff;border:0;box-shadow:0 10px 24px rgba(22,122,69,.2)}
+#settings>.panel:first-child h2,#settings>.panel:first-child .small{color:#fff}
+#settings>.panel:not(:first-child) h2{display:flex;align-items:center;gap:10px;color:#176b42;font-size:17px;padding-bottom:11px;border-bottom:1px solid #e3eee7}
+#settings>.panel:not(:first-child) h2:before{content:' ';width:8px;height:24px;border-radius:8px;background:linear-gradient(#22a06b,#176b42);display:inline-block}
+#settings>.panel p.small{line-height:1.7;color:#65766b}
+#settings input,#settings select{border:1px solid #cddfd3;border-radius:10px;background:#fbfefc;min-height:44px;transition:border-color .2s,box-shadow .2s}
+#settings input:focus,#settings select:focus{outline:none;border-color:#1b8a55;box-shadow:0 0 0 3px rgba(27,138,85,.12)}
+#settings button{border-radius:10px;background:linear-gradient(135deg,#16804a,#20a36a);box-shadow:0 4px 10px rgba(22,128,74,.16);padding:11px 16px}
+#settings button:hover{filter:brightness(.96);transform:translateY(-1px)}
+@media(max-width:800px){#students .students-ref-form-grid{grid-template-columns:1fr}#reports .report-container{padding:10px}#settings>.panel{padding:16px}}
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -586,6 +608,7 @@ body.auth-locked main { display:none !important; }
    <div class="students-ref-form-grid">
     <div class="students-ref-field"><label for="studentName">ሙሉ ስም</label><div class="students-ref-input"><input type="text" id="studentName" placeholder="ሙሉ ስም ያስገቡ" autocomplete="name" required></div></div>
     <div class="students-ref-field"><label for="studentClass">ክፍል</label><div class="students-ref-input"><select id="studentClass" required></select><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></div></div>
+    <div class="students-ref-field"><label for="studentGender">ፆታ / Gender</label><div class="students-ref-input"><select id="studentGender" required><option value="">ፆታ ይምረጡ</option><option value="male">ወንድ</option><option value="female">ሴት</option></select><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></div></div>
     <div class="students-ref-field"><label for="studentPhone">ስልክ (አማራጭ)</label><div class="students-ref-input"><input type="tel" id="studentPhone" placeholder="ስልክ ቁጥር" autocomplete="tel" inputmode="tel"></div></div>
    </div>
    <button type="button" id="addStudent" class="students-ref-btn students-ref-btn-green"><i class="fa-solid fa-plus"></i><span>ተማሪ ጨምር</span></button>
@@ -665,7 +688,7 @@ body.auth-locked main { display:none !important; }
  </div>
 </section>
 </main>
-<div id="editStudentModal" class="hidden" style="position:fixed;inset:0;background:#0008;z-index:30;display:none;align-items:center;justify-content:center;padding:16px;overflow:auto"><div class="panel" style="width:min(560px,100%);max-height:95%;overflow:auto"><h2>የተማሪ መረጃ አስተካክል</h2><p class="small">Student ID አይቀየርም። ስም፣ ክፍል እና ስልክ ማስተካከል ይችላሉ።</p><input id="editStudentId" type="hidden"><label>ሙሉ ስም</label><input id="editStudentName"><label>ክፍል</label><select id="editStudentClass"></select><label>ስልክ (አማራጭ)</label><input id="editStudentPhone" type="tel"><div class="row"><button id="saveStudentEdit" type="button">ለውጡን አስቀምጥ</button><button id="cancelStudentEdit" type="button" style="background:#65736b">ዝጋ</button></div><p id="editStudentMessage" class="small" aria-live="polite"></p></div></div>
+<div id="editStudentModal" class="hidden" style="position:fixed;inset:0;background:#0008;z-index:30;display:none;align-items:center;justify-content:center;padding:16px;overflow:auto"><div class="panel" style="width:min(560px,100%);max-height:95%;overflow:auto"><h2>የተማሪ መረጃ አስተካክል</h2><p class="small">Student ID አይቀየርም። ስም፣ ክፍል እና ስልክ ማስተካከል ይችላሉ።</p><input id="editStudentId" type="hidden"><label>ሙሉ ስም</label><input id="editStudentName"><label>ክፍል</label><select id="editStudentClass"></select><label for="editStudentGender">ፆታ / Gender</label><select id="editStudentGender"><option value="male">ወንድ</option><option value="female">ሴት</option><option value="">አልተመዘገበም</option></select><label>ስልክ (አማራጭ)</label><input id="editStudentPhone" type="tel"><div class="row"><button id="saveStudentEdit" type="button">ለውጡን አስቀምጥ</button><button id="cancelStudentEdit" type="button" style="background:#65736b">ዝጋ</button></div><p id="editStudentMessage" class="small" aria-live="polite"></p></div></div>
 <div id="cloudLogin" class="auth-overlay" style="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto">
   <div class="login-box">
     <div class="icon-circle"><i class="fa-solid fa-church" aria-hidden="true"></i></div>
@@ -951,6 +974,7 @@ function drawAttendance(){
 function renderAttendanceSummary(list,day,iso){const counts={P:0,A:0,L:0,E:0};list.forEach(st=>{const v=day[String(st.id)];if(counts[v]!==undefined)counts[v]++});const labels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};$('attendanceSummary').innerHTML=Object.keys(counts).map(k=>`<div class="summary-row summary-${k}"><span class="summary-letter">${k}</span><strong>${labels[k]}</strong><b>${counts[k]}</b></div>`).join('');$('attendanceSummaryFooter').innerHTML=iso?`📅 ቀን፦ ${dateET(iso)} &nbsp; | &nbsp; ክፍል፦ ${esc(isClassScoped()?assignedClass:($('attClass').selectedOptions[0]?.textContent||'ሁሉም ክፍሎች'))}`:''}
 function renderStats(){let c={P:0,A:0,L:0,E:0};Object.entries(attendance).forEach(([date,day])=>Object.entries(day||{}).forEach(([id,v])=>{const st=students.find(x=>String(x.id)===String(id));if((!isClassScoped()||(st&&st.className===assignedClass))&&c[v]!==undefined)c[v]++}));$('statistics').innerHTML=`<div class="grid">${Object.keys(c).map(k=>`<div class="stat"><b>${c[k]}</b>${k} - ${labels[k]}</div>`).join('')}</div>`}
 function renderReportVisuals(total,from,to,list){const keys=['P','A','L','E'],colors={P:'#16803d',A:'#c62828',L:'#d97706',E:'#7c3aed'},names={P:'ተገኝቷል (P)',A:'ቀርቷል (A)',L:'ዘግይቷል (L)',E:'ፈቃድ (E)'};const sum=keys.reduce((a,k)=>a+(total[k]||0),0);let cursor=0;const segments=keys.map(k=>{const pct=sum?total[k]/sum*100:0;const start=cursor;cursor+=pct;return `${colors[k]} ${start}% ${cursor}%`});$('reportPieChart').style.background=sum?`conic-gradient(${segments.join(',')})`:'conic-gradient(#e5e7eb 0 100%)';$('reportPieChart').setAttribute('aria-label',sum?keys.map(k=>`${names[k]} ${Math.round(total[k]/sum*100)}%`).join(', '):'ምንም መረጃ የለም');$('reportPieLegend').innerHTML=keys.map(k=>`<div><span class="pie-dot" style="background:${colors[k]}"></span><span>${names[k]} <strong>${sum?Math.round(total[k]/sum*100):0}%</strong> (${total[k]||0})</span></div>`).join('');const start=Date.parse(from+'T00:00:00Z'),end=Date.parse(to+'T00:00:00Z'),days=Math.max(1,Math.round((end-start)/86400000)+1),prevTo=new Date(start-86400000).toISOString().slice(0,10),prevFrom=new Date(start-days*86400000).toISOString().slice(0,10);function rate(a,b){let p=0,m=0;Object.entries(attendance).forEach(([d,day])=>{if(d<a||d>b)return;Object.entries(day||{}).forEach(([id,v])=>{const st=students.find(x=>String(x.id)===String(id));if(!st||!list.some(z=>String(z.id)===String(id)))return;if(['P','A','L','E'].includes(v)){m++;if(v==='P')p++}})});return {p,m,pct:m?Math.round(p/m*100):0}}const current=rate(from,to),previous=rate(prevFrom,prevTo),delta=current.pct-previous.pct,cls=delta>0?'comparison-up':delta<0?'comparison-down':'comparison-same',label=delta>0?'▲ ጨምሯል':delta<0?'▼ ቀንሷል':'▬ ለውጥ የለም';$('reportComparison').innerHTML=`<div class="comparison-kpi"><span class="small">የአሁኑ ክልል የመገኘት መጠን</span><strong>${current.pct}%</strong><span class="comparison-change ${cls}">${label} ${Math.abs(delta)} መቶኛ ነጥብ</span><div class="report-comparison-bars"><div><div class="comparison-bar-label"><span>አሁን (${dateET(from)} – ${dateET(to)})</span><b>${current.pct}%</b></div><div class="comparison-bar"><span style="width:${current.pct}%"></span></div></div><div><div class="comparison-bar-label"><span>ቀደመው ተመሳሳይ ${days} ቀን (${dateET(prevFrom)} – ${dateET(prevTo)})</span><b>${previous.pct}%</b></div><div class="comparison-bar"><span style="width:${previous.pct}%;background:#64748b"></span></div></div></div><p class="small" style="margin-top:10px">የተመዘገቡ፦ አሁን ${current.m} • ቀደም ሲል ${previous.m}. ለውጡ በመቶኛ ነጥብ ይሰላል።</p></div>`}
+function genderedStatusLabel(status,gender){const female=gender==='female',male=gender==='male';if(!female&&!male)return ({P:'ተገኝ',A:'ቀር',L:'ዘግይ',E:'ፈቃድ'})[status]||'—';const words={P:female?'ተገኝታለች':'ተገኝቷል',A:female?'ቀርታለች':'ቀርቷል',L:female?'ዘግይታለች':'ዘግይቷል',E:female?'ፈቃድ አላት':'ፈቃድ አለው'};return words[status]||'—'}
 function listForReasonDate(date,classFilter,reasonFilter){const clsList=classFilter==='__ALL__'?classes:[classFilter];return clsList.some(cls=>{const r=getAttendanceReason(date,cls);return r&&(r.type===reasonFilter)&&(reasonFilter!=='ሌላ'||!!r.other)})}
 function report(){
   // ሪፖርት አውጣ እስኪጫን እና መረጃው ትክክል እስኪሆን ድረስ የውጤት ክፍሎችን ደብቅ።
@@ -971,17 +995,17 @@ function report(){
     reportDates.filter(d=>reasonFilter==='__ALL__'||(getAttendanceReason(d,st.className)||{}).type===reasonFilter).forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(Object.prototype.hasOwnProperty.call(c,v)){c[v]++;studentDates.push({date:d,status:v});}});
     const marked=c.P+c.A+c.L+c.E,percent=marked?Math.round((c.P*100+c.L*Number(appSettings.lateScore??75)+c.E*Number(appSettings.permissionScore??100))/marked):0;
     Object.keys(total).forEach(k=>total[k]+=c[k]);
-    rows.push({st,c,marked,percent});
+    rows.push({st,c,marked,percent,studentDates});
     if(sid!=='__ALL__')selected={student:st,counts:c,marked,percent,dates:studentDates};
   });
   const statLabels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};
   $('statistics').innerHTML=Object.keys(total).map(k=>`<div class="report-stat-card ${k.toLowerCase()}"><div class="report-stat-badge ${k.toLowerCase()}">${k}</div><div class="report-stat-info"><span class="report-stat-val">${total[k]}</span><span class="report-stat-label">${k} - ${statLabels[k]}</span></div></div>`).join('');renderReportVisuals(total,from,to,list);
   let reasonCaption=reasonFilter==='__ALL__'?'ሁሉም ምክንያቶች':reasonFilter;
-  let html=`<p class="report-range-note">ከ ${dateET(from)} እስከ ${dateET(to)} &nbsp; • &nbsp; የተመረጡ ተማሪዎች፦ ${list.length} &nbsp; • &nbsp; ምክንያት፦ ${esc(reasonCaption)}</p><table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>`;
-  rows.forEach(({st,c,percent})=>{const pc=percent>=100?'high':percent>=75?'mid':'low';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
-  if(!rows.length)html+='<tr><td colspan="7">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
+  let html=`<p class="report-range-note">ከ ${dateET(from)} እስከ ${dateET(to)} &nbsp; • &nbsp; የተመረጡ ተማሪዎች፦ ${list.length} &nbsp; • &nbsp; ምክንያት፦ ${esc(reasonCaption)}</p><table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>ፆታ</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመጨረሻ ሁኔታ</th><th>የመገኘት መጠን</th></tr></thead><tbody>`;
+  rows.forEach(({st,c,percent,studentDates})=>{const pc=percent>=100?'high':percent>=75?'mid':'low';const latest=studentDates.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];const genderText=st.gender==='female'?'ሴት':st.gender==='male'?'ወንድ':'—';const latestText=latest?genderedStatusLabel(latest.status,st.gender):'—';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${genderText}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td>${latestText}</td><td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
+  if(!rows.length)html+='<tr><td colspan="9">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   html+='</tbody></table>';
-  if(selected){html+=`<h2 style="margin-top:22px">የ${esc(selected.student.name)} የዕለት በዕለት ሪፖርት</h2><p>የተመዘገቡ ቀናት፦ ${selected.marked} | የመገኘት መጠን፦ <strong>${selected.percent}%</strong></p><table class="report-table"><thead><tr><th>ቀን</th><th>የAttendance ሁኔታ</th></tr></thead><tbody>`;if(!selected.dates.length)html+='<tr><td colspan="2">በዚህ የቀን ክልል ውስጥ የተመዘገበ Attendance የለም።</td></tr>';else selected.dates.forEach(item=>{html+=`<tr><td>${dateET(item.date)}</td><td class="${item.status}"><strong>${item.status} - ${labels[item.status]}</strong></td></tr>`;});html+='</tbody></table>';}
+  if(selected){html+=`<h2 style="margin-top:22px">የ${esc(selected.student.name)} የዕለት በዕለት ሪፖርት</h2><p>የተመዘገቡ ቀናት፦ ${selected.marked} | የመገኘት መጠን፦ <strong>${selected.percent}%</strong></p><table class="report-table"><thead><tr><th>ቀን</th><th>የAttendance ሁኔታ</th></tr></thead><tbody>`;if(!selected.dates.length)html+='<tr><td colspan="2">በዚህ የቀን ክልል ውስጥ የተመዘገበ Attendance የለም።</td></tr>';else selected.dates.forEach(item=>{html+=`<tr><td>${dateET(item.date)}</td><td class="${item.status}"><strong>${item.status} - ${genderedStatusLabel(item.status,selected.student.gender)}</strong></td></tr>`;});html+='</tbody></table>';}
   $('reportResult').innerHTML=html;
   $('statistics').classList.remove('hidden');$('reportVisualSection').classList.remove('hidden');$('comparativeAnalysisCard').classList.toggle('hidden',!$('showComparativeAnalysis').checked);$('reportResultCard').classList.remove('hidden');
 }
@@ -1160,12 +1184,12 @@ $('saveAtt').onclick=async()=>{
  if(!ok)return; // Never show success after Firestore rejects the write.
  saveLocal();renderStats();updateDashboard();await logActivity('Attendance saved',`ቀን ${dateET(iso)} • ${isClassScoped()?assignedClass:$('attClass').value}`);alert('Attendanceው በFirebase በትክክል ተቀምጧል።');
 };
-$('addStudent').onclick=async()=>{if(role!=='supervisor')return alert('Supervisor ብቻ ነው።');let name=$('studentName').value.trim();if(!name)return alert('ስም ያስገቡ።');let phone=$('studentPhone').value.trim();const normName=name.toLocaleLowerCase().replace(/\s+/g,' ');if(students.some(s=>String(s.name||'').trim().toLocaleLowerCase().replace(/\s+/g,' ')===normName))return alert('ይህ ስም ቀድሞ ተመዝግቧል። ተመሳሳይ ተማሪ ደግሞ መመዝገብ አይቻልም።');if(phone&&students.some(s=>String(s.phone||'').trim().replace(/\s+/g,'')===phone.replace(/\s+/g,'')))return alert('ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል።');const className=$('studentClass').value;let newId;try{newId=nextStudentId(className)}catch(e){return alert(e.message)}const st={id:newId,name,className,phone};students.push(st);const ok=await cloudSave();if(!ok){students=students.filter(s=>String(s.id)!==String(st.id));return;}saveLocal();$('studentName').value='';$('studentPhone').value='';renderAll();await logActivity('Student added',`${st.name} • ${st.id} • ${st.className}`);alert('ምዝገባ በተሳካ ሁኔታ ተጠናቋል። ID: '+st.id)};
+$('addStudent').onclick=async()=>{if(role!=='supervisor')return alert('Supervisor ብቻ ነው።');let name=$('studentName').value.trim();if(!name)return alert('ስም ያስገቡ።');let phone=$('studentPhone').value.trim(),gender=$('studentGender').value;if(!gender)return alert('የተማሪውን ፆታ ይምረጡ።');const normName=name.toLocaleLowerCase().replace(/\s+/g,' ');if(students.some(s=>String(s.name||'').trim().toLocaleLowerCase().replace(/\s+/g,' ')===normName))return alert('ይህ ስም ቀድሞ ተመዝግቧል። ተመሳሳይ ተማሪ ደግሞ መመዝገብ አይቻልም።');if(phone&&students.some(s=>String(s.phone||'').trim().replace(/\s+/g,'')===phone.replace(/\s+/g,'')))return alert('ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል።');const className=$('studentClass').value;let newId;try{newId=nextStudentId(className)}catch(e){return alert(e.message)}const st={id:newId,name,className,phone,gender};students.push(st);const ok=await cloudSave();if(!ok){students=students.filter(s=>String(s.id)!==String(st.id));return;}saveLocal();$('studentName').value='';$('studentPhone').value='';$('studentGender').value='';renderAll();await logActivity('Student added',`${st.name} • ${st.id} • ${st.className}`);alert('ምዝገባ በተሳካ ሁኔታ ተጠናቋል። ID: '+st.id)};
 $('className').addEventListener('input',()=>{const c=$('className').value.trim();$('classPrefix').value=classPrefixes[c]||defaultPrefixForClass(c)});$('addClass').onclick=async()=>{if(role!=='supervisor')return alert('Supervisor ብቻ ነው።');let c=$('className').value.trim(),prefix=$('classPrefix').value.trim().toUpperCase();if(!c||classes.includes(c))return alert('የክፍል ስም ያስገቡ፤ እንደገና ያለ ክፍል አይጨምሩ።');if(!/^[A-Z]{2,8}$/.test(prefix))return alert('Prefix ከ2 እስከ 8 የእንግሊዝኛ ፊደላት ብቻ መሆን አለበት።');if(Object.entries(classPrefixes).some(([name,p])=>name!==c&&String(p).toUpperCase()===prefix))return alert('ይህ Prefix ለሌላ ክፍል ተመድቧል። ሌላ ይምረጡ።');classes.push(c);classPrefixes[c]=prefix;const ok=await cloudSave();if(!ok){classes=classes.filter(x=>x!==c);delete classPrefixes[c];return}saveLocal();$('className').value='';$('classPrefix').value='';renderAll();await logActivity('Class added',c)};
 function openStudentEdit(id){
  if(role!=='supervisor')return alert('Supervisor ብቻ ነው።');
  const st=students.find(x=>String(x.id)===String(id)); if(!st)return;
- $('editStudentId').value=String(st.id); $('editStudentName').value=st.name||''; $('editStudentPhone').value=st.phone||'';
+ $('editStudentId').value=String(st.id); $('editStudentName').value=st.name||''; $('editStudentPhone').value=st.phone||''; $('editStudentGender').value=st.gender||'';
  $('editStudentClass').innerHTML=classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
  if(st.className&&!classes.includes(st.className))$('editStudentClass').insertAdjacentHTML('beforeend',`<option value="${esc(st.className)}">${esc(st.className)}</option>`);
  $('editStudentClass').value=st.className||classes[0]||''; $('editStudentMessage').textContent='';
@@ -1183,12 +1207,12 @@ $('editStudentModal').addEventListener('click',e=>{if(e.target===$('editStudentM
 $('saveStudentEdit').onclick=async()=>{
  if(role!=='supervisor')return alert('Supervisor ብቻ ነው።');
  const id=$('editStudentId').value,st=students.find(x=>String(x.id)===String(id));if(!st)return;
- const name=$('editStudentName').value.trim(),phone=$('editStudentPhone').value.trim(),className=$('editStudentClass').value;
+ const name=$('editStudentName').value.trim(),phone=$('editStudentPhone').value.trim(),className=$('editStudentClass').value,gender=$('editStudentGender').value;
  if(!name){$('editStudentMessage').textContent='ስም ባዶ መሆን አይችልም።';return;}
  const norm=name.toLocaleLowerCase().replace(/\s+/g,' ');
  if(students.some(x=>String(x.id)!==String(id)&&String(x.name||'').trim().toLocaleLowerCase().replace(/\s+/g,' ')===norm)){$('editStudentMessage').textContent='ይህ ስም ሌላ ተማሪ ላይ ተመዝግቧል።';return;}
  const phoneNorm=phone.replace(/\s+/g,'');if(phoneNorm&&students.some(x=>String(x.id)!==String(id)&&String(x.phone||'').trim().replace(/\s+/g,'')===phoneNorm)){$('editStudentMessage').textContent='ይህ ስልክ ቁጥር ሌላ ተማሪ ላይ ተመዝግቧል።';return;}
- const old={...st};st.name=name;st.phone=phone;st.className=className; $('saveStudentEdit').disabled=true;$('editStudentMessage').textContent='በማስቀመጥ ላይ…';
+ const old={...st};st.name=name;st.phone=phone;st.className=className;st.gender=gender; $('saveStudentEdit').disabled=true;$('editStudentMessage').textContent='በማስቀመጥ ላይ…';
  const ok=await cloudSave();$('saveStudentEdit').disabled=false;if(!ok){Object.assign(st,old);$('editStudentMessage').textContent='መረጃው አልተቀመጠም። ኢንተርኔትን እና መግቢያን ያረጋግጡ።';return;}
  saveLocal();renderAll();closeStudentEdit();alert('የተማሪው ስም፣ ክፍል እና ስልክ በተሳካ ሁኔታ ተስተካክለዋል።');
 };
