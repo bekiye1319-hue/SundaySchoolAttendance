@@ -15,8 +15,6 @@ android:roundIcon="@drawable/ic_launcher"
 </manifest>
 
 
-    
-    android:icon="@drawable/ic_launcher"
-android:roundIcon="@drawable/ic_launcher"
+
 
     
