@@ -1,4 +1,4 @@
-<!doctype html>
+ፈ<!doctype html>
 <html lang="am"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ሰንበት ትምህርት ቤት - Attendance</title>
 <style>
 :root{--g:#167a45;--b:#1769aa;--r:#b42318;--bg:#f4f7f5;--line:#d8e2dc}*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px Arial,"Noto Sans Ethiopic",sans-serif;color:#182522}header{background:var(--g);color:white;text-align:center;padding:18px}h1{margin:0 0 6px;font-size:23px}nav{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;background:white;padding:10px;position:sticky;top:0}button,.btn{border:0;border-radius:8px;padding:10px 13px;background:var(--g);color:white;font-weight:bold;cursor:pointer}button:disabled{opacity:.6}nav button{background:#e8f1eb;color:#174d32}nav button.active{background:var(--g);color:white}main{max-width:1100px;margin:auto;padding:14px}.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:14px}h2{font-size:19px;margin:0 0 12px;color:var(--g)}label{display:block;font-weight:bold;margin:8px 0 5px}input,select{width:100%;padding:10px;border:1px solid #bac9c0;border-radius:7px;font-size:16px;background:white}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:9px;border:1px solid var(--line);text-align:left}th{background:#edf4ef}.hidden{display:none!important}.notice{padding:10px;border-radius:8px;background:#fff7dc;margin:10px 0}.small{font-size:13px;color:#53635b}.P{color:#16803d}.A{color:#c62828}.L{color:#1769aa}.E{color:#8657a8}.status{text-align:center}.stat{padding:12px;background:#edf5ef;border-radius:9px;text-align:center}.stat b{display:block;font-size:24px;color:var(--g)}@media print{nav,.no-print,button{display:none!important}body{background:white}header{background:white;color:black}.panel{border:0}.page{display:none!important}body.print-attendance #attendance{display:block!important}body.print-report #reports{display:block!important}body.print-attendance #attendanceTable table,body.print-report #reportResult table{font-size:12px}body.print-attendance #attendanceTable th,body.print-attendance #attendanceTable td,body.print-report #reportResult th,body.print-report #reportResult td{padding:5px}}
@@ -704,6 +704,14 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
 @media print{#mobileBottomNav,#pullRefreshIndicator{display:none!important}body{padding-bottom:0!important}}
 </style>
 
+
+<style id="v17-mobile-navigation-visibility-fix">
+@media screen and (max-width:800px){
+ #mobileBottomNav{display:grid!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:9999!important;visibility:visible!important;opacity:1!important;}
+ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))!important;}
+}
+@media screen and (min-width:801px){#mobileBottomNav{display:none!important;}}
+</style>
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -996,15 +1004,19 @@ async function loadCloud(){
    // Existing attendance documents are keyed by studentId rather than className.
    // Read in small 'in' batches so Rules can verify each student's assigned class.
    const ids=students.map(st=>String(st.id));
-   for(let i=0;i<ids.length;i+=10){
-     const group=ids.slice(i,i+10);
-     const snap=await db.collection('attendance').where('studentId','in',group).get();
-     attendanceDocs.push(...snap.docs);
-   }
+   // Fetch the 10-ID Firestore batches concurrently instead of waiting for each one.
+   const batches=[];
+   for(let i=0;i<ids.length;i+=10)batches.push(ids.slice(i,i+10));
+   const snaps=await Promise.all(batches.map(group=>db.collection('attendance').where('studentId','in',group).get()));
+   snaps.forEach(snap=>attendanceDocs.push(...snap.docs));
  }else{
-   [ss,cc]=await Promise.all([db.collection('students').get(),db.collection('classes').get()]);
+   // Load all three collections together to reduce refresh waiting time.
+   [ss,cc,...attendanceDocs]=await Promise.all([
+     db.collection('students').get(),
+     db.collection('classes').get(),
+     db.collection('attendance').get()
+   ]);
    students=ss.docs.map(d=>({...d.data(),id:String(d.data().id||d.id)}));
-   const aa=await db.collection('attendance').get();attendanceDocs=aa.docs;
  }
  classes=cc.docs.map(d=>d.data().name||d.id);if(isClassScoped()&&!classes.includes(assignedClass))classes=[assignedClass];if(!classes.length)classes=['አጠቃላይ'];
  cc.docs.forEach(d=>{const x=d.data(),name=x.name||d.id;if(x.prefix)classPrefixes[name]=String(x.prefix).toUpperCase();else if(!classPrefixes[name]){const generated=defaultPrefixForClass(name);if(generated)classPrefixes[name]=generated;}});
@@ -1976,35 +1988,21 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
  const indicator=document.getElementById('pullRefreshIndicator');
  const indicatorText=document.getElementById('pullRefreshText');
  if(!bottom||!sidebar||!indicator)return;
- const pageButtons=[...sidebar.querySelectorAll('button[data-page]')];
- function setBottomActive(page){
-  bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
- }
- bottom.addEventListener('click',e=>{
-  const pageButton=e.target.closest('[data-mobile-page]');
-  if(pageButton){const target=sidebar.querySelector('button[data-page="'+pageButton.dataset.mobilePage+'"]');if(target&&!target.classList.contains('hidden'))target.click();return;}
-  if(e.target.closest('[data-mobile-more]')){
-   const toggle=document.getElementById('menuToggle');
-   if(toggle)toggle.click();
-  }
- });
- pageButtons.forEach(b=>b.addEventListener('click',()=>setBottomActive(b.dataset.page)));
- const originalApplyRoleUI=window.applyRoleUI;
- // Keep the mobile destinations in sync with role permissions after login.
- const syncRoleNav=()=>{
-  const students=sidebar.querySelector('[data-page="students"]');
-  const studentsBtn=bottom.querySelector('[data-mobile-page="students"]');
-  if(studentsBtn)studentsBtn.classList.toggle('hidden',!!students?.classList.contains('hidden'));
-  const reports=sidebar.querySelector('[data-page="reports"]');
-  const reportsBtn=bottom.querySelector('[data-mobile-page="reports"]');
-  if(reportsBtn)reportsBtn.classList.toggle('hidden',!!reports?.classList.contains('hidden'));
+ const setActive=page=>bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
+ const sync=()=>{
+  ['students','reports'].forEach(page=>{const source=sidebar.querySelector('[data-page="'+page+'"]');const target=bottom.querySelector('[data-mobile-page="'+page+'"]');if(target)target.classList.toggle('hidden',!source||source.classList.contains('hidden'));});
+  const active=sidebar.querySelector('button[data-page].active');if(active)setActive(active.dataset.page);
  };
- const roleObserver=new MutationObserver(syncRoleNav);
- roleObserver.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
- syncRoleNav();
- // Pull-to-refresh: only when already at the top, and only after a deliberate downward pull.
- let startY=0,startX=0,pulling=false,refreshing=false,armed=false;
- const threshold=82;
+ bottom.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-mobile-page]');
+  if(btn){const target=sidebar.querySelector('button[data-page="'+btn.dataset.mobilePage+'"]');if(target&&!target.classList.contains('hidden'))target.click();return;}
+  if(e.target.closest('[data-mobile-more]')){const toggle=document.getElementById('menuToggle');if(toggle)toggle.click();}
+ });
+ sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>{setActive(b.dataset.page);setTimeout(sync,0);}));
+ new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+ sync();window.syncMobileBottomNavigation=sync;
+ // Pull-to-refresh is accepted only from the top of the page and for a deliberate downward pull.
+ let startY=0,startX=0,pulling=false,refreshing=false,armed=false;const threshold=58;
  document.addEventListener('touchstart',e=>{
   if(e.touches.length!==1||window.scrollY>2||document.body.classList.contains('auth-locked'))return;
   startY=e.touches[0].clientY;startX=e.touches[0].clientX;pulling=true;armed=false;
@@ -2013,23 +2011,16 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
   if(!pulling||refreshing||e.touches.length!==1)return;
   const dy=e.touches[0].clientY-startY,dx=e.touches[0].clientX-startX;
   if(Math.abs(dx)>Math.abs(dy)||dy<=0||window.scrollY>2){pulling=false;return;}
-  if(dy>25){indicator.classList.add('show');indicatorText.textContent=dy>=threshold?'ለማደስ አሁን ይልቀቁ':'ለማደስ ወደታች ይጎትቱ';armed=dy>=threshold;}
+  if(dy>18){indicator.classList.add('show');indicatorText.textContent=dy>=threshold?'ለማደስ አሁን ይልቀቁ':'ለማደስ ወደታች ይጎትቱ';armed=dy>=threshold;}
  },{passive:true});
  document.addEventListener('touchend',async()=>{
-  if(!pulling)return;pulling=false;
-  if(!armed||refreshing){indicator.classList.remove('show');return;}
-  refreshing=true;indicator.classList.add('loading','show');indicatorText.textContent='መረጃዎችን በማደስ ላይ…';
-  try{
-   if(!window.firebase?.auth?.().currentUser||typeof window.loadCloud!=='function')throw new Error('እባክዎ Sign In ያድርጉ።');
-   await window.loadCloud();
-   if(typeof window.loadAppSettings==='function')await window.loadAppSettings();
-   indicatorText.textContent='በተሳካ ሁኔታ ታድሷል ✓';
-  }catch(err){console.error('Pull refresh failed:',err);indicatorText.textContent='ማደስ አልተሳካም፤ Internet ያረጋግጡ';}
-  finally{setTimeout(()=>{indicator.classList.remove('show','loading');refreshing=false;armed=false;},1200);}
+  if(!pulling)return;pulling=false;if(!armed||refreshing){indicator.classList.remove('show');return;}
+  refreshing=true;indicator.classList.add('loading','show');indicatorText.textContent='መረጃዎችን በፍጥነት በማደስ ላይ…';
+  try{if(!window.firebase?.auth?.().currentUser||typeof window.loadCloud!=='function')throw new Error('እባክዎ Sign In ያድርጉ።');await window.loadCloud();indicatorText.textContent='በተሳካ ሁኔታ ታድሷል ✓';}
+  catch(err){console.error('Pull refresh failed:',err);indicatorText.textContent='ማደስ አልተሳካም፤ Internet ያረጋግጡ';}
+  finally{setTimeout(()=>{indicator.classList.remove('show','loading');refreshing=false;armed=false;},650);}
  },{passive:true});
  document.addEventListener('touchcancel',()=>{pulling=false;armed=false;indicator.classList.remove('show');},{passive:true});
- // Expose a small sync hook for the existing navigation and role code.
- window.syncMobileBottomNavigation=()=>{const active=sidebar.querySelector('button[data-page].active');if(active)setBottomActive(active.dataset.page);syncRoleNav();};
 })();
 </script>
 
