@@ -781,12 +781,14 @@ function drawAttendance(){
      statusFilter=$('attendanceStatusFilter')?.value||'ALL',
      day=attendance[iso]||{},
      list=students.filter(st=>(c==='__ALL__'||st.className===c)&&(!q||[st.name,st.id,st.className,st.phone].some(v=>String(v||'').toLocaleLowerCase().includes(q)))&&(statusFilter==='ALL'||(statusFilter==='NONE'?!day[String(st.id)]:day[String(st.id)]===statusFilter)));
- $('attendanceTable').innerHTML=`<table class="attendance-reference-table"><thead><tr>
- <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th class="status-head">የመገኘት ሁኔታ (P / A / L / E)</th>
+ const radioCell=(st,code)=>`<td class="attendance-radio-td"><label class="attendance-radio-option status-${code}" title="${code}"><input type="radio" name="st-${esc(st.id)}" value="${code}" aria-label="${esc(st.name)} ${code}" ${day[String(st.id)]===code?'checked':''}><span class="attendance-radio-visual" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label></td>`;
+ $('attendanceTable').innerHTML=`<table class="attendance-reference-table attendance-four-column-radio"><thead><tr>
+ <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th>
+ <th class="radio-head head-P">P</th><th class="radio-head head-A">A</th><th class="radio-head head-L">L</th><th class="radio-head head-E">E</th>
  </tr></thead><tbody>${list.map((st,i)=>`<tr>
  <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell">${esc(st.name)}</td><td>${esc(st.className||'')}</td>
- <td class="status attendance-choice-cell"><div class="attendance-choice-group">${['P','A','L','E'].map(code=>`<label class="attendance-choice status-${code}" title="${code}"><span class="attendance-choice-letter">${code}</span><span class="attendance-circle status-${code}"><input aria-label="${esc(st.name)} ${code}" type="radio" name="st-${esc(st.id)}" value="${code}" ${day[String(st.id)]===code?'checked':''}><span class="attendance-circle-mark" aria-hidden="true"></span></span></label>`).join('')}</div></td>
- </tr>`).join('')||'<tr><td colspan="5" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
+ ${['P','A','L','E'].map(code=>radioCell(st,code)).join('')}
+ </tr>`).join('')||'<tr><td colspan="8" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
  renderAttendanceSummary(list,day,iso)
 }
 function renderAttendanceSummary(list,day,iso){const counts={P:0,A:0,L:0,E:0};list.forEach(st=>{const v=day[String(st.id)];if(counts[v]!==undefined)counts[v]++});const labels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};$('attendanceSummary').innerHTML=Object.keys(counts).map(k=>`<div class="summary-row summary-${k}"><span class="summary-letter">${k}</span><strong>${labels[k]}</strong><b>${counts[k]}</b></div>`).join('');$('attendanceSummaryFooter').innerHTML=iso?`📅 ቀን፦ ${dateET(iso)} &nbsp; | &nbsp; ክፍል፦ ${esc(isClassScoped()?assignedClass:($('attClass').selectedOptions[0]?.textContent||'ሁሉም ክፍሎች'))}`:''}
@@ -967,6 +969,30 @@ $('refreshActivityLogs').addEventListener('click',renderActivityLogs);document.q
  window.addEventListener('resize',()=>{if(window.innerWidth>800)close();});
 })();
 </script>
+
+<style id="attendance-four-column-radio-reference">
+/* Match the user's latest reference: four separate status columns and compact checked circles. */
+#attendance .attendance-four-column-radio{min-width:700px!important;width:100%!important;border-collapse:collapse!important}
+#attendance .attendance-four-column-radio th.radio-head{width:58px!important;min-width:58px!important;text-align:center!important;font-weight:800!important;font-size:13px!important;background:#f8fafc!important}
+#attendance .attendance-four-column-radio th.head-P{color:#059669!important}
+#attendance .attendance-four-column-radio th.head-A{color:#ef4444!important}
+#attendance .attendance-four-column-radio th.head-L{color:#2563eb!important}
+#attendance .attendance-four-column-radio th.head-E{color:#9333ea!important}
+#attendance .attendance-four-column-radio td.attendance-radio-td{text-align:center!important;vertical-align:middle!important;padding:10px 8px!important;width:58px!important}
+#attendance .attendance-radio-option{display:inline-flex!important;position:relative!important;width:28px!important;height:28px!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;margin:0!important}
+#attendance .attendance-radio-option input{position:absolute!important;inset:0!important;width:28px!important;height:28px!important;margin:0!important;opacity:0!important;cursor:pointer!important;z-index:2!important}
+#attendance .attendance-radio-visual{display:flex!important;align-items:center!important;justify-content:center!important;width:25px!important;height:25px!important;border:2px solid #cbd5e1!important;border-radius:50%!important;background:#fff!important;color:#fff!important;transition:background .18s ease,border-color .18s ease,transform .18s ease!important;pointer-events:none!important}
+#attendance .attendance-radio-visual i{font-size:10px!important;opacity:0!important;transform:scale(.5)!important;transition:opacity .15s ease,transform .15s ease!important}
+#attendance .attendance-radio-option.status-P input:checked + .attendance-radio-visual{background:#10b981!important;border-color:#10b981!important;box-shadow:0 2px 5px #10b98135!important}
+#attendance .attendance-radio-option.status-A input:checked + .attendance-radio-visual{background:#ef4444!important;border-color:#ef4444!important;box-shadow:0 2px 5px #ef444435!important}
+#attendance .attendance-radio-option.status-L input:checked + .attendance-radio-visual{background:#2563eb!important;border-color:#2563eb!important;box-shadow:0 2px 5px #2563eb35!important}
+#attendance .attendance-radio-option.status-E input:checked + .attendance-radio-visual{background:#9333ea!important;border-color:#9333ea!important;box-shadow:0 2px 5px #9333ea35!important}
+#attendance .attendance-radio-option input:checked + .attendance-radio-visual i{opacity:1!important;transform:scale(1)!important}
+#attendance .attendance-radio-option:focus-within .attendance-radio-visual{outline:3px solid #bfdbfe!important;outline-offset:2px!important}
+@media(max-width:600px){#attendance .attendance-four-column-radio{min-width:700px!important}#attendance .attendance-four-column-radio th,#attendance .attendance-four-column-radio td{padding-left:8px!important;padding-right:8px!important}}
+@media print{#attendance .attendance-radio-visual{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
+</style>
+
 </body></html>
 
 <style id="requested-report-status-layout-fix">
