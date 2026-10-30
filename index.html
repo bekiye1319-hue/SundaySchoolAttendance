@@ -629,7 +629,40 @@ body.app-dark-theme [style*="background: white"],body.app-dark-theme [style*="ba
 #reports .report-table{width:100%;min-width:680px;}
 @media(max-width:800px){#reports .report-container{padding:10px!important;}#reports .report-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:480px){#reports .report-filter-grid{grid-template-columns:minmax(0,1fr);}}
-</style></head><body class="auth-loading">
+</style>
+<style id="attendance-table-user-gui-v15">
+/* Attendance table adapted from the user's supplied GUI; data and Firebase handlers remain unchanged. */
+#attendance #attendanceTable{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow-x:auto;box-shadow:0 4px 12px rgba(15,23,42,.06);}
+#attendance #attendanceTable table.attendance-four-column-radio{width:100%;min-width:700px;margin:0;border-collapse:collapse;direction:ltr;background:#fff;}
+#attendance #attendanceTable table.attendance-four-column-radio thead tr{background:#f9fafb;border-bottom:1px solid #e5e7eb;}
+#attendance #attendanceTable table.attendance-four-column-radio th{padding:13px 14px;color:#4b5563;font-size:13px;font-weight:800;border:0;border-bottom:1px solid #e5e7eb;white-space:nowrap;text-align:right;}
+#attendance #attendanceTable table.attendance-four-column-radio th:first-child,
+#attendance #attendanceTable table.attendance-four-column-radio th.radio-head{text-align:center;}
+#attendance #attendanceTable table.attendance-four-column-radio td{padding:12px 14px;border:0;border-bottom:1px solid #e5e7eb;color:#374151;font-size:13px;vertical-align:middle;background:#fff;}
+#attendance #attendanceTable table.attendance-four-column-radio tbody tr:hover td{background:#f9fafb;}
+#attendance #attendanceTable table.attendance-four-column-radio tbody tr:last-child td{border-bottom:0;}
+#attendance #attendanceTable table.attendance-four-column-radio td.attendance-index{text-align:center;color:#6b7280;font-weight:600;}
+#attendance #attendanceTable table.attendance-four-column-radio td.student-id-cell{font-weight:700;white-space:nowrap;}
+#attendance #attendanceTable table.attendance-four-column-radio td.student-name-cell{min-width:150px;text-align:right;font-weight:700;color:#1f2937;}
+#attendance #attendanceTable table.attendance-four-column-radio td:nth-child(4){text-align:right;min-width:105px;}
+#attendance #attendanceTable table.attendance-four-column-radio td.attendance-radio-td{text-align:center;padding:10px 8px;}
+#attendance #attendanceTable .attendance-radio-option{width:28px;height:28px;}
+#attendance #attendanceTable .attendance-radio-visual{width:24px;height:24px;border:2px solid #d1d5db;background:#fff;}
+#attendance #attendanceTable .attendance-radio-option.status-P input:checked + .attendance-radio-visual{background:#10b981;border-color:#10b981;}
+#attendance #attendanceTable .attendance-radio-option.status-A input:checked + .attendance-radio-visual{background:#ef4444;border-color:#ef4444;}
+#attendance #attendanceTable .attendance-radio-option.status-L input:checked + .attendance-radio-visual{background:#3b82f6;border-color:#3b82f6;}
+#attendance #attendanceTable .attendance-radio-option.status-E input:checked + .attendance-radio-visual{background:#8b5cf6;border-color:#8b5cf6;}
+#attendance #attendanceTable .attendance-radio-option input:disabled{cursor:not-allowed;}
+#attendance #attendanceTable .attendance-radio-option:has(input:disabled){cursor:not-allowed;opacity:.55;}
+body.app-dark-theme #attendance #attendanceTable{background:#1e293b;border-color:#475569;}
+body.app-dark-theme #attendance #attendanceTable table.attendance-four-column-radio th{background:#263449!important;color:#e2e8f0!important;border-color:#475569!important;}
+body.app-dark-theme #attendance #attendanceTable table.attendance-four-column-radio td{background:#1e293b!important;color:#e2e8f0!important;border-color:#475569!important;}
+body.app-dark-theme #attendance #attendanceTable table.attendance-four-column-radio tbody tr:hover td{background:#263449!important;}
+@media(max-width:700px){#attendance #attendanceTable table.attendance-four-column-radio{min-width:700px;}#attendance #attendanceTable table.attendance-four-column-radio th,#attendance #attendanceTable table.attendance-four-column-radio td{padding-left:10px;padding-right:10px;}}
+@media print{#attendance #attendanceTable{box-shadow:none;border:1px solid #e5e7eb;}#attendance #attendanceTable table.attendance-four-column-radio{min-width:0!important;}#attendance #attendanceTable .attendance-radio-visual{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style>
+
+</head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
   <div class="navbar-left"><i class="fa-solid fa-church"></i> ሰንበት ትምህርት ቤት</div>
