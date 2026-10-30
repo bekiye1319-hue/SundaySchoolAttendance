@@ -452,6 +452,15 @@ h2{color:#0f623a}
 
 /* Classes dashboard: clear metric cards and consistent action buttons */
 .classes-panel{overflow:hidden}.classes-intro{margin:4px 0 14px;color:#64756a}.class-overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:15px;margin:16px 0 22px}.class-overview-card{border:1px solid #d8e7dc;border-radius:16px;padding:16px;background:linear-gradient(150deg,#ffffff 0%,#f3faf5 100%);box-shadow:0 5px 16px rgba(24,75,45,.07)}.class-overview-card h3{margin:0 0 13px;padding-bottom:10px;border-bottom:1px solid #e4eee7;color:#176b40;font-size:18px}.class-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.class-metrics>div{min-height:76px;padding:11px;border-radius:12px;background:#fff;border:1px solid #e4eee7;display:flex;align-items:center;flex-wrap:wrap;gap:4px}.class-metrics b{font-size:22px;color:#173d2a;margin:0 3px}.class-metrics span{display:block;width:100%;font-size:12px;color:#617268;margin-top:2px}.class-metrics>div:last-child{grid-column:1/-1;min-height:65px}.class-add-btn{background:#16804a!important;color:#fff!important;border-radius:10px!important;padding:11px 18px!important;font-weight:700!important}.class-delete-btn{background:#dc4545!important;color:#fff!important;border:0!important;border-radius:8px!important;padding:8px 12px!important;font-weight:700!important}.classes-panel #classesTable table{width:100%;border-collapse:collapse}.classes-panel #classesTable th{background:#eaf4ed;color:#214d34}.classes-panel #classesTable td,.classes-panel #classesTable th{padding:11px 9px;text-align:center;border-bottom:1px solid #e5ece7}@media(max-width:650px){.class-overview-grid{grid-template-columns:1fr}.class-metrics>div{min-height:70px}.classes-panel{padding:12px}}
+
+/* Login screen: keep all application navigation hidden until authentication succeeds. */
+body.auth-locked nav.no-print,
+body.auth-locked #supervisorDesktopNavbar,
+body.auth-locked header:not(.desktop-navbar),
+body.auth-locked #menuToggle,
+body.auth-locked #sidebarBackdrop { display:none !important; }
+body.auth-locked main { display:none !important; }
+
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -473,7 +482,7 @@ h2{color:#0f623a}
 @media print{#supervisorDesktopNavbar{display:none!important}}
 </style>
 
-</head><body>
+</head><body class="auth-locked">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><span class="header-badge">SS</span></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
   <div class="navbar-left"><i class="fa-solid fa-church"></i> ሰንበት ትምህርት ቤት</div>
@@ -576,7 +585,6 @@ h2{color:#0f623a}
       </div>
       <button id="cloudLoginBtn" class="btn" type="submit"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> ግባ / Sign in</button>
     </form>
-    <button id="cloudSignupBtn" class="signup-link" type="button">መለያ ፍጠር / Sign up</button>
     <div id="cloudLoginMessage" class="alert-message" aria-live="polite"></div>
     <button id="cloudLogoutBtn" class="hidden" type="button">ውጣ / Sign out</button>
   </div>
@@ -598,7 +606,7 @@ function getLocalLogs(){try{return JSON.parse(localStorage.getItem('ss_activity_
 async function logActivity(action,details=''){if(!currentUser)return;const item={action:String(action),details:String(details),userEmail:currentUser.email||'',userId:currentUser.uid,role:role||'',className:isClassScoped()?assignedClass:'All classes',createdAt:new Date().toISOString()};const logs=getLocalLogs();logs.unshift(item);try{localStorage.setItem('ss_activity_logs',JSON.stringify(logs.slice(0,250)))}catch(e){}try{await db.collection('activityLogs').add({...item,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdAtISO:item.createdAt})}catch(e){console.warn('Firebase activityLogs write denied; local copy saved.',e.message)}if(role==='supervisor')renderRecentActivityStream()}
 async function renderRecentActivityStream(){const box=$('recentActivityStream'),panel=$('recentActivityPanel');if(!box||!panel)return;panel.classList.toggle('hidden',role!=='supervisor');if(role!=='supervisor')return;let rows=[];try{const snap=await db.collection('activityLogs').orderBy('createdAt','desc').limit(8).get();rows=snap.docs.map(d=>{const x=d.data();return {...x,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().toISOString():x.createdAtISO||x.createdAt||''}})}catch(e){rows=getLocalLogs().slice(0,8)}if(!rows.length){box.innerHTML='<p class="small">ገና የተመዘገበ እንቅስቃሴ የለም። Attendance፣ ተማሪ ወይም ሪፖርት ሲጠቀሙ እዚህ ይታያል።</p>';return}box.innerHTML=rows.slice(0,8).map(x=>`<div class="recent-activity-item"><span class="recent-activity-dot"></span><div><strong>${esc(x.action||'እንቅስቃሴ')}</strong><small>${esc(x.details||'')} • ${esc(x.userEmail||x.role||'')}<br>${esc(x.createdAt?new Date(x.createdAt).toLocaleString():'')}</small></div></div>`).join('')}
 async function renderActivityLogs(){if(role!=='supervisor')return;const box=$('activityLogsTable'),note=$('activityLogsMessage');let rows=[];try{const snap=await db.collection('activityLogs').orderBy('createdAt','desc').limit(100).get();rows=snap.docs.map(d=>{const x=d.data();return {...x,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().toISOString():x.createdAtISO||x.createdAt||''}});note.textContent='Firebase ላይ የተቀመጡ የቅርብ 100 እንቅስቃሴዎች።'}catch(e){rows=getLocalLogs();note.textContent='Firebase ፈቃድ ካልተገኘ የዚህ መሣሪያ የአካባቢ መዝገቦች ብቻ ይታያሉ።'}rows=rows.slice(0,100);box.innerHTML='<table><thead><tr><th>ቀን/ሰዓት</th><th>ተጠቃሚ</th><th>Role</th><th>እንቅስቃሴ</th><th>ዝርዝር</th><th>ክፍል</th></tr></thead><tbody>'+(rows.length?rows.map(x=>`<tr><td>${esc(x.createdAt?new Date(x.createdAt).toLocaleString():'—')}</td><td>${esc(x.userEmail||x.userId||'—')}</td><td>${esc(x.role||'—')}</td><td><span class="activity-badge">${esc(x.action||'—')}</span></td><td>${esc(x.details||'—')}</td><td>${esc(x.className||'—')}</td></tr>`).join(''):'<tr><td colspan="6">ገና የተመዘገበ እንቅስቃሴ የለም።</td></tr>')+'</tbody></table>'}
-function setLogin(show){$('cloudLogin').style.display=show?'flex':'none';$('cloudLogoutBtn').classList.toggle('hidden',!currentUser)}
+function setLogin(show){document.body.classList.toggle('auth-locked',!!show);$('cloudLogin').style.display=show?'flex':'none';$('cloudLogoutBtn').classList.toggle('hidden',!currentUser)}
 function dateISO(s){let m=String(s||'').trim().match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);if(!m)return null;let d=+m[1],mo=+m[2],y=+m[3];if(d<1||d>30||mo<1||mo>13||y<1)return null;try{let f=new Intl.DateTimeFormat('en-u-ca-ethiopic',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'});let start=Date.UTC(y+7,7,25),end=Date.UTC(y+8,9,10);for(let t=start;t<=end;t+=86400000){let p={};f.formatToParts(new Date(t)).forEach(x=>{if(x.type!=='literal')p[x.type]=+x.value});if(p.year===y&&p.month===mo&&p.day===d)return new Date(t).toISOString().slice(0,10)}}catch(e){}return null}
 function dateET(iso){if(!iso)return '';let a=iso.split('-').map(Number);try{let p={};new Intl.DateTimeFormat('en-u-ca-ethiopic',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'}).formatToParts(new Date(Date.UTC(a[0],a[1]-1,a[2]))).forEach(x=>{if(x.type!=='literal')p[x.type]=+x.value});return String(p.day).padStart(2,'0')+'/'+String(p.month).padStart(2,'0')+'/'+p.year}catch(e){return iso}}
 function today(){return dateET(new Date().toISOString().slice(0,10))}
@@ -696,7 +704,6 @@ async function signup(){
  }catch(e){console.error(e);msg('Signup ስህተት: '+(e.message||'መለያ መፍጠር አልተሳካም።'))}
  finally{$('cloudSignupBtn').disabled=false}
 }
-$('cloudSignupBtn').addEventListener('click',signup);
 $('loginForm').addEventListener('submit',e=>{e.preventDefault();login()});
 $('cloudLoginBtn').addEventListener('click',e=>{e.preventDefault();login()});$('cloudEmail').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('cloudPassword').focus()}});
 const togglePassword=$('togglePassword');if(togglePassword)togglePassword.addEventListener('click',()=>{const field=$('cloudPassword'),visible=field.type==='password';field.type=visible?'text':'password';togglePassword.textContent=visible?'◎':'◉';togglePassword.setAttribute('aria-pressed',String(visible));togglePassword.setAttribute('aria-label',visible?'Password ደብቅ':'Password አሳይ')});
