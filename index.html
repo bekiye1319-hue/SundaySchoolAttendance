@@ -1360,6 +1360,156 @@ renderAll();
 #attendance .attendance-radio-option input:disabled{cursor:not-allowed!important;opacity:.25!important}
 #attendance .attendance-radio-option:has(input:disabled){cursor:not-allowed!important;opacity:.45!important}
 </style>
+
+<style id="full-responsive-darkmode-fix">
+
+/* ==========================================================
+   FULL RESPONSIVE + DARK MODE ACCESSIBILITY PATCH
+   Visual-only CSS: does not change attendance/auth/data logic.
+   ========================================================== */
+:root{color-scheme:light;--app-surface:#fff;--app-surface-2:#f7faf8;--app-text:#182522;--app-muted:#53635b;--app-border:#d8e2dc;--app-shadow:0 8px 24px rgba(16,24,40,.07)}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{min-height:100vh;min-height:100dvh}
+main{min-height:calc(100vh - 62px);min-height:calc(100dvh - 62px)}
+.page,section,article,form,fieldset,.panel,.card,[class*="-card"],[class*="-panel"]{min-width:0;max-width:100%}
+.grid,.row,.dashboard-stats,.quick-actions,.report-filter-grid,.report-button-group,.students-ref-form-grid,.attendance-filters,.class-overview-grid,.report-stats-grid,.report-visual-grid{min-width:0}
+input,select,textarea,button{font:inherit;max-width:100%}
+input,select,textarea{min-width:0}
+textarea{width:100%;resize:vertical}
+button,.btn{min-height:40px;line-height:1.35;white-space:normal;overflow-wrap:anywhere;touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #60a5fa!important;outline-offset:2px!important}
+img,svg,canvas,video{max-width:100%}
+.panel,.report-card,.report-visual-card,.students-ref-card,.backup-new-card,.class-overview-card{box-shadow:var(--app-shadow)}
+.table-wrap,.students-ref-table-wrap,.attendance-table-wrap,.report-table-wrap{max-width:100%;overflow:auto!important;overscroll-behavior-x:contain;scrollbar-width:thin}
+table{max-width:none;border-collapse:collapse}
+th,td{overflow-wrap:anywhere}
+/* Desktop / large screens */
+@media(min-width:1201px){
+ main{max-width:1600px!important;margin-left:auto!important;margin-right:auto!important;padding-left:32px!important;padding-right:32px!important}
+ .dashboard-stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .quick-actions{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .class-overview-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+/* Laptop and tablet landscape */
+@media(min-width:801px) and (max-width:1200px){
+ main{width:100%!important;padding:86px 20px 28px!important}
+ .dashboard-stats,.quick-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .class-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .report-visual-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .panel{padding:16px!important}
+}
+/* All phones and portrait tablets */
+@media(max-width:800px){
+ html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+ main{width:100%!important;max-width:100%!important;margin:0!important;padding:58px 12px 24px!important}
+ .page{width:100%!important;max-width:100%!important;margin:0!important;padding:0!important}
+ .panel,.report-card,.report-visual-card,.students-ref-card,.backup-new-card{width:100%;padding:14px!important;margin:0 0 12px!important;border-radius:13px!important}
+ .dashboard-title{display:flex!important;flex-wrap:wrap!important;gap:8px!important;align-items:flex-start!important}
+ .dashboard-stats,.quick-actions,.class-overview-grid,.report-visual-grid,.report-filter-grid,.students-ref-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+ .dashboard-stat,.stat,.class-overview-card,.report-stat-card{min-width:0!important}
+ .grid{grid-template-columns:1fr!important;gap:10px!important}
+ .row{display:flex!important;flex-wrap:wrap!important;gap:8px!important;width:100%!important}
+ .row>*{min-width:0!important;max-width:100%!important}
+ .row button,.row .btn{flex:1 1 calc(50% - 8px);min-width:0!important;min-height:44px!important}
+ input,select,textarea{width:100%!important;min-height:44px!important;font-size:16px!important}
+ button,.btn{min-height:44px!important;padding:10px 12px!important}
+ h1{font-size:clamp(18px,4.5vw,23px)!important;line-height:1.35!important}
+ h2{font-size:clamp(17px,4vw,20px)!important;line-height:1.4!important}
+ h3{font-size:16px!important}
+ .report-pie-wrap{gap:12px!important}
+ .report-pie-chart{width:130px!important;height:130px!important;flex-basis:130px!important}
+ .attendance-actions{width:100%!important}
+ #attendance .attendance-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #attendance .attendance-actions button{width:100%!important;min-width:0!important}
+ #attendance .attendance-status-grid{max-width:100%!important;flex-wrap:wrap!important;gap:10px!important}
+ #attendance .attendance-status-btn{flex:0 0 auto!important}
+ #attendance .attendance-reference-table,#attendance .attendance-four-column-radio{min-width:680px!important}
+ #students .students-ref-table-wrap table{min-width:820px!important}
+ #studentsTable table{min-width:620px!important}
+ #reportResult table{min-width:680px!important}
+ #classesTable table{min-width:480px!important}
+ .desktop-navbar{height:50px!important;min-height:50px!important}
+ body>nav.no-print{max-width:min(86vw,320px)!important;width:min(86vw,320px)!important}
+}
+@media(max-width:560px){
+ main{padding:56px 9px 20px!important}
+ .panel,.report-card,.report-visual-card,.students-ref-card,.backup-new-card{padding:12px!important}
+ .dashboard-stats,.quick-actions,.class-overview-grid,.report-visual-grid,.report-filter-grid,.students-ref-form-grid{grid-template-columns:1fr!important}
+ .row button,.row .btn{flex-basis:100%!important}
+ .dashboard-stat{padding:11px!important}
+ .dashboard-stat strong,.report-stat-val{font-size:clamp(19px,6vw,25px)!important}
+ .attendance-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+ #attendance .attendance-toolbar .status-legend{width:100%!important;justify-content:space-around!important;gap:8px!important;flex-wrap:wrap!important}
+ #attendance .attendance-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+ #attendance .attendance-actions button{font-size:12px!important;padding:9px 6px!important}
+ .report-pie-wrap{flex-direction:column!important;align-items:flex-start!important}
+ .report-pie-chart{align-self:center!important}
+ .students-ref-pagination{flex-wrap:wrap!important;gap:6px!important}
+}
+@media(max-width:380px){
+ main{padding-left:7px!important;padding-right:7px!important}
+ .panel,.report-card,.report-visual-card,.students-ref-card{padding:10px!important}
+ #attendance .attendance-actions button{font-size:11px!important}
+ #attendance .attendance-status-btn span{font-size:11px!important}
+ .report-stats-grid{gap:7px!important}
+}
+/* Dark theme: cover all content cards, tables, forms, labels, overlays and generated UI. */
+body.app-dark-theme{color-scheme:dark;--bg:#0b1220;--line:#334155;--ink:#e5edf5;--app-surface:#172235;--app-surface-2:#1e293b;--app-text:#e5edf5;--app-muted:#bdc9d8;--app-border:#3b4b61;background:#0b1220!important;color:#e5edf5!important}
+body.app-dark-theme main,body.app-dark-theme .page,body.app-dark-theme section,body.app-dark-theme article{color:#e5edf5!important}
+body.app-dark-theme .panel,body.app-dark-theme .dashboard-stat,body.app-dark-theme .stat,body.app-dark-theme .report-card,body.app-dark-theme .report-visual-card,body.app-dark-theme .students-ref-card,body.app-dark-theme .backup-new-card,body.app-dark-theme .class-overview-card,body.app-dark-theme .class-metrics>div,body.app-dark-theme .comparison-kpi,body.app-dark-theme .recent-activity-item,body.app-dark-theme .attendance-filter-panel,body.app-dark-theme .attendance-reference-form-card,body.app-dark-theme .attendance-list-panel,body.app-dark-theme .students-ref-table-card,body.app-dark-theme .report-container,body.app-dark-theme .report-app-header,body.app-dark-theme .report-form-group,body.app-dark-theme .report-control,body.app-dark-theme .form-group,body.app-dark-theme .input-wrapper,body.app-dark-theme .backup-new-head{background:#172235!important;color:#e5edf5!important;border-color:#3b4b61!important}
+body.app-dark-theme h1,body.app-dark-theme h2,body.app-dark-theme h3,body.app-dark-theme h4,body.app-dark-theme h5,body.app-dark-theme h6,body.app-dark-theme p,body.app-dark-theme label,body.app-dark-theme legend,body.app-dark-theme summary,body.app-dark-theme .small,body.app-dark-theme .section-caption,body.app-dark-theme .students-ref-subtitle,body.app-dark-theme .classes-intro,body.app-dark-theme .report-brand-sub,body.app-dark-theme .report-card-title{color:#e2eaf4!important}
+body.app-dark-theme span:not(.P):not(.A):not(.L):not(.E),body.app-dark-theme strong,body.app-dark-theme td,body.app-dark-theme li{color:#e2eaf4}
+body.app-dark-theme input:not([type=radio]):not([type=checkbox]),body.app-dark-theme select,body.app-dark-theme textarea,body.app-dark-theme .report-control,body.app-dark-theme .students-ref-input,body.app-dark-theme .attendance-search-field{background:#0f1a2b!important;color:#f8fafc!important;border:1px solid #52647d!important}
+body.app-dark-theme input::placeholder,body.app-dark-theme textarea::placeholder{color:#9aaabd!important;opacity:1!important}
+body.app-dark-theme input:disabled,body.app-dark-theme select:disabled,body.app-dark-theme textarea:disabled{background:#263449!important;color:#aebdce!important}
+body.app-dark-theme table{color:#e2eaf4!important;background:#172235!important}
+body.app-dark-theme th{background:#26364d!important;color:#f1f5f9!important;border-color:#465873!important}
+body.app-dark-theme td{background:#172235!important;color:#e2eaf4!important;border-color:#3b4b61!important}
+body.app-dark-theme tr:nth-child(even) td{background:#1b2a40!important}
+body.app-dark-theme .table-wrap,body.app-dark-theme .students-ref-table-wrap,body.app-dark-theme .attendance-table-wrap,body.app-dark-theme .report-table-wrap{background:#111c2e!important;border-color:#3b4b61!important}
+body.app-dark-theme .notice{background:#3a321b!important;color:#ffedb0!important;border:1px solid #75602a!important}
+body.app-dark-theme .attendance-toolbar .status-legend{background:#172235!important;color:#e5edf5!important;border-color:#465873!important}
+body.app-dark-theme .class-overview-card{background:linear-gradient(145deg,#1b2a40,#172235)!important}
+body.app-dark-theme .class-metrics>div{background:#1e2d43!important}
+body.app-dark-theme .recent-activity-item{background:#1b2a40!important}
+body.app-dark-theme .recent-activity-item strong,body.app-dark-theme .report-visual-card h3{color:#f1f5f9!important}
+body.app-dark-theme .recent-activity-item small,body.app-dark-theme .class-metrics span{color:#bdc9d8!important}
+body.app-dark-theme .report-pie-chart:after{background:#172235!important}
+body.app-dark-theme .report-pie-legend div{color:#e2eaf4!important}
+body.app-dark-theme .comparison-kpi{background:#1e2d43!important}
+body.app-dark-theme .comparison-kpi strong{color:#f1f5f9!important}
+body.app-dark-theme .inactive-panel{background:#2b2027!important;border-color:#85404b!important}
+body.app-dark-theme .inactive-panel h2{color:#ffb4bd!important}
+body.app-dark-theme .inactive-panel th{background:#482b35!important;color:#ffe4e8!important}
+body.app-dark-theme .attendance-status-btn{background:transparent!important}
+body.app-dark-theme .attendance-status-btn span{color:inherit!important}
+/* Keep semantic status colors legible in both themes. */
+body.app-dark-theme .P,body.app-dark-theme .status-P{color:#4ade80!important}
+body.app-dark-theme .A,body.app-dark-theme .status-A{color:#f87171!important}
+body.app-dark-theme .L,body.app-dark-theme .status-L{color:#60a5fa!important}
+body.app-dark-theme .E,body.app-dark-theme .status-E{color:#c4a1ff!important}
+body.app-dark-theme .report-stat-card.p{background:#183a2b!important;color:#bbf7d0!important;border-color:#276749!important}
+body.app-dark-theme .report-stat-card.a{background:#42252b!important;color:#fecaca!important;border-color:#85404b!important}
+body.app-dark-theme .report-stat-card.l{background:#42351d!important;color:#fde68a!important;border-color:#80632b!important}
+body.app-dark-theme .report-stat-card.e{background:#35264b!important;color:#e9d5ff!important;border-color:#65458a!important}
+body.app-dark-theme .report-stat-card *{color:inherit!important}
+body.app-dark-theme .attendance-status-btn.status-P{color:#86efac!important}
+body.app-dark-theme .attendance-status-btn.status-A{color:#fca5a5!important}
+body.app-dark-theme .attendance-status-btn.status-L{color:#93c5fd!important}
+body.app-dark-theme .attendance-status-btn.status-E{color:#d8b4fe!important}
+body.app-dark-theme .attendance-status-btn:has(input:checked){background:#26364d!important}
+body.app-dark-theme .desktop-navbar{background:#065f46!important}
+body.app-dark-theme nav.no-print{background:#172235!important;color:#e5edf5!important;border-color:#3b4b61!important}
+body.app-dark-theme nav.no-print a,body.app-dark-theme nav.no-print button{color:#e5edf5}
+body.app-dark-theme .sidebar-section-label{color:#aebdce!important}
+body.app-dark-theme .global-profile-navbar,body.app-dark-theme .sidebar-user{background:#1e2d43!important;color:#e5edf5!important}
+body.app-dark-theme .auth-loading{background:#0b1220!important;color:#e5edf5!important}
+body.app-dark-theme .modal,body.app-dark-theme .modal-content,body.app-dark-theme [role=dialog],body.app-dark-theme .swal2-popup{background:#172235!important;color:#e5edf5!important;border-color:#465873!important}
+body.app-dark-theme .modal *,body.app-dark-theme [role=dialog] *{color:inherit}
+body.app-dark-theme .hidden{display:none!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+</style>
 </body></html>
 
 <style id="requested-report-status-layout-fix">
