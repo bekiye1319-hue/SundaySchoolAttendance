@@ -628,7 +628,7 @@ body.auth-locked main { display:none !important; }
  <div class="panel"><h2>7. Late Cutoff Time / የLate መጀመሪያ ሰዓት</h2><div class="grid"><div><label for="lateCutoffClass">ክፍል / Class</label><select id="lateCutoffClass"></select></div><div><label for="lateCutoffTime">Late የሚጀምርበት ሰዓት</label><input id="lateCutoffTime" type="time" value="09:00"></div></div><div id="lateCutoffSettingsNotice" class="small" aria-live="polite"></div></div>
  <div class="panel"><h2>8. Attendance Edit Time Limit / የማስተካከያ ጊዜ ገደብ</h2><div class="grid"><div><label for="attendanceEditHours">Teacher ለስንት ሰዓት ማስተካከል ይችላል?</label><select id="attendanceEditHours"><option value="1">1 ሰዓት</option><option value="6">6 ሰዓት</option><option value="12">12 ሰዓት</option><option value="24">24 ሰዓት</option><option value="48">48 ሰዓት</option><option value="168">7 ቀን</option><option value="720">30 ቀን</option><option value="0">Unlimited / ያልተገደበ</option></select></div></div><div id="editLimitSettingsNotice" class="small" aria-live="polite"></div></div>
  <div class="panel"><h2>9. Teacher &amp; Role Permissions / የፈቃድ ቅንብር</h2><p class="small">Supervisor ብቻ ይቀይራል። ከታች ያሉት ፈቃዶች በFirestore Rules ውስጥም መጠበቅ አለባቸው።</p><div class="grid"><div><label for="permissionRole">Role</label><select id="permissionRole"><option value="teacher">Teacher</option><option value="class_teacher">Class Teacher</option><option value="class_assistant">Class Assistant</option></select></div><div><label><input type="checkbox" id="permView"> View / ማየት</label><label><input type="checkbox" id="permAttendance"> Record Attendance / መመዝገብ</label><label><input type="checkbox" id="permEdit"> Edit Attendance / ማስተካከል</label></div></div><div id="rolePermissionsSettingsNotice" class="small" aria-live="polite"></div></div>
- <div class="panel"><h2>10. Class Teacher Assignment / መምህር መመደብ</h2><div class="grid"><div><label for="assignmentEmail">የመምህሩ Login Email</label><input id="assignmentEmail" type="email" placeholder="teacher@example.com"></div><div><label for="assignmentClass">ክፍል</label><select id="assignmentClass"></select></div><div><label for="assignmentRole">Role</label><select id="assignmentRole"><option value="class_teacher">Class Teacher</option><option value="class_assistant">Class Assistant</option></select></div></div><div class="row"><button type="button" id="saveClassAssignment">መድብ / Save Assignment</button></div><div id="classTeacherAssignmentSettingsNotice" class="small" aria-live="polite"></div></div>
+
  <div class="row"><button type="button" id="saveExtendedSettings">6–9 ቅንብሮችን አስቀምጥ / Save Settings</button></div>
 </section>
 <section id="backup" class="page hidden backup-page">
@@ -984,14 +984,14 @@ async function saveExtendedSettings(changes,activity){if(role!=='supervisor')thr
 function applyLanguage(lang){document.documentElement.lang=lang==='en'?'en':'am';const map=lang==='en'?{'ዳሽቦርድ':'Dashboard','ተማሪዎች':'Students','ክፍሎች':'Classes','Attendance':'Attendance','ሪፖርት':'Reports','Backup':'Backup','Settings':'Settings','ውጣ':'Logout','ተገኝቷል':'Present','ቀርቷል':'Absent','ዘግይቷል':'Late','ፈቃድ':'Permission'}:{'Dashboard':'ዳሽቦርድ','Students':'ተማሪዎች','Classes':'ክፍሎች','Reports':'ሪፖርት','Logout':'ውጣ','Present':'ተገኝቷል','Absent':'ቀርቷል','Late':'ዘግይቷል','Permission':'ፈቃድ'};document.querySelectorAll('nav button').forEach(b=>{if(!b.dataset.originalLabel)b.dataset.originalLabel=b.textContent.trim();const original=b.dataset.originalLabel;let label=original;Object.keys(map).forEach(k=>{if(label.includes(k))label=label.replace(k,map[k])});b.textContent=label});}
 function fillExtendedSettingsForm(){
  const opts=classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
- ['lateCutoffClass','assignmentClass'].forEach(id=>{const el=$(id);if(el)el.innerHTML=opts});
+ if($('lateCutoffClass'))$('lateCutoffClass').innerHTML=opts;
  if($('languageSelect'))$('languageSelect').value=extendedSettings.language||'am';
  if($('attendanceEditHours'))$('attendanceEditHours').value=String(extendedSettings.attendanceEditHours??24);
  if($('lateCutoffClass')&&classes.length){$('lateCutoffClass').value=classes[0];$('lateCutoffTime').value=(extendedSettings.lateCutoffByClass||{})[classes[0]]||'09:00'}
  const pr=$('permissionRole')?.value||'teacher',p=(extendedSettings.rolePermissions||{})[pr]||{view:true,attendance:true,edit:false};
  if($('permView'))$('permView').checked=!!p.view;if($('permAttendance'))$('permAttendance').checked=!!p.attendance;if($('permEdit'))$('permEdit').checked=!!p.edit;
  const sup=role==='supervisor';
- ['languageSelect','lateCutoffClass','lateCutoffTime','attendanceEditHours','permissionRole','permView','permAttendance','permEdit','assignmentEmail','assignmentClass','assignmentRole','saveClassAssignment','saveExtendedSettings'].forEach(id=>{if($(id))$(id).disabled=!sup});
+ ['languageSelect','lateCutoffClass','lateCutoffTime','attendanceEditHours','permissionRole','permView','permAttendance','permEdit','saveExtendedSettings'].forEach(id=>{if($(id))$(id).disabled=!sup});
 }
 $('permissionRole').addEventListener('change',fillExtendedSettingsForm);
 async function saveAllExtendedSettings(){
@@ -1004,21 +1004,7 @@ async function saveAllExtendedSettings(){
  try{await saveExtendedSettings(changes,'Language, late cutoff, edit limit and role permissions updated');applyLanguage(changes.language);$('lateCutoffSettingsNotice').textContent=`${cls}: ${time} ተቀምጧል።`;$('editLimitSettingsNotice').textContent=`${hrs===0?'Unlimited':hrs+' hours'} ተቀምጧል።`;$('rolePermissionsSettingsNotice').textContent='Role permissions ተቀምጠዋል።';notice.textContent='Settings በFirestore ተቀምጠዋል።';}
  catch(e){notice.textContent='ማስቀመጥ አልተሳካም። '+e.message}
 }
-async function saveClassAssignment(){
- const notice=$('classTeacherAssignmentSettingsNotice');if(role!=='supervisor'){notice.textContent='Supervisor ብቻ ይህን ይፈቅዳል።';return}
- const email=$('assignmentEmail').value.trim().toLowerCase(),cls=$('assignmentClass').value,assignedRole=$('assignmentRole').value;
- if(!email||!cls){notice.textContent='Email እና Class ያስፈልጋሉ።';return}
- try{
-   const q=await db.collection('classAssignments').where('email','==',email).limit(1).get();
-   if(q.empty){notice.textContent='ይህ Email ያለው የመለያ ሰነድ አልተገኘም። በusers ሰነድ ውስጥ email መኖሩን ያረጋግጡ።';return}
-   const uid=q.docs[0].id;
-   await db.collection('classAssignments').doc(uid).set({userId:uid,email,className:cls,role:assignedRole,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
-   notice.textContent='Assignment ተቀምጧል። የusers.role እና className መቀየር በአሁኑ Rules የተከለከለ ስለሆነ Admin SDK/Cloud Function ያስፈልጋል።';
-   await logActivity('Class assignment saved',`${email} → ${cls} (${assignedRole})`);
- }catch(e){notice.textContent='Assignment አልተሳካም። '+e.message}
-}
 $('saveExtendedSettings').addEventListener('click',saveAllExtendedSettings);
-$('saveClassAssignment').addEventListener('click',saveClassAssignment);
 $('lateCutoffClass').addEventListener('change',e=>{$('lateCutoffTime').value=(extendedSettings.lateCutoffByClass||{})[e.target.value]||'09:00'});
 $('desktopNavbarLogout').addEventListener('click',()=>{const logout=$('topLogout');if(logout)logout.click()});const syncDesktopNavbar=()=>{const r=$('sidebarRole'),e=$('sidebarEmail');if(r)$('desktopNavbarRole').textContent=r.textContent;if(e)$('desktopNavbarEmail').textContent=e.textContent};syncDesktopNavbar();const navbarObserver=new MutationObserver(syncDesktopNavbar);['sidebarRole','sidebarEmail'].forEach(id=>{const el=$(id);if(el)navbarObserver.observe(el,{childList:true,subtree:true,characterData:true})});
 /* Mobile drawer events are handled once by mobile-sidebar-drawer-reliable-handler below. */
