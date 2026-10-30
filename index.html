@@ -1083,7 +1083,7 @@ function applyLanguage(lang){
   const replacement=map[trimmed];if(replacement!==undefined){const leading=raw.match(/^\s*/)?.[0]||'',trailing=raw.match(/\s*$/)?.[0]||'';const next=leading+replacement+trailing;if(node.nodeValue!==next)node.nodeValue=next;}
  }
  document.querySelectorAll('input[placeholder],textarea[placeholder],input[title],button[title],[aria-label]').forEach(el=>{
-  ['placeholder','title','aria-label'].forEach(attr=>{if(!el.hasAttribute(attr))return;const key='langOriginal_'+attr; if(!el.dataset[key])el.dataset[key]=el.getAttribute(attr);const raw=el.dataset[key];if(isBilingualText(raw))return;const out=map[raw];if(out!==undefined&&el.getAttribute(attr)!==out)el.setAttribute(attr,out);});
+  ['placeholder','title','aria-label'].forEach(attr=>{if(!el.hasAttribute(attr))return;const key='data-lang-original-'+attr; if(!el.hasAttribute(key))el.setAttribute(key,el.getAttribute(attr));const raw=el.getAttribute(key);if(isBilingualText(raw))return;const out=map[raw];if(out!==undefined&&el.getAttribute(attr)!==out)el.setAttribute(attr,out);});
  });
 }
 let languageObserver=null;
