@@ -667,7 +667,33 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 function getLocalLogs(){try{return JSON.parse(localStorage.getItem('ss_activity_logs')||'[]')}catch(e){return []}}
 async function logActivity(action,details=''){if(!currentUser)return;const item={action:String(action),details:String(details),userEmail:currentUser.email||'',userId:currentUser.uid,role:role||'',className:isClassScoped()?assignedClass:'All classes',createdAt:new Date().toISOString()};const logs=getLocalLogs();logs.unshift(item);try{localStorage.setItem('ss_activity_logs',JSON.stringify(logs.slice(0,250)))}catch(e){}try{await db.collection('activityLogs').add({...item,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdAtISO:item.createdAt})}catch(e){console.warn('Firebase activityLogs write denied; local copy saved.',e.message)}if(role==='supervisor')renderRecentActivityStream()}
 async function renderRecentActivityStream(){const box=$('recentActivityStream'),panel=$('recentActivityPanel');if(!box||!panel)return;panel.classList.toggle('hidden',role!=='supervisor');if(role!=='supervisor')return;let rows=[];try{const snap=await db.collection('activityLogs').orderBy('createdAt','desc').limit(8).get();rows=snap.docs.map(d=>{const x=d.data();return {...x,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().toISOString():x.createdAtISO||x.createdAt||''}})}catch(e){rows=getLocalLogs().slice(0,8)}if(!rows.length){box.innerHTML='<p class="small">ገና የተመዘገበ እንቅስቃሴ የለም። Attendance፣ ተማሪ ወይም ሪፖርት ሲጠቀሙ እዚህ ይታያል።</p>';return}box.innerHTML=rows.slice(0,8).map(x=>`<div class="recent-activity-item"><span class="recent-activity-dot"></span><div><strong>${esc(x.action||'እንቅስቃሴ')}</strong><small>${esc(x.details||'')} • ${esc(x.userEmail||x.role||'')}<br>${esc(x.createdAt?new Date(x.createdAt).toLocaleString():'')}</small></div></div>`).join('')}
-async function renderActivityLogs(){if(role!=='supervisor')return;const box=$('activityLogsTable'),note=$('activityLogsMessage');let rows=[];try{const snap=await db.collection('activityLogs').orderBy('createdAt','desc').limit(100).get();rows=snap.docs.map(d=>{const x=d.data();return {...x,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().toISOString():x.createdAtISO||x.createdAt||''}});note.textContent='Firebase ላይ የተቀመጡ የቅርብ 100 እንቅስቃሴዎች።'}catch(e){rows=getLocalLogs();note.textContent='Firebase ፈቃድ ካልተገኘ የዚህ መሣሪያ የአካባቢ መዝገቦች ብቻ ይታያሉ።'}rows=rows.slice(0,100);box.innerHTML='<table><thead><tr><th>ቀን/ሰዓት</th><th>ተጠቃሚ</th><th>Role</th><th>እንቅስቃሴ</th><th>ዝርዝር</th><th>ክፍል</th></tr></thead><tbody>'+(rows.length?rows.map(x=>`<tr><td>${esc(x.createdAt?new Date(x.createdAt).toLocaleString():'—')}</td><td>${esc(x.userEmail||x.userId||'—')}</td><td>${esc(x.role||'—')}</td><td><span class="activity-badge">${esc(x.action||'—')}</span></td><td>${esc(x.details||'—')}</td><td>${esc(x.className||'—')}</td></tr>`).join(''):'<tr><td colspan="6">ገና የተመዘገበ እንቅስቃሴ የለም።</td></tr>')+'</tbody></table>'}
+async function renderActivityLogs(){
+ if(role!=='supervisor')return;
+ const box=$('activityLogsTable'),note=$('activityLogsMessage');
+ if(!box||!note)return;
+ note.textContent='የActivity Logs መረጃ ከFirebase በመጫን ላይ…';
+ box.innerHTML='<p class="small">በመጫን ላይ…</p>';
+ let rows=[],source='firebase';
+ try{
+  const snap=await db.collection('activityLogs').orderBy('createdAt','desc').limit(100).get();
+  rows=snap.docs.map(d=>{const x=d.data();return {...x,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().toISOString():x.createdAtISO||x.createdAt||''}});
+  note.textContent='Firebase ላይ የተቀመጡ የቅርብ 100 እንቅስቃሴዎች።';
+ }catch(e){
+  console.warn('Activity Logs refresh failed; showing local logs.',e);
+  source='local';rows=getLocalLogs();
+  note.textContent=friendlyFirebaseError(e,'load')+' የዚህ መሣሪያ የአካባቢ መዝገቦች ብቻ እየታዩ ነው።';
+ }
+ rows=rows.slice(0,100);
+ box.innerHTML='<table><thead><tr><th>ቀን/ሰዓት</th><th>ተጠቃሚ</th><th>Role</th><th>እንቅስቃሴ</th><th>ዝርዝር</th><th>ክፍል</th></tr></thead><tbody>'+(rows.length?rows.map(x=>`<tr><td>${esc(x.createdAt&&Number.isFinite(new Date(x.createdAt).getTime())?new Date(x.createdAt).toLocaleString():'—')}</td><td>${esc(x.userEmail||x.userId||'—')}</td><td>${esc(x.role||'—')}</td><td><span class="activity-badge">${esc(x.action||'—')}</span></td><td>${esc(x.details||'—')}</td><td>${esc(x.className||'—')}</td></tr>`).join(''):'<tr><td colspan="6">ገና የተመዘገበ እንቅስቃሴ የለም።</td></tr>')+'</tbody></table>';
+ if(source==='firebase')renderRecentActivityStream();
+}
+async function refreshActivityLogs(){
+ const btn=$('refreshActivityLogs');
+ if(role!=='supervisor'){if($('activityLogsMessage'))$('activityLogsMessage').textContent='ይህን መዝገብ Supervisor ብቻ ማደስ ይችላል።';return;}
+ if(btn){btn.disabled=true;btn.textContent='በማደስ ላይ…';}
+ try{await renderActivityLogs();}
+ finally{if(btn){btn.disabled=false;btn.textContent='እንደገና አድስ';}}
+}
 function setLogin(show){document.body.classList.toggle('auth-locked',!!show);$('cloudLogin').style.display=show?'flex':'none';$('cloudLogoutBtn').classList.toggle('hidden',!currentUser)}
 function dateISO(value){
   // Accept Ethiopian dates as D/M/YYYY, DD/MM/YYYY, or DD-MM-YYYY.
@@ -984,7 +1010,7 @@ function download(name,text){let a=document.createElement('a');a.href=URL.create
 $('backupBtn').onclick=()=>{download('sunday-school-backup.json',JSON.stringify({students,classes,classPrefixes,attendance},null,2));logActivity('Backup downloaded','የመረጃ Backup ፋይል ወረደ')};
 $('restoreFile').onchange=async e=>{if(role!=='supervisor'){alert('Backup Restore የሚያደርገው Supervisor ብቻ ነው።');e.target.value='';return;}let f=e.target.files[0];if(!f)return;try{let d=JSON.parse(await f.text());if(!Array.isArray(d.students)||!Array.isArray(d.classes)||!d.attendance)throw Error();students=d.students;classes=d.classes;classPrefixes={...classPrefixes,...(d.classPrefixes||{})};attendance=d.attendance;const ok=await cloudSave('all');if(!ok)throw Error('Firebase ላይ ማስቀመጥ አልተሳካም');saveLocal();renderAll();await logActivity('Backup restored','Backup መረጃ ተመልሷል');$('backupMessage').textContent='Restore ተሳክቷል።'}catch(err){$('backupMessage').textContent='የBackup ፋይሉ ትክክል አይደለም።'}};
 $('viewSupervisorStatus').addEventListener('click',renderSupervisorClassStatus);$('supervisorStatusClass').addEventListener('change',renderSupervisorClassStatus);$('supervisorStatusFilter').addEventListener('change',renderSupervisorClassStatus);$('supervisorStatusDate').addEventListener('change',renderSupervisorClassStatus);
-$('refreshActivityLogs').addEventListener('click',renderActivityLogs);document.querySelector('nav button[data-page="activityLogs"]').addEventListener('click',renderActivityLogs);renderAll();setLogin(true);
+$('refreshActivityLogs').addEventListener('click',refreshActivityLogs);document.querySelector('nav button[data-page="activityLogs"]').addEventListener('click',renderActivityLogs);renderAll();setLogin(true);
 })();
 </script>
 <style id="attendance-radio-match-user-reference">
