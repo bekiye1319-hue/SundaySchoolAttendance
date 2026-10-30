@@ -572,6 +572,52 @@ body.auth-locked main { display:none !important; }
 @media(prefers-reduced-motion:reduce){#classes .class-overview-card{transition:none!important}body>nav.no-print,#sidebarBackdrop{transition:none!important}}
 </style>
 <style id="settings-dark-theme">body.app-dark-theme{--bg:#101827;--line:#334155;--ink:#e5edf5;background:#101827;color:#e5edf5}body.app-dark-theme main{color:#e5edf5}body.app-dark-theme .panel,body.app-dark-theme .dashboard-stat,body.app-dark-theme .report-card,body.app-dark-theme .students-ref-card{background:#1e293b!important;color:#e5edf5!important;border-color:#334155!important}body.app-dark-theme h2,body.app-dark-theme h3,body.app-dark-theme .dashboard-stat strong{color:#e5edf5!important}body.app-dark-theme p,body.app-dark-theme .small,body.app-dark-theme label{color:#cbd5e1}body.app-dark-theme input,body.app-dark-theme select{background:#0f172a!important;color:#f8fafc!important;border-color:#475569!important}body.app-dark-theme th{background:#263449!important;color:#f1f5f9!important}body.app-dark-theme td{border-color:#475569!important;color:#e2e8f0}body.app-dark-theme tr:nth-child(even) td{background:#1a2638!important}body.app-dark-theme header{background:#172235!important;color:#f8fafc!important;border-color:#334155!important}body.app-dark-theme header h1{color:#86efac!important}</style>
+
+<style id="global-mobile-readability-and-complete-dark-mode-fix">
+@media(max-width:800px){
+ body>header:not(.desktop-navbar){height:auto!important;min-height:68px!important;overflow:visible!important;position:relative!important;display:flex!important;align-items:center!important;gap:12px!important;padding:12px 14px!important;background:var(--surface,#fff)!important;color:var(--text,#172b22)!important;z-index:20!important}
+ body>header:not(.desktop-navbar) #menuToggle{position:relative!important;inset:auto!important;flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;z-index:21!important;border-radius:12px!important}
+ body>header:not(.desktop-navbar) .header-brand{display:block!important;flex:1 1 auto!important;min-width:0!important;overflow:visible!important}
+ body>header:not(.desktop-navbar) .header-brand h1{display:block!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.35!important;margin:0 0 3px!important}
+ body>header:not(.desktop-navbar) .header-brand p{display:block!important;white-space:normal!important;line-height:1.45!important;margin:0!important}
+ body>header:not(.desktop-navbar) .header-badge{display:grid!important;flex:0 0 36px!important;width:36px!important;height:36px!important}
+ #supervisorDesktopNavbar{display:none!important} main{padding:14px 10px!important;min-height:calc(100dvh - 68px)!important}
+}
+body.app-dark-theme{--surface:#1e293b;--surface-2:#263449;--surface-3:#334155;--text:#f1f5f9;--muted:#cbd5e1;--border:#475569;background:#0b1220!important;color:#f1f5f9!important;color-scheme:dark}
+body.app-dark-theme main,body.app-dark-theme .page,body.app-dark-theme #dashboard,body.app-dark-theme #attendance,body.app-dark-theme #students,body.app-dark-theme #classes,body.app-dark-theme #reports,body.app-dark-theme #activityLogs,body.app-dark-theme #backup,body.app-dark-theme #settings{background:#0b1220!important;color:#f1f5f9!important}
+body.app-dark-theme header:not(.desktop-navbar){background:#172235!important;color:#f1f5f9!important;border-color:#334155!important}
+body.app-dark-theme h1,body.app-dark-theme h2,body.app-dark-theme h3,body.app-dark-theme h4,body.app-dark-theme .header-brand h1,body.app-dark-theme .dashboard-title,body.app-dark-theme .report-brand-title{color:#e5f5eb!important}
+body.app-dark-theme p,body.app-dark-theme label,body.app-dark-theme small,body.app-dark-theme .small,body.app-dark-theme .muted,body.app-dark-theme .dashboard-stat span,body.app-dark-theme .report-brand-sub{color:#cbd5e1!important}
+body.app-dark-theme .panel,body.app-dark-theme .card,body.app-dark-theme .stat,body.app-dark-theme .dashboard-stat,body.app-dark-theme .report-card,body.app-dark-theme .report-visual-card,body.app-dark-theme .comparison-kpi,body.app-dark-theme .students-ref-card,body.app-dark-theme .class-overview-card,body.app-dark-theme .class-metrics>div,body.app-dark-theme .notice,body.app-dark-theme .settings-card,body.app-dark-theme .setting-card{background:#1e293b!important;color:#f1f5f9!important;border-color:#475569!important;box-shadow:0 4px 16px #0003!important}
+body.app-dark-theme .class-overview-card h3,body.app-dark-theme .class-metrics b,body.app-dark-theme .class-metrics span{color:#e2e8f0!important}
+body.app-dark-theme input,body.app-dark-theme select,body.app-dark-theme textarea,body.app-dark-theme option{background:#0f172a!important;color:#f8fafc!important;border-color:#64748b!important}
+body.app-dark-theme input::placeholder,body.app-dark-theme textarea::placeholder{color:#94a3b8!important;opacity:1}
+body.app-dark-theme button,body.app-dark-theme .btn{color:#fff!important}
+body.app-dark-theme button:disabled{color:#cbd5e1!important;opacity:.55}
+body.app-dark-theme table{color:#e5edf5!important;background:#1e293b!important}
+body.app-dark-theme thead th,body.app-dark-theme th{background:#263449!important;color:#f8fafc!important;border-color:#475569!important}
+body.app-dark-theme td{background:#1e293b!important;color:#e2e8f0!important;border-color:#475569!important}
+body.app-dark-theme tbody tr:nth-child(even) td{background:#243247!important}
+body.app-dark-theme tbody tr:hover td{background:#304158!important}
+body.app-dark-theme .table-wrap,body.app-dark-theme .report-table-responsive,body.app-dark-theme #classesTable,body.app-dark-theme #studentsTable{background:#1e293b!important;border-color:#475569!important}
+body.app-dark-theme .report-app-header,body.app-dark-theme .report-filter-panel,body.app-dark-theme .report-section,body.app-dark-theme .report-table-container,body.app-dark-theme .report-visual-card{background:#1e293b!important;color:#e5edf5!important;border-color:#475569!important}
+body.app-dark-theme .report-visual-card h3,body.app-dark-theme .report-pie-legend div,body.app-dark-theme .comparison-bar-label,body.app-dark-theme .report-table{color:#e5edf5!important}
+body.app-dark-theme .report-pie-chart:after{background:#1e293b!important}
+body.app-dark-theme .notice{background:#3b3218!important;color:#fff1c2!important;border-color:#75612b!important}
+body.app-dark-theme .activity-badge{background:#164e38!important;color:#bbf7d0!important}
+body.app-dark-theme .mini-bar,body.app-dark-theme .comparison-bar{background:#475569!important}
+body.app-dark-theme .sidebar-user,body.app-dark-theme .sidebar-brand{border-color:#475569!important}
+body.app-dark-theme .menu-toggle{background:#087a50!important;color:#fff!important}
+body.app-dark-theme .students-ref-action{background:#334155!important;color:#f8fafc!important}
+body.app-dark-theme a{color:#93c5fd!important}body.app-dark-theme hr{border-color:#475569!important}
+body.app-dark-theme .attendance-reference-table th{background:#263449!important;color:#f1f5f9!important;border-color:#475569!important}
+body.app-dark-theme .attendance-reference-table td{color:#e2e8f0!important;border-color:#475569!important}
+body.app-dark-theme .attendance-reference-table tr:hover td{background:#263449!important}
+body.app-dark-theme .attendance-circle-mark{background:#0f172a!important;border-color:#64748b!important}
+body.app-dark-theme [role=dialog],body.app-dark-theme .modal,body.app-dark-theme .modal-content,body.app-dark-theme .dropdown-menu{background:#1e293b!important;color:#f1f5f9!important;border-color:#475569!important}
+body.app-dark-theme [style*="background: white"],body.app-dark-theme [style*="background:#fff"],body.app-dark-theme [style*="background: #fff"]{background:#1e293b!important;color:#f1f5f9!important}
+</style>
+
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><span class="header-badge">SS</span></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
