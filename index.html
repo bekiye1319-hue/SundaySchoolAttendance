@@ -782,12 +782,11 @@ function drawAttendance(){
      day=attendance[iso]||{},
      list=students.filter(st=>(c==='__ALL__'||st.className===c)&&(!q||[st.name,st.id,st.className,st.phone].some(v=>String(v||'').toLocaleLowerCase().includes(q)))&&(statusFilter==='ALL'||(statusFilter==='NONE'?!day[String(st.id)]:day[String(st.id)]===statusFilter)));
  $('attendanceTable').innerHTML=`<table class="attendance-reference-table"><thead><tr>
- <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th>
- <th class="status-head P">P</th><th class="status-head A">A</th><th class="status-head L">L</th><th class="status-head E">E</th>
+ <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th class="status-head">የመገኘት ሁኔታ (P / A / L / E)</th>
  </tr></thead><tbody>${list.map((st,i)=>`<tr>
  <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell">${esc(st.name)}</td><td>${esc(st.className||'')}</td>
- ${['P','A','L','E'].map(code=>`<td class="status"><label class="attendance-circle status-${code}" title="${code}"><input aria-label="${esc(st.name)} ${code}" type="radio" name="st-${esc(st.id)}" value="${code}" ${day[String(st.id)]===code?'checked':''}><span class="attendance-circle-mark" aria-hidden="true"></span></label></td>`).join('')}
- </tr>`).join('')||'<tr><td colspan="8" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
+ <td class="status attendance-choice-cell"><div class="attendance-choice-group">${['P','A','L','E'].map(code=>`<label class="attendance-choice status-${code}" title="${code}"><span class="attendance-choice-letter">${code}</span><span class="attendance-circle status-${code}"><input aria-label="${esc(st.name)} ${code}" type="radio" name="st-${esc(st.id)}" value="${code}" ${day[String(st.id)]===code?'checked':''}><span class="attendance-circle-mark" aria-hidden="true"></span></span></label>`).join('')}</div></td>
+ </tr>`).join('')||'<tr><td colspan="5" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
  renderAttendanceSummary(list,day,iso)
 }
 function renderAttendanceSummary(list,day,iso){const counts={P:0,A:0,L:0,E:0};list.forEach(st=>{const v=day[String(st.id)];if(counts[v]!==undefined)counts[v]++});const labels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};$('attendanceSummary').innerHTML=Object.keys(counts).map(k=>`<div class="summary-row summary-${k}"><span class="summary-letter">${k}</span><strong>${labels[k]}</strong><b>${counts[k]}</b></div>`).join('');$('attendanceSummaryFooter').innerHTML=iso?`📅 ቀን፦ ${dateET(iso)} &nbsp; | &nbsp; ክፍል፦ ${esc(isClassScoped()?assignedClass:($('attClass').selectedOptions[0]?.textContent||'ሁሉም ክፍሎች'))}`:''}
@@ -930,6 +929,44 @@ $('refreshActivityLogs').addEventListener('click',renderActivityLogs);document.q
 @media print{#attendance .attendance-circle-mark{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
 </style>
 
+
+<style id="mobile-sidebar-and-attendance-choice-fix">
+/* Mobile sidebar drawer: keep the menu button visible and place the drawer above every page layer. */
+@media (max-width:800px){
+  header:not(.desktop-navbar){display:flex!important;position:relative!important;z-index:60!important;padding:10px 12px!important;min-height:62px!important;}
+  header:not(.desktop-navbar) #menuToggle{display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative!important;z-index:62!important;visibility:visible!important;opacity:1!important;}
+  nav.no-print{display:flex!important;position:fixed!important;left:0!important;right:auto!important;top:0!important;bottom:0!important;width:min(300px,86vw)!important;height:100vh!important;height:100dvh!important;max-height:100vh!important;z-index:10020!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;overflow-y:auto!important;overscroll-behavior:contain!important;background:#102d22!important;transform:translateX(-110%)!important;visibility:hidden!important;pointer-events:none!important;transition:transform .24s ease,visibility .24s ease!important;}
+  nav.no-print.sidebar-open{transform:translateX(0)!important;visibility:visible!important;pointer-events:auto!important;}
+  .sidebar-backdrop{display:block!important;position:fixed!important;inset:0!important;z-index:10019!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;}
+  .sidebar-backdrop.show{opacity:1!important;visibility:visible!important;pointer-events:auto!important;}
+  nav.no-print button{display:flex!important;align-items:center!important;width:100%!important;min-height:44px!important;flex:0 0 auto!important;}
+  body.sidebar-drawer-open{overflow:hidden!important;touch-action:none!important;}
+}
+/* Each student gets the same labeled, compact four-choice group as the supplied reference. */
+#attendance .attendance-choice-group{display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,24px);padding:7px 4px;min-width:180px}
+#attendance .attendance-choice{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:6px!important;margin:0!important;cursor:pointer!important;min-width:24px!important}
+#attendance .attendance-choice-letter{font-size:12px!important;font-weight:800!important;color:#667085!important;line-height:1!important}
+#attendance .attendance-choice.status-P .attendance-choice-letter{color:#168b55!important}
+#attendance .attendance-choice.status-A .attendance-choice-letter{color:#dc3636!important}
+#attendance .attendance-choice.status-L .attendance-choice-letter{color:#3478dc!important}
+#attendance .attendance-choice.status-E .attendance-choice-letter{color:#8b50c7!important}
+#attendance .attendance-choice-cell{min-width:210px!important}
+@media(max-width:600px){#attendance .attendance-reference-table{min-width:650px!important}#attendance .attendance-choice-group{gap:16px}}
+@media(prefers-reduced-motion:reduce){nav.no-print,.sidebar-backdrop{transition:none!important}}
+</style>
+<script id="mobile-sidebar-drawer-reliable-handler">
+(()=>{
+ const nav=document.querySelector('nav.no-print'),toggle=document.getElementById('menuToggle'),backdrop=document.getElementById('sidebarBackdrop');
+ if(!nav||!toggle||!backdrop)return;
+ const close=()=>{nav.classList.remove('sidebar-open');backdrop.classList.remove('show');document.body.classList.remove('sidebar-drawer-open');toggle.setAttribute('aria-expanded','false');};
+ const open=()=>{nav.classList.add('sidebar-open');backdrop.classList.add('show');document.body.classList.add('sidebar-drawer-open');toggle.setAttribute('aria-expanded','true');};
+ toggle.addEventListener('click',e=>{e.preventDefault();nav.classList.contains('sidebar-open')?close():open();});
+ backdrop.addEventListener('click',close);
+ nav.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',close));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+ window.addEventListener('resize',()=>{if(window.innerWidth>800)close();});
+})();
+</script>
 </body></html>
 
 <style id="requested-report-status-layout-fix">
