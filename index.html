@@ -669,7 +669,28 @@ async function logActivity(action,details=''){if(!currentUser)return;const item=
 async function renderRecentActivityStream(){const box=$('recentActivityStream'),panel=$('recentActivityPanel');if(!box||!panel)return;panel.classList.toggle('hidden',role!=='supervisor');if(role!=='supervisor')return;let rows=[];try{const snap=await db.collection('activityLogs').orderBy('createdAt','desc').limit(8).get();rows=snap.docs.map(d=>{const x=d.data();return {...x,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().toISOString():x.createdAtISO||x.createdAt||''}})}catch(e){rows=getLocalLogs().slice(0,8)}if(!rows.length){box.innerHTML='<p class="small">ገና የተመዘገበ እንቅስቃሴ የለም። Attendance፣ ተማሪ ወይም ሪፖርት ሲጠቀሙ እዚህ ይታያል።</p>';return}box.innerHTML=rows.slice(0,8).map(x=>`<div class="recent-activity-item"><span class="recent-activity-dot"></span><div><strong>${esc(x.action||'እንቅስቃሴ')}</strong><small>${esc(x.details||'')} • ${esc(x.userEmail||x.role||'')}<br>${esc(x.createdAt?new Date(x.createdAt).toLocaleString():'')}</small></div></div>`).join('')}
 async function renderActivityLogs(){if(role!=='supervisor')return;const box=$('activityLogsTable'),note=$('activityLogsMessage');let rows=[];try{const snap=await db.collection('activityLogs').orderBy('createdAt','desc').limit(100).get();rows=snap.docs.map(d=>{const x=d.data();return {...x,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().toISOString():x.createdAtISO||x.createdAt||''}});note.textContent='Firebase ላይ የተቀመጡ የቅርብ 100 እንቅስቃሴዎች።'}catch(e){rows=getLocalLogs();note.textContent='Firebase ፈቃድ ካልተገኘ የዚህ መሣሪያ የአካባቢ መዝገቦች ብቻ ይታያሉ።'}rows=rows.slice(0,100);box.innerHTML='<table><thead><tr><th>ቀን/ሰዓት</th><th>ተጠቃሚ</th><th>Role</th><th>እንቅስቃሴ</th><th>ዝርዝር</th><th>ክፍል</th></tr></thead><tbody>'+(rows.length?rows.map(x=>`<tr><td>${esc(x.createdAt?new Date(x.createdAt).toLocaleString():'—')}</td><td>${esc(x.userEmail||x.userId||'—')}</td><td>${esc(x.role||'—')}</td><td><span class="activity-badge">${esc(x.action||'—')}</span></td><td>${esc(x.details||'—')}</td><td>${esc(x.className||'—')}</td></tr>`).join(''):'<tr><td colspan="6">ገና የተመዘገበ እንቅስቃሴ የለም።</td></tr>')+'</tbody></table>'}
 function setLogin(show){document.body.classList.toggle('auth-locked',!!show);$('cloudLogin').style.display=show?'flex':'none';$('cloudLogoutBtn').classList.toggle('hidden',!currentUser)}
-function dateISO(s){let m=String(s||'').trim().match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);if(!m)return null;let d=+m[1],mo=+m[2],y=+m[3];if(d<1||d>30||mo<1||mo>13||y<1)return null;try{let f=new Intl.DateTimeFormat('en-u-ca-ethiopic',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'});let start=Date.UTC(y+7,7,25),end=Date.UTC(y+8,9,10);for(let t=start;t<=end;t+=86400000){let p={};f.formatToParts(new Date(t)).forEach(x=>{if(x.type!=='literal')p[x.type]=+x.value});if(p.year===y&&p.month===mo&&p.day===d)return new Date(t).toISOString().slice(0,10)}}catch(e){}return null}
+function dateISO(value){
+  // Accept Ethiopian dates as D/M/YYYY, DD/MM/YYYY, or DD-MM-YYYY.
+  // Ethiopian months 1–12 have 30 days; Pagume has 5 or 6 days.
+  const raw=String(value??'').trim();
+  const match=raw.match(/^(\d{1,2})\s*([/-])\s*(\d{1,2})\s*\2\s*(\d{4})$/);
+  if(!match)return null;
+  const day=Number(match[1]),month=Number(match[3]),year=Number(match[4]);
+  if(!Number.isInteger(day)||!Number.isInteger(month)||!Number.isInteger(year)||year<1||month<1||month>13)return null;
+  const maxDay=month===13?(year%4===3?6:5):30;
+  if(day<1||day>maxDay)return null;
+  try{
+    const formatter=new Intl.DateTimeFormat('en-u-ca-ethiopic',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'});
+    // Search only the Gregorian interval that can contain this Ethiopian year.
+    const start=Date.UTC(year+7,7,25),end=Date.UTC(year+8,9,15);
+    for(let time=start;time<=end;time+=86400000){
+      const parts={};
+      formatter.formatToParts(new Date(time)).forEach(part=>{if(part.type!=='literal')parts[part.type]=Number(part.value)});
+      if(parts.year===year&&parts.month===month&&parts.day===day)return new Date(time).toISOString().slice(0,10);
+    }
+  }catch(error){console.warn('Ethiopian date conversion failed:',error)}
+  return null;
+}
 function dateET(iso){if(!iso)return '';let a=iso.split('-').map(Number);try{let p={};new Intl.DateTimeFormat('en-u-ca-ethiopic',{day:'numeric',month:'numeric',year:'numeric',timeZone:'UTC'}).formatToParts(new Date(Date.UTC(a[0],a[1]-1,a[2]))).forEach(x=>{if(x.type!=='literal')p[x.type]=+x.value});return String(p.day).padStart(2,'0')+'/'+String(p.month).padStart(2,'0')+'/'+p.year}catch(e){return iso}}
 function today(){return dateET(new Date().toISOString().slice(0,10))}
 function defaultPrefixForClass(c){if(classPrefixes[c])return classPrefixes[c];const latin=String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');return latin?'SS'+latin.slice(0,3):''}
