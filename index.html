@@ -1166,6 +1166,50 @@ const LANG_EN={
 'የAttendance መዝገብ (Backup & Restore)':'Attendance Records (Backup & Restore)','Backup አውርድ':'Download Backup','የሁሉንም መረጃ ቅጂ በJSON ፋይል ወደ መሣሪያዎ ያውርዱ።':'Download a copy of all data to your device as a JSON file.','Restore ፋይል ምርጫ':'Choose Restore File','ቀደም ሲል ያስቀመጡትን Backup ፋይል አስገባ።':'Select a previously saved backup file.','ፋይል ምረጥ (Restore)':'Choose File (Restore)','የBackup ቅንብሮች':'Backup Settings','ጠፍቷል':'Off','በየሳምንቱ':'Weekly','በየወሩ':'Monthly','ሙሉ መተካት':'Overwrite','የሌለውን ብቻ መጨመር':'Merge missing records only','Backup / Restore የተማሪዎችን፣ ክፍሎችን እና የAttendance መረጃዎችን ለማስቀመጥና ለመመለስ ይረዳል።':'Backup and Restore helps save and recover student, class, and attendance data.','የተማሪ መረጃ አስተካክል':'Edit Student Information','Student ID አይቀየርም። ስም፣ ክፍል እና ስልክ ማስተካከል ይችላሉ።':'Student ID cannot be changed. You can edit the name, class, and phone number.','ለውጡን አስቀምጥ':'Save Changes','ዝጋ':'Close','የሰራተኛ መግቢያ (Staff Login)':'Staff Login','ግባ / Sign in':'Sign in',
 'ተማሪዎች':'Students','ክፍሎች':'Classes','ሪፖርት':'Reports','ክፍል':'Class','ሁሉም ክፍሎች':'All Classes','እንደገና አድስ':'Refresh','የተመዘገቡ ተማሪዎች:':'Registered Students:','አዲሱን ድገም':'Confirm New Password','አማርኛ':'Amharic','ቀን':'Day','ሌሊት':'Night','1 ሰዓት':'1 Hour','6 ሰዓት':'6 Hours','12 ሰዓት':'12 Hours','24 ሰዓት':'24 Hours','48 ሰዓት':'48 Hours','7 ቀን':'7 Days','30 ቀን':'30 Days'
 };
+// Additional complete Amharic-only interface translations (English mode).
+Object.assign(LANG_EN,{
+'ሰንበት ትምህርት ቤት':'Sunday School',
+'በስርዓቱ ውስጥ በቅርቡ የተፈጸሙ እርምጃዎች።':'Recent actions performed in the system.',
+'እንቅስቃሴዎች በመጫን ላይ…':'Loading activities…','መዝገቦች በመጫን ላይ…':'Loading records…',
+'መዝሙር':'Hymn','ወረብ':'Woreb (religious chant)','ትምህርት':'Lesson','ሌላ':'Other',
+'ሌላ ምክንያት ይጻፉ':'Enter another reason','ሌላ ምክንያቱን ይጻፉ።':'Enter the other reason.',
+'የተመረጠው ምክንያት ለዚህ ቀንና ክፍል ይመዘገባል።':'The selected reason will be saved for this date and class.',
+'ፆታ ይምረጡ':'Select Gender','ወንድ':'Male','ሴት':'Female',
+'በክፍል አጣራ':'Filter by Class','በመረጡት ክፍል ያሉ ተማሪዎች ከታች ይታያሉ፦':'Students in the selected class are shown below:',
+'ሁሉም ምክንያቶች':'All Reasons','ተማሪ':'Student','አዲሱን ድገም':'Confirm New Password',
+'ገና የተመዘገበ እንቅስቃሴ የለም።':'No activity has been recorded yet.',
+'የActivity Logs መረጃ ከFirebase በመጫን ላይ…':'Loading Activity Logs from Firebase…',
+'በመጫን ላይ…':'Loading…','Firebase ላይ የተቀመጡ የቅርብ 100 እንቅስቃሴዎች።':'The 100 most recent activities saved in Firebase.',
+'የዚህ መሣሪያ የአካባቢ መዝገቦች ብቻ እየታዩ ነው።':'Only local records on this device are being displayed.',
+'ቀን/ሰዓት':'Date/Time','ተጠቃሚ':'User','እንቅስቃሴ':'Activity','ዝርዝር':'Details',
+'ይህን መዝገብ Supervisor ብቻ ማደስ ይችላል።':'Only the Supervisor can refresh this record.',
+'በማደስ ላይ…':'Refreshing…','የዚህ ክፍል ID Prefix አልተዘጋጀም። Supervisor እንዲያስተካክል ይጠይቁ።':'The ID prefix for this class is not configured. Ask the Supervisor to update it.',
+'መግባት':'Sign in','ማስቀመጥ':'Saving','አልተሳካም።':'Failed.','ያልታወቀ ስህተት':'Unknown error',
+'መጀመሪያ Sign In ያድርጉ።':'Please sign in first.',
+'Attendance ለመመዝገብ ፈቃድ የለዎትም።':'You do not have permission to record attendance.',
+'ተማሪዎችንና ክፍሎችን ለመቀየር Supervisor መሆን ያስፈልጋል።':'You must be a Supervisor to modify students and classes.',
+'Email እና Password ያስገቡ።':'Enter your email and password.','በመግባት ላይ...':'Signing in…','ገብተዋል።':'Signed in successfully.',
+'ስም ያስገቡ።':'Enter a name.','የተማሪውን ፆታ ይምረጡ።':'Select the student’s gender.',
+'ይህ ስም ቀድሞ ተመዝግቧል። ተመሳሳይ ተማሪ ደግሞ መመዝገብ አይቻልም።':'This name is already registered. The same student cannot be registered twice.',
+'ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል።':'This phone number is already registered.',
+'ምዝገባ በተሳካ ሁኔታ ተጠናቋል። ID:':'Registration completed successfully. ID:',
+'የክፍል ስም ያስገቡ፤ እንደገና ያለ ክፍል አይጨምሩ።':'Enter a class name. Do not add a duplicate class.',
+'ይህ Prefix ለሌላ ክፍል ተመድቧል። ሌላ ይምረጡ።':'This prefix is already assigned to another class. Choose a different one.',
+'ይህን ተማሪ መሰረዝ ይፈልጋሉ?':'Do you want to delete this student?',
+'በዚህ ክፍል ተማሪ አለ።':'There are students in this class.',
+'ስም ባዶ መሆን አይችልም።':'Name cannot be empty.',
+'ይህ ስም ሌላ ተማሪ ላይ ተመዝግቧል።':'This name is already used by another student.',
+'ይህ ስልክ ቁጥር ሌላ ተማሪ ላይ ተመዝግቧል።':'This phone number is already used by another student.',
+'በማስቀመጥ ላይ…':'Saving…','መረጃው አልተቀመጠም። ኢንተርኔትን እና መግቢያን ያረጋግጡ።':'Data was not saved. Check your internet connection and sign-in status.',
+'የተማሪው ስም፣ ክፍል እና ስልክ በተሳካ ሁኔታ ተስተካክለዋል።':'The student’s name, class, and phone number were updated successfully.',
+'ከመታተም በፊት ትክክለኛ ቀን ያስገቡ።':'Enter a valid date before printing.',
+'Excel መሳሪያው አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።':'The Excel library did not load. Connect to the internet and try again.',
+'Excel ለማውረድ የቀን ክልሉን ያስተካክሉ።':'Adjust the date range to download Excel.',
+'ወርሃዊ Excel ለማውረድ ከ30 ቀናት በላይ የሆነ የቀን ክልል ይምረጡ (ቢያንስ 31 ቀናት)።':'To download a monthly Excel report, select a date range longer than 30 days (at least 31 days).',
+'ተሳክቷል።':'Successful.','ቀናት':'Days','ቀን':'Day','ሌሊት':'Night',
+'1 ሰዓት':'1 Hour','6 ሰዓት':'6 Hours','12 ሰዓት':'12 Hours','24 ሰዓት':'24 Hours','48 ሰዓት':'48 Hours','7 ቀን':'7 Days','30 ቀን':'30 Days',
+'ሙሉ መተካት':'Overwrite All','የሌለውን ብቻ መጨመር':'Add Missing Only','ጠፍቷል':'Off','በየሳምንቱ':'Weekly','በየወሩ':'Monthly'
+});
 const LANG_AM={'Dashboard':'ዳሽቦርድ','Students':'ተማሪዎች','Classes':'ክፍሎች','Reports':'ሪፖርት','Logout':'ውጣ','Present':'ተገኝቷል','Absent':'ቀርቷል','Late':'ዘግይቷል','Permission':'ፈቃድ','Full Name':'ሙሉ ስም','Phone':'ስልክ','Save':'አስቀምጥ','Edit':'አስተካክል','Delete':'ሰርዝ','Search':'ፈልግ','All':'ሁሉም','Date':'ቀን','Student':'ተማሪ','Class':'ክፍል','Download':'አውርድ','Password':'የይለፍ ቃል','Notice':'ማስታወቂያ','Close':'ዝጋ','Choose':'ምረጥ'};
 Object.entries(LANG_EN).forEach(([amText,enText])=>{if(!LANG_AM[enText])LANG_AM[enText]=amText});
 function isBilingualText(t){return /[ሀ-፿]/.test(t)&&/[A-Za-z]/.test(t)}
@@ -1177,10 +1221,13 @@ function applyLanguage(lang){
   const raw=LANG_TEXT_ORIGINAL.has(node)?LANG_TEXT_ORIGINAL.get(node):node.nodeValue;
   if(!LANG_TEXT_ORIGINAL.has(node))LANG_TEXT_ORIGINAL.set(node,raw);
   const trimmed=raw.trim();if(!trimmed||isBilingualText(trimmed))continue;
-  const replacement=map[trimmed];if(replacement!==undefined){const leading=raw.match(/^\s*/)?.[0]||'',trailing=raw.match(/\s*$/)?.[0]||'';const next=leading+replacement+trailing;if(node.nodeValue!==next)node.nodeValue=next;}
+  let replacement=map[trimmed];
+  // Also translate known Amharic phrases inside dynamic text nodes (for example, messages containing dates or counts).
+  if(replacement===undefined){replacement=trimmed;const keys=Object.keys(map).filter(k=>k.length>=4&&/[ሀ-፿]/.test(k)).sort((a,b)=>b.length-a.length);for(const key of keys){if(replacement.includes(key))replacement=replacement.split(key).join(map[key]);}if(replacement===trimmed)replacement=undefined;}
+  if(replacement!==undefined){const leading=raw.match(/^\s*/)?.[0]||'',trailing=raw.match(/\s*$/)?.[0]||'';const next=leading+replacement+trailing;if(node.nodeValue!==next)node.nodeValue=next;}
  }
- document.querySelectorAll('input[placeholder],textarea[placeholder],input[title],button[title],[aria-label]').forEach(el=>{
-  ['placeholder','title','aria-label'].forEach(attr=>{
+ document.querySelectorAll('input[placeholder],textarea[placeholder],input[title],button[title],[aria-label],input[type=button][value],input[type=submit][value],input[type=reset][value]').forEach(el=>{
+  ['placeholder','title','aria-label','value'].forEach(attr=>{
    if(!el.hasAttribute(attr))return;
    // Use ordinary HTML attributes, not element.dataset. Attribute names such as
    // data-lang-original-aria-label are safe; dataset camel-casing with hyphens is not.
