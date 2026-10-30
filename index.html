@@ -900,6 +900,13 @@ function getInactiveStudents(){
   .filter(st=>st.missed>=threshold)
   .sort((a,b)=>b.missed-a.missed||String(a.name||'').localeCompare(String(b.name||'')));
 }
+function isLateCutoffPassed(student,iso){
+ // Late cutoff applies only to today's attendance in Addis Ababa.
+ if(iso!==todayAddisISO()||!student)return false;
+ const cutoff=(extendedSettings.lateCutoffByClass||{})[student.className];
+ if(!cutoff||!/^([01]\d|2[0-3]):[0-5]\d$/.test(cutoff))return false;
+ return ethiopianNowStandard()>=cutoff;
+}
 function drawAttendance(){
  let iso=dateISO($('attDate').value);
  if(!iso){$('attendanceTable').innerHTML='<p style="padding:12px">ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';renderAttendanceSummary([],{},null);return}
@@ -908,7 +915,7 @@ function drawAttendance(){
      statusFilter=$('attendanceStatusFilter')?.value||'ALL',
      day=attendance[iso]||{},
      list=students.filter(st=>(c==='__ALL__'||st.className===c)&&(!q||[st.name,st.id,st.className,st.phone].some(v=>String(v||'').toLocaleLowerCase().includes(q)))&&(statusFilter==='ALL'||(statusFilter==='NONE'?!day[String(st.id)]:day[String(st.id)]===statusFilter)));
- const radioCell=(st,code)=>`<td class="attendance-radio-td"><label class="attendance-radio-option status-${code}" title="${code}"><input type="radio" name="st-${esc(st.id)}" value="${code}" aria-label="${esc(st.name)} ${code}" ${day[String(st.id)]===code?'checked':''}><span class="attendance-radio-visual" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label></td>`;
+ const radioCell=(st,code)=>{const cutoffPassed=isLateCutoffPassed(st,iso);const current=day[String(st.id)];return `<td class="attendance-radio-td"><label class="attendance-radio-option status-${code}" title="${code==='P'&&cutoffPassed?'Late cutoff አልፏል፤ Present አይፈቀድም።':code}"><input type="radio" name="st-${esc(st.id)}" value="${code}" aria-label="${esc(st.name)} ${code}" ${code==='P'&&cutoffPassed?'disabled':''} ${current===code?'checked':''}><span class="attendance-radio-visual" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label></td>`};
  $('attendanceTable').innerHTML=`<table class="attendance-reference-table attendance-four-column-radio"><thead><tr>
  <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th>
  <th class="radio-head head-P">P</th><th class="radio-head head-A">A</th><th class="radio-head head-L">L</th><th class="radio-head head-E">E</th>
@@ -1056,7 +1063,7 @@ $('permissionRole').addEventListener('change',fillExtendedSettingsForm);
 $('lateCutoffClass').addEventListener('change',e=>{const et=standardToEthiopianClock((extendedSettings.lateCutoffByClass||{})[e.target.value]||'09:00');$('lateCutoffTime').value=et.time;$('lateCutoffPeriod').value=et.period});
 $('desktopNavbarLogout').addEventListener('click',()=>{const logout=$('topLogout');if(logout)logout.click()});const syncDesktopNavbar=()=>{const r=$('sidebarRole'),e=$('sidebarEmail');if(r)$('desktopNavbarRole').textContent=r.textContent;if(e)$('desktopNavbarEmail').textContent=e.textContent};syncDesktopNavbar();const navbarObserver=new MutationObserver(syncDesktopNavbar);['sidebarRole','sidebarEmail'].forEach(id=>{const el=$(id);if(el)navbarObserver.observe(el,{childList:true,subtree:true,characterData:true})});
 /* Mobile drawer events are handled once by mobile-sidebar-drawer-reliable-handler below. */
-$('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attDate').addEventListener('change',drawAttendance);if($('attendanceSearch'))$('attendanceSearch').addEventListener('input',drawAttendance);if($('attendanceStatusFilter'))$('attendanceStatusFilter').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;$('attendanceTable').addEventListener('change',e=>{if(e.target.matches('input[type=radio]')){const iso=dateISO($('attDate').value);const c=isClassScoped()?assignedClass:$('attClass').value;const list=students.filter(st=>c==='__ALL__'||st.className===c);const day={...(attendance[iso]||{})};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);renderAttendanceSummary(list,day,iso)}});$('allPresent').onclick=()=>{document.querySelectorAll('#attendanceTable input[value=P]').forEach(x=>x.checked=true);const iso=dateISO($('attDate').value),c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(st=>c==='__ALL__'||st.className===c),day={...(attendance[iso]||{})};list.forEach(st=>day[String(st.id)]='P');renderAttendanceSummary(list,day,iso)};
+$('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attDate').addEventListener('change',drawAttendance);if($('attendanceSearch'))$('attendanceSearch').addEventListener('input',drawAttendance);if($('attendanceStatusFilter'))$('attendanceStatusFilter').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;$('attendanceTable').addEventListener('change',e=>{if(e.target.matches('input[type=radio]')){const iso=dateISO($('attDate').value);const c=isClassScoped()?assignedClass:$('attClass').value;const list=students.filter(st=>c==='__ALL__'||st.className===c);const day={...(attendance[iso]||{})};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);renderAttendanceSummary(list,day,iso)}});$('allPresent').onclick=()=>{const iso=dateISO($('attDate').value),c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(st=>c==='__ALL__'||st.className===c),day={...(attendance[iso]||{})};list.forEach(st=>day[String(st.id)]=isLateCutoffPassed(st,iso)?'L':'P');document.querySelectorAll('#attendanceTable input[type=radio]').forEach(x=>{const id=x.name.slice(3);x.checked=day[id]===x.value});renderAttendanceSummary(list,day,iso)};
 $('saveAtt').onclick=async()=>{
  if(!currentUser)return alert('መጀመሪያ Sign In ያድርጉ።');
  const iso=dateISO($('attDate').value);
@@ -1066,13 +1073,10 @@ $('saveAtt').onclick=async()=>{
  // Auto-convert P to L after the class-specific Ethiopian-clock cutoff.
  // Only apply this to today's attendance in Addis Ababa; never rewrite historical dates.
  if(iso===todayAddisISO()){
-   const now=ethiopianNowStandard();
    Object.keys(day).forEach(studentId=>{
      if(day[studentId]!=='P')return;
      const student=students.find(st=>String(st.id)===String(studentId));
-     if(!student)return;
-     const cutoff=(extendedSettings.lateCutoffByClass||{})[student.className];
-     if(cutoff && /^([01]\d|2[0-3]):[0-5]\d$/.test(cutoff) && now>=cutoff) day[studentId]='L';
+     if(student&&isLateCutoffPassed(student,iso))day[studentId]='L';
    });
  }
  attendance[iso]=day;
@@ -1307,6 +1311,11 @@ renderAll();setLogin(true);
   nav.no-print{z-index:10020!important;}
   .sidebar-backdrop{z-index:10019!important;}
 }
+</style>
+
+<style id="late-cutoff-disabled-present-style">
+#attendance .attendance-radio-option input:disabled{cursor:not-allowed!important;opacity:.25!important}
+#attendance .attendance-radio-option:has(input:disabled){cursor:not-allowed!important;opacity:.45!important}
 </style>
 </body></html>
 
