@@ -992,7 +992,12 @@ async function saveGeneralFields(fields, messageId, successText){
   await db.collection('appSettings').doc('general').set({...fields,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
   appSettings={...appSettings,...fields};
   localStorage.setItem('ss_app_settings',JSON.stringify({theme:appSettings.theme||'light'}));
-  updateDashboard(); await logActivity('Setting updated',Object.keys(fields).join(', ')); box.textContent='✅ '+successText;
+  // Refresh every view that depends on the shared Supervisor settings.
+  // updateDashboard refreshes the dashboard inactive list; renderClasses refreshes
+  // Active/Inactive counts in the class overview and classes table immediately.
+  updateDashboard();
+  renderClasses();
+  await logActivity('Setting updated',Object.keys(fields).join(', ')); box.textContent='✅ '+successText;
  }catch(e){console.error(e);box.textContent='❌ አልተቀመጠም። '+(e.message||'Firebase Rules ያረጋግጡ።')}
  finally{btn.disabled=role!=='supervisor'}
 }
