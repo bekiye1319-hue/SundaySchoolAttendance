@@ -461,6 +461,31 @@ body.auth-locked #menuToggle,
 body.auth-locked #sidebarBackdrop { display:none !important; }
 body.auth-locked main { display:none !important; }
 
+
+/* Integrated attendance reference layout: four independent P/A/L/E radio columns. */
+#attendance .attendance-reference-table{width:100%;min-width:700px;border-collapse:collapse;margin:0;font-size:13px;text-align:left}
+#attendance .attendance-reference-table th{background:#fff;color:#167a45;font-weight:800;padding:13px 10px;border:0;border-bottom:2px solid #eaf0ec;white-space:nowrap}
+#attendance .attendance-reference-table th.status-head,#attendance .attendance-reference-table td.status{text-align:center;width:54px}
+#attendance .attendance-reference-table th.status-head.P{color:#159653}#attendance .attendance-reference-table th.status-head.A{color:#e04b4b}#attendance .attendance-reference-table th.status-head.L{color:#2979d2}#attendance .attendance-reference-table th.status-head.E{color:#8a63cf}
+#attendance .attendance-reference-table td{padding:11px 10px;border:0;border-bottom:1px solid #f0f3f1;color:#374151;font-weight:600;vertical-align:middle}
+#attendance .attendance-reference-table tr:last-child td{border-bottom:0}
+#attendance .attendance-reference-table tr:hover td{background:#fbfdfb}
+#attendance .attendance-index{color:#94a3b8;font-weight:500}
+#attendance .student-id-cell{font-weight:800;color:#111827;white-space:nowrap}
+#attendance .student-name-cell{min-width:145px}
+#attendance .attendance-circle{display:inline-flex;position:relative;width:23px;height:23px;margin:0;cursor:pointer;vertical-align:middle}
+#attendance .attendance-circle input{position:absolute;inset:0;width:23px;height:23px;margin:0;opacity:0;cursor:pointer;z-index:2}
+#attendance .attendance-circle-mark{position:absolute;inset:0;width:23px;height:23px;border:2px solid #cbd5e1;border-radius:50%;background:#fff;display:grid;place-items:center;pointer-events:none;transition:background .15s,border-color .15s}
+#attendance .attendance-circle-mark:after{content:"";width:7px;height:7px;border-radius:50%;background:#fff;transform:scale(0);transition:transform .15s}
+#attendance .attendance-circle.status-P input:checked+.attendance-circle-mark{background:#159653;border-color:#159653}
+#attendance .attendance-circle.status-A input:checked+.attendance-circle-mark{background:#e04b4b;border-color:#e04b4b}
+#attendance .attendance-circle.status-L input:checked+.attendance-circle-mark{background:#2979d2;border-color:#2979d2}
+#attendance .attendance-circle.status-E input:checked+.attendance-circle-mark{background:#8a63cf;border-color:#8a63cf}
+#attendance .attendance-circle input:checked+.attendance-circle-mark:after{transform:scale(1)}
+#attendance .attendance-circle:focus-within .attendance-circle-mark{outline:3px solid #dbeafe;outline-offset:2px}
+@media(max-width:700px){#attendance .attendance-reference-table{min-width:700px}}
+@media print{#attendance .attendance-reference-table{min-width:0!important}#attendance .attendance-circle-mark{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -748,7 +773,23 @@ function getInactiveStudents(){
   .filter(st=>st.missed>=4)
   .sort((a,b)=>b.missed-a.missed||String(a.name||'').localeCompare(String(b.name||'')));
 }
-function drawAttendance(){let iso=dateISO($('attDate').value);if(!iso){$('attendanceTable').innerHTML='<p style="padding:12px">ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';renderAttendanceSummary([],{},null);return}let c=isClassScoped()?assignedClass:$('attClass').value,q=($('attendanceSearch')?.value||'').trim().toLocaleLowerCase(),statusFilter=$('attendanceStatusFilter')?.value||'ALL',day=attendance[iso]||{},list=students.filter(st=>(c==='__ALL__'||st.className===c)&&(!q||[st.name,st.id,st.className,st.phone].some(v=>String(v||'').toLocaleLowerCase().includes(q)))&&(statusFilter==='ALL'||(statusFilter==='NONE'?!day[String(st.id)]:day[String(st.id)]===statusFilter)));$('attendanceTable').innerHTML=`<table class="attendance-reference-table"><thead><tr><th style="width:38px">#</th><th style="width:95px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>Attendance</th></tr></thead><tbody>${list.map((s,i)=>`<tr><td>${i+1}</td><td class="student-id-cell">${esc(s.id)}</td><td class="student-name-cell">${esc(s.name)}</td><td>${esc(s.className||'')}</td><td><div class="attendance-status-grid">${['P','A','L','E'].map(st=>`<label class="attendance-status-btn status-${st}" title="${st}"><input aria-label="${esc(s.name)} ${st}" type="radio" name="st-${esc(s.id)}" value="${st}" ${day[String(s.id)]===st?'checked':''}><span>${st}</span></label>`).join('')}</div></td></tr>`).join('')||'<tr><td colspan="5" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;renderAttendanceSummary(list,day,iso)}
+function drawAttendance(){
+ let iso=dateISO($('attDate').value);
+ if(!iso){$('attendanceTable').innerHTML='<p style="padding:12px">ትክክለኛ የኢትዮጵያ ቀን ያስገቡ።</p>';renderAttendanceSummary([],{},null);return}
+ let c=isClassScoped()?assignedClass:$('attClass').value,
+     q=($('attendanceSearch')?.value||'').trim().toLocaleLowerCase(),
+     statusFilter=$('attendanceStatusFilter')?.value||'ALL',
+     day=attendance[iso]||{},
+     list=students.filter(st=>(c==='__ALL__'||st.className===c)&&(!q||[st.name,st.id,st.className,st.phone].some(v=>String(v||'').toLocaleLowerCase().includes(q)))&&(statusFilter==='ALL'||(statusFilter==='NONE'?!day[String(st.id)]:day[String(st.id)]===statusFilter)));
+ $('attendanceTable').innerHTML=`<table class="attendance-reference-table"><thead><tr>
+ <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th>
+ <th class="status-head P">P</th><th class="status-head A">A</th><th class="status-head L">L</th><th class="status-head E">E</th>
+ </tr></thead><tbody>${list.map((st,i)=>`<tr>
+ <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell">${esc(st.name)}</td><td>${esc(st.className||'')}</td>
+ ${['P','A','L','E'].map(code=>`<td class="status"><label class="attendance-circle status-${code}" title="${code}"><input aria-label="${esc(st.name)} ${code}" type="radio" name="st-${esc(st.id)}" value="${code}" ${day[String(st.id)]===code?'checked':''}><span class="attendance-circle-mark" aria-hidden="true"></span></label></td>`).join('')}
+ </tr>`).join('')||'<tr><td colspan="8" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
+ renderAttendanceSummary(list,day,iso)
+}
 function renderAttendanceSummary(list,day,iso){const counts={P:0,A:0,L:0,E:0};list.forEach(st=>{const v=day[String(st.id)];if(counts[v]!==undefined)counts[v]++});const labels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};$('attendanceSummary').innerHTML=Object.keys(counts).map(k=>`<div class="summary-row summary-${k}"><span class="summary-letter">${k}</span><strong>${labels[k]}</strong><b>${counts[k]}</b></div>`).join('');$('attendanceSummaryFooter').innerHTML=iso?`📅 ቀን፦ ${dateET(iso)} &nbsp; | &nbsp; ክፍል፦ ${esc(isClassScoped()?assignedClass:($('attClass').selectedOptions[0]?.textContent||'ሁሉም ክፍሎች'))}`:''}
 function renderStats(){let c={P:0,A:0,L:0,E:0};Object.entries(attendance).forEach(([date,day])=>Object.entries(day||{}).forEach(([id,v])=>{const st=students.find(x=>String(x.id)===String(id));if((!isClassScoped()||(st&&st.className===assignedClass))&&c[v]!==undefined)c[v]++}));$('statistics').innerHTML=`<div class="grid">${Object.keys(c).map(k=>`<div class="stat"><b>${c[k]}</b>${k} - ${labels[k]}</div>`).join('')}</div>`}
 function renderReportVisuals(total,from,to,list){const keys=['P','A','L','E'],colors={P:'#16803d',A:'#c62828',L:'#d97706',E:'#7c3aed'},names={P:'ተገኝቷል (P)',A:'ቀርቷል (A)',L:'ዘግይቷል (L)',E:'ፈቃድ (E)'};const sum=keys.reduce((a,k)=>a+(total[k]||0),0);let cursor=0;const segments=keys.map(k=>{const pct=sum?total[k]/sum*100:0;const start=cursor;cursor+=pct;return `${colors[k]} ${start}% ${cursor}%`});$('reportPieChart').style.background=sum?`conic-gradient(${segments.join(',')})`:'conic-gradient(#e5e7eb 0 100%)';$('reportPieChart').setAttribute('aria-label',sum?keys.map(k=>`${names[k]} ${Math.round(total[k]/sum*100)}%`).join(', '):'ምንም መረጃ የለም');$('reportPieLegend').innerHTML=keys.map(k=>`<div><span class="pie-dot" style="background:${colors[k]}"></span><span>${names[k]} <strong>${sum?Math.round(total[k]/sum*100):0}%</strong> (${total[k]||0})</span></div>`).join('');const start=Date.parse(from+'T00:00:00Z'),end=Date.parse(to+'T00:00:00Z'),days=Math.max(1,Math.round((end-start)/86400000)+1),prevTo=new Date(start-86400000).toISOString().slice(0,10),prevFrom=new Date(start-days*86400000).toISOString().slice(0,10);function rate(a,b){let p=0,m=0;Object.entries(attendance).forEach(([d,day])=>{if(d<a||d>b)return;Object.entries(day||{}).forEach(([id,v])=>{const st=students.find(x=>String(x.id)===String(id));if(!st||!list.some(z=>String(z.id)===String(id)))return;if(['P','A','L','E'].includes(v)){m++;if(v==='P')p++}})});return {p,m,pct:m?Math.round(p/m*100):0}}const current=rate(from,to),previous=rate(prevFrom,prevTo),delta=current.pct-previous.pct,cls=delta>0?'comparison-up':delta<0?'comparison-down':'comparison-same',label=delta>0?'▲ ጨምሯል':delta<0?'▼ ቀንሷል':'▬ ለውጥ የለም';$('reportComparison').innerHTML=`<div class="comparison-kpi"><span class="small">የአሁኑ ክልል የመገኘት መጠን</span><strong>${current.pct}%</strong><span class="comparison-change ${cls}">${label} ${Math.abs(delta)} መቶኛ ነጥብ</span><div class="report-comparison-bars"><div><div class="comparison-bar-label"><span>አሁን (${dateET(from)} – ${dateET(to)})</span><b>${current.pct}%</b></div><div class="comparison-bar"><span style="width:${current.pct}%"></span></div></div><div><div class="comparison-bar-label"><span>ቀደመው ተመሳሳይ ${days} ቀን (${dateET(prevFrom)} – ${dateET(prevTo)})</span><b>${previous.pct}%</b></div><div class="comparison-bar"><span style="width:${previous.pct}%;background:#64748b"></span></div></div></div><p class="small" style="margin-top:10px">የተመዘገቡ፦ አሁን ${current.m} • ቀደም ሲል ${previous.m}. ለውጡ በመቶኛ ነጥብ ይሰላል።</p></div>`}
