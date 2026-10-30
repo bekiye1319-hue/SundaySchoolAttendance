@@ -697,8 +697,21 @@ function defaultPrefixForClass(c){if(classPrefixes[c])return classPrefixes[c];co
 function isClassScoped(){return ['class_teacher','class_assistant'].includes(role)}
 function nextStudentId(className){const prefix=String(classPrefixes[className]||'').toUpperCase();if(!prefix)throw new Error('የዚህ ክፍል ID Prefix አልተዘጋጀም። Supervisor እንዲያስተካክል ይጠይቁ።');let highest=-1;const re=new RegExp('^'+prefix+'(\\d+)$','i');students.forEach(st=>{const m=String(st.id||'').match(re);if(m)highest=Math.max(highest,parseInt(m[1],10)||0)});let n;if(highest>=0)n=highest+1;else n=(prefix==='SSAM'||prefix==='SSAT')?0:1;return prefix+String(n).padStart(4,'0')}
 function saveLocal(){try{localStorage.setItem('ss_students',JSON.stringify(students));localStorage.setItem('ss_classes',JSON.stringify(classes));localStorage.setItem('ss_class_prefixes',JSON.stringify(classPrefixes));localStorage.setItem('ss_attendance',JSON.stringify(attendance))}catch(e){}}
+function friendlyFirebaseError(error,context='save'){
+ const code=String(error&&error.code||'').toLowerCase();
+ if(code.includes('permission-denied')||code.includes('unauthorized')||code.includes('missing-or-insufficient-permissions'))
+   return 'የFirebase ፈቃድ አልተሰጠም (permission-denied)። የFirestore Rules የዚህን ተጠቃሚ Role እና ክፍል እንዲፈቅዱ ያረጋግጡ። የAttendance ማስቀመጥ ብቻ ለTeacher ይፈቀድ።';
+ if(code.includes('unavailable')||code.includes('network-request-failed')||code.includes('deadline-exceeded'))
+   return 'የኢንተርኔት/Firebase ግንኙነት ተቋርጧል። ኢንተርኔትዎን ያረጋግጡና እንደገና ይሞክሩ።';
+ if(code.includes('unauthenticated')||code.includes('not-authenticated'))
+   return 'የመግቢያ ጊዜዎ አልቋል። እንደገና Sign In ያድርጉ።';
+ if(code.includes('resource-exhausted'))
+   return 'የFirebase ጥያቄ ገደብ ተደርሷል። ጥቂት ጊዜ ጠብቀው እንደገና ይሞክሩ።';
+ return (context==='login'?'መግባት':'ማስቀመጥ')+' አልተሳካም። '+String(error&&error.message||'ያልታወቀ ስህተት');
+}
 async function cloudSave(scope='records'){
  if(!currentUser){alert('መጀመሪያ Sign In ያድርጉ።');return false;}
+ if(scope==='attendance'&&!['supervisor','teacher','class_teacher','class_assistant'].includes(role)){alert('Attendance ለመመዝገብ ፈቃድ የለዎትም።');return false;}
  try{
    const batch=db.batch();
    // Attendance-only saves let teachers save attendance without attempting to write
@@ -743,11 +756,11 @@ async function cloudSave(scope='records'){
    return true;
  }catch(e){
    console.error('Firebase save failed:',e);
-   alert('Firebase ላይ ማስቀመጥ አልተሳካም: '+e.message);
+   alert(friendlyFirebaseError(e,'save'));
    return false;
  }
 }
-async function login(){let email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password){msg('Email እና Password ያስገቡ።');return}$('cloudLoginBtn').disabled=true;msg('በመግባት ላይ...');try{let cred=await auth.signInWithEmailAndPassword(email,password);currentUser=cred.user;let ud=await db.collection('users').doc(currentUser.uid).get();if(!ud.exists||!['supervisor','teacher','class_teacher','class_assistant'].includes(ud.data().role)){await auth.signOut();currentUser=null;role=null;msg('users/'+cred.user.uid+' ውስጥ role=supervisor፣ teacher፣ class_teacher ወይም class_assistant መሆኑን ይፈትሹ።');return}role=ud.data().role;assignedClass=String(ud.data().className||ud.data().assignedClass||'');if($('backupUserEmail'))$('backupUserEmail').textContent=currentUser.email||'';if($('backupUserRole'))$('backupUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('globalUserEmail'))$('globalUserEmail').textContent=currentUser.email||'';if($('globalUserRole'))$('globalUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarEmail'))$('sidebarEmail').textContent=currentUser.email||'';if($('sidebarRole'))$('sidebarRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarAvatar'))$('sidebarAvatar').textContent=(currentUser.email||'S').charAt(0).toUpperCase();if(isClassScoped()&&!assignedClass){await auth.signOut();currentUser=null;role=null;msg('class_teacher/class_assistant ለሆነ መለያ users ሰነዱ ውስጥ className ወይም assignedClass መሙላት አለበት።');return}await loadCloud();setLogin(false);applyRoleUI();$('cloudPassword').value='';msg('ገብተዋል።');logActivity('Sign in','ተጠቃሚ ወደ ስርዓቱ ገባ');if(role==='supervisor')renderActivityLogs()}catch(e){console.error(e);msg('ስህተት: '+(e.message||'Firebase ግንኙነት አልተሳካም።'))}finally{$('cloudLoginBtn').disabled=false}}
+async function login(){let email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password){msg('Email እና Password ያስገቡ።');return}$('cloudLoginBtn').disabled=true;msg('በመግባት ላይ...');try{let cred=await auth.signInWithEmailAndPassword(email,password);currentUser=cred.user;let ud=await db.collection('users').doc(currentUser.uid).get();if(!ud.exists||!['supervisor','teacher','class_teacher','class_assistant'].includes(ud.data().role)){await auth.signOut();currentUser=null;role=null;msg('users/'+cred.user.uid+' ውስጥ role=supervisor፣ teacher፣ class_teacher ወይም class_assistant መሆኑን ይፈትሹ።');return}role=ud.data().role;assignedClass=String(ud.data().className||ud.data().assignedClass||'');if($('backupUserEmail'))$('backupUserEmail').textContent=currentUser.email||'';if($('backupUserRole'))$('backupUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('globalUserEmail'))$('globalUserEmail').textContent=currentUser.email||'';if($('globalUserRole'))$('globalUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarEmail'))$('sidebarEmail').textContent=currentUser.email||'';if($('sidebarRole'))$('sidebarRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarAvatar'))$('sidebarAvatar').textContent=(currentUser.email||'S').charAt(0).toUpperCase();if(isClassScoped()&&!assignedClass){await auth.signOut();currentUser=null;role=null;msg('class_teacher/class_assistant ለሆነ መለያ users ሰነዱ ውስጥ className ወይም assignedClass መሙላት አለበት።');return}await loadCloud();setLogin(false);applyRoleUI();$('cloudPassword').value='';msg('ገብተዋል።');logActivity('Sign in','ተጠቃሚ ወደ ስርዓቱ ገባ');if(role==='supervisor')renderActivityLogs()}catch(e){console.error(e);msg(friendlyFirebaseError(e,'login'))}finally{$('cloudLoginBtn').disabled=false}}
 async function loadCloud(){
  let ss,cc,attendanceDocs=[];
  if(isClassScoped()){
