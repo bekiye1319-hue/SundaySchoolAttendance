@@ -805,13 +805,14 @@ async function renderActivityLogs(){
  rows=rows.slice(0,100);
  box.innerHTML='<table><thead><tr><th>ቀን/ሰዓት</th><th>ተጠቃሚ</th><th>Role</th><th>እንቅስቃሴ</th><th>ዝርዝር</th><th>ክፍል</th></tr></thead><tbody>'+(rows.length?rows.map(x=>`<tr><td>${esc(x.createdAt&&Number.isFinite(new Date(x.createdAt).getTime())?new Date(x.createdAt).toLocaleString():'—')}</td><td>${esc(x.userEmail||x.userId||'—')}</td><td>${esc(x.role||'—')}</td><td><span class="activity-badge">${esc(x.action||'—')}</span></td><td>${esc(x.details||'—')}</td><td>${esc(x.className||'—')}</td></tr>`).join(''):'<tr><td colspan="6">ገና የተመዘገበ እንቅስቃሴ የለም።</td></tr>')+'</tbody></table>';
  if(source==='firebase')renderRecentActivityStream();
+ applyLanguage(extendedSettings.language||'am');
 }
 async function refreshActivityLogs(){
  const btn=$('refreshActivityLogs');
  if(role!=='supervisor'){if($('activityLogsMessage'))$('activityLogsMessage').textContent='ይህን መዝገብ Supervisor ብቻ ማደስ ይችላል።';return;}
  if(btn){btn.disabled=true;btn.textContent='በማደስ ላይ…';}
  try{await renderActivityLogs();}
- finally{if(btn){btn.disabled=false;btn.textContent='እንደገና አድስ';}}
+ finally{if(btn){btn.disabled=false;btn.textContent='እንደገና አድስ';applyLanguage(extendedSettings.language||'am');}}
 }
 function setLogin(show){document.body.classList.remove('auth-loading');document.body.classList.toggle('auth-locked',!!show);$('cloudLogin').style.display=show?'flex':'none'}
 function dateISO(value){
@@ -1120,7 +1121,7 @@ async function saveGeneralFields(fields, messageId, successText){
 async function saveInactiveDays(){const n=Number($('inactiveDaysSetting').value);if(!Number.isInteger(n)||n<1||n>60){$('inactiveDaysMessage').textContent='1–60 ቀን መሆን አለበት።';return}await saveGeneralFields({inactiveDays:n},'inactiveDaysMessage','Inactive Days ተቀምጧል።')}
 async function saveStatusRules(){const late=Number($('lateScoreSetting').value),perm=Number($('permissionScoreSetting').value);if(![late,perm].every(v=>Number.isFinite(v)&&v>=0&&v<=100)){$('statusRulesMessage').textContent='0–100 መካከል ያለ ቁጥር ያስገቡ።';return}await saveGeneralFields({lateScore:late,permissionScore:perm},'statusRulesMessage','Status Rules ተቀምጠዋል።')}
 function saveThemeSetting(){const theme=$('themeSetting').value;appSettings={...appSettings,theme};applyTheme(theme);try{localStorage.setItem('ss_app_settings',JSON.stringify({theme}))}catch(e){}$('themeSettingsMessage').textContent='✅ Theme በዚህ መሳሪያ ተቀምጧል።'}
-function saveLanguageSetting(){const lang=$('languageSelect').value;extendedSettings={...extendedSettings,language:lang};applyLanguage(lang);try{localStorage.setItem('ss_extended_settings',JSON.stringify({...extendedSettings,language:lang}))}catch(e){}$('languageSettingsNotice').textContent='✅ ቋንቋው ለዚህ ተጠቃሚ/መሳሪያ ተቀምጧል።'}
+function saveLanguageSetting(){const lang=$('languageSelect').value;extendedSettings={...extendedSettings,language:lang};try{localStorage.setItem('ss_extended_settings',JSON.stringify({...extendedSettings,language:lang}))}catch(e){}$('languageSettingsNotice').textContent='✅ ቋንቋው ለዚህ ተጠቃሚ/መሳሪያ ተቀምጧል።';applyLanguage(lang);if(!$('activityLogs').classList.contains('hidden'))renderActivityLogs();if(!$('recentActivityPanel')?.classList.contains('hidden'))renderRecentActivityStream();}
 function ethiopianClockToStandard(value,period){
  const m=String(value||'').match(/^(\d{2}):(\d{2})$/);if(!m)return null;
  let h=Number(m[1]),min=Number(m[2]);if(h<1||h>12||min<0||min>59)return null;
@@ -1263,6 +1264,19 @@ Object.assign(LANG_EN,{
 'Backup በተሳካ ሁኔታ ተፈጥሯል።':'Backup created successfully.','Restore በተሳካ ሁኔታ ተጠናቋል።':'Restore completed successfully.',
 'የዚህ መሣሪያ የአካባቢ መዝገቦች ብቻ እየታዩ ነው።':'Only local records on this device are being displayed.',
 'በማስቀመጥ ላይ…':'Saving…','ተሳክቷል።':'Successful.','አልተሳካም።':'Failed.'
+});
+Object.assign(LANG_EN,{
+'የተጠቃሚዎች እንቅስቃሴ መዝገብ (Activity Logs)':'User Activity Log (Activity Logs)',
+'የAttendance ማስቀመጥ፣ የተማሪ/ክፍል ለውጦች፣ ሪፖርት እና Backup/Restore እንቅስቃሴዎች። Supervisor ብቻ ያያል።':'Attendance saves, student/class changes, reports, and Backup/Restore activities. Visible to the Supervisor only.',
+'እንደገና አድስ':'Refresh','የActivity Logs መረጃ ከFirebase በመጫን ላይ…':'Loading Activity Logs from Firebase…',
+'በመጫን ላይ…':'Loading…','Firebase ላይ የተቀመጡ የቅርብ 100 እንቅስቃሴዎች።':'Latest 100 activities saved in Firebase.',
+'የዚህ መሣሪያ የአካባቢ መዝገቦች ብቻ እየታዩ ነው።':'Only local records on this device are being displayed.',
+'ቀን/ሰዓት':'Date/Time','ተጠቃሚ':'User','እንቅስቃሴ':'Activity','ዝርዝር':'Details','ክፍል':'Class',
+'ገና የተመዘገበ እንቅስቃሴ የለም።':'No activity has been recorded yet.',
+'ይህን መዝገብ Supervisor ብቻ ማደስ ይችላል።':'Only the Supervisor can refresh this log.',
+'ተጠቃሚ ወደ ስርዓቱ ገባ':'User signed in to the system',
+'የAttendance ሪፖርት ተፈጠረ':'Attendance report generated',
+'ተሳክቷል።':'Successful.','የተመዘገቡ መረጃዎች':'Recorded data'
 });
 const LANG_AM={'Dashboard':'ዳሽቦርድ','Students':'ተማሪዎች','Classes':'ክፍሎች','Reports':'ሪፖርት','Logout':'ውጣ','Present':'ተገኝቷል','Absent':'ቀርቷል','Late':'ዘግይቷል','Permission':'ፈቃድ','Full Name':'ሙሉ ስም','Phone':'ስልክ','Save':'አስቀምጥ','Edit':'አስተካክል','Delete':'ሰርዝ','Search':'ፈልግ','All':'ሁሉም','Date':'ቀን','Student':'ተማሪ','Class':'ክፍል','Download':'አውርድ','Password':'የይለፍ ቃል','Notice':'ማስታወቂያ','Close':'ዝጋ','Choose':'ምረጥ'};
 Object.entries(LANG_EN).forEach(([amText,enText])=>{if(!LANG_AM[enText])LANG_AM[enText]=amText});
@@ -1848,6 +1862,19 @@ body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-chil
 body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(2){color:#f87171!important;}
 body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(3){color:#60a5fa!important;}
 body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(4){color:#c084fc!important;}
+</style>
+
+
+<style id="v11-attendance-legend-darkmode-fix">
+body.app-dark-theme #attendance .attendance-reference-legend,
+body.app-dark-theme #attendance .attendance-reference-legend[aria-label],
+body.app-dark-theme #attendance .attendance-reference-legend>span,
+body.app-dark-theme #attendance .attendance-reference-legend>span>span{
+ background:#1e293b!important;color:#e5edf5!important;border-color:#475569!important;
+}
+body.app-dark-theme #attendance .attendance-reference-legend{box-shadow:0 4px 16px #0004!important;}
+body.app-dark-theme #attendance .attendance-reference-legend .ref-pill{color:#fff!important;}
+body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5edf5!important;}
 </style>
 
 </body></html>
