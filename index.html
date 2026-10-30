@@ -217,7 +217,6 @@ main{padding:27px 30px;background:#f4f7f5}#dashboard .panel{padding:22px}.dashbo
 #cloudLogin .signup-link{display:block;background:transparent!important;color:var(--login-primary)!important;border:0!important;box-shadow:none!important;width:100%;min-height:40px;font-size:14px;font-weight:700;padding:8px;margin:8px 0 0;font-family:inherit}
 #cloudLogin .alert-message{display:none;padding:10px;margin-top:16px;border-radius:8px;font-size:13px;text-align:center;background:#d4edda;color:#155724;border:1px solid #c3e6cb;overflow-wrap:anywhere;line-height:1.5}
 #cloudLogin .alert-message:not(:empty){display:block}
-#cloudLogin #cloudLogoutBtn{margin-top:8px;width:100%;background:#65736b}
 #cloudLogin button:focus-visible,#cloudLogin input:focus-visible{outline:3px solid #d8b84b;outline-offset:2px}
 @media(max-width:420px){#cloudLogin .login-box{padding:30px 22px}#cloudLogin .icon-circle{width:72px;height:72px;font-size:32px}}
 
@@ -682,7 +681,6 @@ body.auth-locked main { display:none !important; }
       <button id="cloudLoginBtn" class="btn" type="submit"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> ግባ / Sign in</button>
     </form>
     <div id="cloudLoginMessage" class="alert-message" aria-live="polite"></div>
-    <button id="cloudLogoutBtn" class="hidden" type="button">ውጣ / Sign out</button>
   </div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -733,7 +731,7 @@ async function refreshActivityLogs(){
  try{await renderActivityLogs();}
  finally{if(btn){btn.disabled=false;btn.textContent='እንደገና አድስ';}}
 }
-function setLogin(show){document.body.classList.remove('auth-loading');document.body.classList.toggle('auth-locked',!!show);$('cloudLogin').style.display=show?'flex':'none';$('cloudLogoutBtn').classList.toggle('hidden',!currentUser)}
+function setLogin(show){document.body.classList.remove('auth-loading');document.body.classList.toggle('auth-locked',!!show);$('cloudLogin').style.display=show?'flex':'none'}
 function dateISO(value){
   // Accept Ethiopian dates as D/M/YYYY, DD/MM/YYYY, or DD-MM-YYYY.
   // Ethiopian months 1–12 have 30 days; Pagume has 5 or 6 days.
@@ -869,7 +867,7 @@ async function signup(){
 $('loginForm').addEventListener('submit',e=>{e.preventDefault();login()});
 $('cloudLoginBtn').addEventListener('click',e=>{e.preventDefault();login()});$('cloudEmail').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('cloudPassword').focus()}});
 const togglePassword=$('togglePassword');if(togglePassword)togglePassword.addEventListener('click',()=>{const field=$('cloudPassword'),visible=field.type==='password';field.type=visible?'text':'password';togglePassword.textContent=visible?'◎':'◉';togglePassword.setAttribute('aria-pressed',String(visible));togglePassword.setAttribute('aria-label',visible?'Password ደብቅ':'Password አሳይ')});
-$('cloudLogoutBtn').addEventListener('click',async()=>{clearAuthSession();await auth.signOut();currentUser=null;role=null;setLogin(true);msg('ወጥተዋል። እንደገና ይግቡ።')});
+
 $('backupLogout').addEventListener('click',()=> $('topLogout').click());$('globalNavbarLogout').addEventListener('click',()=> $('topLogout').click());
 $('topLogout').addEventListener('click',async()=>{if(!currentUser){setLogin(true);return;}if(!confirm('ከስርዓቱ መውጣት ይፈልጋሉ?'))return;try{clearAuthSession();await auth.signOut();currentUser=null;role=null;setLogin(true);msg('በተሳካ ሁኔታ ወጥተዋል።');}catch(e){alert('Logout አልተሳካም። እንደገና ይሞክሩ።')}});
 function fillSelects(){const visibleClasses=isClassScoped()?[assignedClass]:classes;let opts=visibleClasses.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');$('studentClass').innerHTML=opts;$('attClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('attClass').value=isClassScoped()?assignedClass:'__ALL__';$('reportClass').innerHTML=(isClassScoped()?'':'<option value="__ALL__">ሁሉም ክፍሎች</option>')+opts;$('reportClass').value=isClassScoped()?assignedClass:'__ALL__';const visibleStudents=isClassScoped()?students.filter(st=>st.className===assignedClass):students;$('reportStudent').innerHTML='<option value="__ALL__">ሁሉም ተማሪዎች</option>'+visibleStudents.map(st=>`<option value="${esc(st.id)}">${esc(st.name)}</option>`).join('');if(isClassScoped())$('studentClass').value=assignedClass}
@@ -1083,7 +1081,17 @@ function applyLanguage(lang){
   const replacement=map[trimmed];if(replacement!==undefined){const leading=raw.match(/^\s*/)?.[0]||'',trailing=raw.match(/\s*$/)?.[0]||'';const next=leading+replacement+trailing;if(node.nodeValue!==next)node.nodeValue=next;}
  }
  document.querySelectorAll('input[placeholder],textarea[placeholder],input[title],button[title],[aria-label]').forEach(el=>{
-  ['placeholder','title','aria-label'].forEach(attr=>{if(!el.hasAttribute(attr))return;const key='data-lang-original-'+attr; if(!el.hasAttribute(key))el.setAttribute(key,el.getAttribute(attr));const raw=el.getAttribute(key);if(isBilingualText(raw))return;const out=map[raw];if(out!==undefined&&el.getAttribute(attr)!==out)el.setAttribute(attr,out);});
+  ['placeholder','title','aria-label'].forEach(attr=>{
+   if(!el.hasAttribute(attr))return;
+   // Use ordinary HTML attributes, not element.dataset. Attribute names such as
+   // data-lang-original-aria-label are safe; dataset camel-casing with hyphens is not.
+   const key='data-lang-original-'+attr;
+   if(!el.hasAttribute(key))el.setAttribute(key,el.getAttribute(attr));
+   const raw=el.getAttribute(key)||'';
+   if(isBilingualText(raw))return;
+   const out=map[raw];
+   if(out!==undefined&&el.getAttribute(attr)!==out)el.setAttribute(attr,out);
+  });
  });
 }
 let languageObserver=null;
