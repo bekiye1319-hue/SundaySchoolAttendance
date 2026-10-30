@@ -507,6 +507,42 @@ body.auth-locked main { display:none !important; }
 @media print{#supervisorDesktopNavbar{display:none!important}}
 </style>
 
+
+<style id="mobile-sidebar-final-click-fix-and-class-cards">
+@media(max-width:800px){
+  header:not(.desktop-navbar){height:0!important;min-height:0!important;overflow:visible!important;position:static!important;}
+  header:not(.desktop-navbar) #menuToggle{position:fixed!important;top:4px!important;left:9px!important;z-index:2147483001!important;display:flex!important;align-items:center!important;justify-content:center!important;pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important;}
+  body>nav.no-print{position:fixed!important;inset:0 auto 0 0!important;width:min(300px,86vw)!important;height:100dvh!important;max-height:100dvh!important;z-index:2147483000!important;display:flex!important;flex-direction:column!important;overflow-y:auto!important;visibility:hidden!important;pointer-events:none!important;transform:translate3d(-105%,0,0)!important;transition:transform .25s ease,visibility .25s ease!important;}
+  body>nav.no-print.sidebar-open{visibility:visible!important;pointer-events:auto!important;transform:translate3d(0,0,0)!important;}
+  #sidebarBackdrop{position:fixed!important;inset:0!important;z-index:2147482999!important;display:block!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;}
+  #sidebarBackdrop.show{opacity:1!important;visibility:visible!important;pointer-events:auto!important;}
+  body.sidebar-drawer-open{overflow:hidden!important;}
+}
+/* Refined class overview cards: polished, consistent, and responsive without changing data logic. */
+#classes .class-overview-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))!important;gap:17px!important;margin:18px 0 24px!important;}
+#classes .class-overview-card{position:relative!important;isolation:isolate!important;overflow:hidden!important;border:1px solid #d9e8df!important;border-radius:18px!important;padding:18px!important;background:linear-gradient(145deg,#fff 0%,#f5fbf7 70%,#eaf7ef 100%)!important;box-shadow:0 7px 22px rgba(21,75,44,.09)!important;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important;}
+#classes .class-overview-card:before{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,#087b50,#35b779,#9bd9b5);z-index:-1;}
+#classes .class-overview-card:after{content:"";position:absolute;width:115px;height:115px;border-radius:50%;right:-48px;top:-52px;background:rgba(22,128,74,.055);z-index:-1;}
+#classes .class-overview-card:hover{transform:translateY(-3px)!important;border-color:#a9d5ba!important;box-shadow:0 12px 28px rgba(21,75,44,.14)!important;}
+#classes .class-overview-card h3{display:flex!important;align-items:center!important;gap:9px!important;margin:2px 0 15px!important;padding:0 0 12px!important;border-bottom:1px solid #dfebe3!important;color:#145c38!important;font-size:18px!important;font-weight:850!important;}
+#classes .class-overview-card h3:before{content:"▦";display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:11px;background:#dff4e7;color:#16804a;font-size:19px;}
+#classes .class-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
+#classes .class-metrics>div{position:relative!important;display:flex!important;align-items:center!important;align-content:center!important;gap:5px 7px!important;min-height:82px!important;padding:12px!important;border:1px solid #e3eee7!important;border-radius:13px!important;background:rgba(255,255,255,.92)!important;box-shadow:0 2px 7px rgba(24,70,43,.035)!important;}
+#classes .class-metrics>div:nth-child(1){background:linear-gradient(145deg,#fff,#f0f7ff)!important;}
+#classes .class-metrics>div:nth-child(2){background:linear-gradient(145deg,#fff,#edfaf1)!important;}
+#classes .class-metrics>div:nth-child(3){background:linear-gradient(145deg,#fff,#fff2f1)!important;}
+#classes .class-metrics>div:nth-child(4){background:linear-gradient(145deg,#fff,#f5f0ff)!important;}
+#classes .class-metrics b{font-size:24px!important;line-height:1.1!important;color:#174d32!important;font-weight:850!important;}
+#classes .class-metrics span{font-size:11px!important;line-height:1.4!important;color:#637568!important;font-weight:700!important;}
+#classes .class-metrics>div:last-child{grid-column:1/-1!important;min-height:68px!important;background:linear-gradient(100deg,#fff,#f2faf5)!important;}
+#classes .classes-panel #classesTable{overflow-x:auto;border:1px solid #e1ebe4;border-radius:13px;background:#fff;}
+#classes .classes-panel #classesTable table{min-width:680px!important;border-collapse:separate!important;border-spacing:0!important;}
+#classes .classes-panel #classesTable th{position:sticky;top:0;background:#edf7f0!important;color:#205638!important;font-weight:850!important;}
+#classes .classes-panel #classesTable tbody tr:nth-child(even){background:#f8fbf9!important;}
+#classes .classes-panel #classesTable tbody tr:hover{background:#eef8f1!important;}
+@media(max-width:650px){#classes .class-overview-grid{grid-template-columns:1fr!important;gap:13px!important}#classes .class-overview-card{padding:15px!important}#classes .class-metrics>div{min-height:76px!important}}
+@media(prefers-reduced-motion:reduce){#classes .class-overview-card{transition:none!important}body>nav.no-print,#sidebarBackdrop{transition:none!important}}
+</style>
 </head><body class="auth-locked">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><span class="header-badge">SS</span></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -856,7 +892,7 @@ $('attDate').value=today();$('fromDate').value=today();$('toDate').value=today()
 function navigateTo(page){const b=document.querySelector('nav button[data-page="'+page+'"]');if(b)b.click()}
 document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.page==='reports'){ $('statistics').classList.add('hidden'); $('reportVisualSection').classList.add('hidden'); $('reportResultCard').classList.add('hidden'); $('statistics').innerHTML=''; $('reportResult').innerHTML=''; }document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$(b.dataset.page).classList.remove('hidden')}));
 $('desktopNavbarLogout').addEventListener('click',()=>{const logout=$('topLogout');if(logout)logout.click()});const syncDesktopNavbar=()=>{const r=$('sidebarRole'),e=$('sidebarEmail');if(r)$('desktopNavbarRole').textContent=r.textContent;if(e)$('desktopNavbarEmail').textContent=e.textContent};syncDesktopNavbar();const navbarObserver=new MutationObserver(syncDesktopNavbar);['sidebarRole','sidebarEmail'].forEach(id=>{const el=$(id);if(el)navbarObserver.observe(el,{childList:true,subtree:true,characterData:true})});
-const menuToggle=$('menuToggle'), sidebarBackdrop=$('sidebarBackdrop'), sideNav=document.querySelector('nav.no-print');function closeSidebar(){sideNav.classList.remove('sidebar-open');sidebarBackdrop.classList.remove('show');menuToggle.setAttribute('aria-expanded','false')}menuToggle.addEventListener('click',()=>{const open=!sideNav.classList.contains('sidebar-open');sideNav.classList.toggle('sidebar-open',open);sidebarBackdrop.classList.toggle('show',open);menuToggle.setAttribute('aria-expanded',String(open))});sidebarBackdrop.addEventListener('click',closeSidebar);document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',closeSidebar));
+/* Mobile drawer events are handled once by mobile-sidebar-drawer-reliable-handler below. */
 $('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attDate').addEventListener('change',drawAttendance);if($('attendanceSearch'))$('attendanceSearch').addEventListener('input',drawAttendance);if($('attendanceStatusFilter'))$('attendanceStatusFilter').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;$('attendanceTable').addEventListener('change',e=>{if(e.target.matches('input[type=radio]')){const iso=dateISO($('attDate').value);const c=isClassScoped()?assignedClass:$('attClass').value;const list=students.filter(st=>c==='__ALL__'||st.className===c);const day={...(attendance[iso]||{})};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);renderAttendanceSummary(list,day,iso)}});$('allPresent').onclick=()=>{document.querySelectorAll('#attendanceTable input[value=P]').forEach(x=>x.checked=true);const iso=dateISO($('attDate').value),c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(st=>c==='__ALL__'||st.className===c),day={...(attendance[iso]||{})};list.forEach(st=>day[String(st.id)]='P');renderAttendanceSummary(list,day,iso)};
 $('saveAtt').onclick=async()=>{
  if(!currentUser)return alert('መጀመሪያ Sign In ያድርጉ።');
@@ -959,15 +995,31 @@ $('refreshActivityLogs').addEventListener('click',renderActivityLogs);document.q
 </style>
 <script id="mobile-sidebar-drawer-reliable-handler">
 (()=>{
- const nav=document.querySelector('nav.no-print'),toggle=document.getElementById('menuToggle'),backdrop=document.getElementById('sidebarBackdrop');
- if(!nav||!toggle||!backdrop)return;
- const close=()=>{nav.classList.remove('sidebar-open');backdrop.classList.remove('show');document.body.classList.remove('sidebar-drawer-open');toggle.setAttribute('aria-expanded','false');};
- const open=()=>{nav.classList.add('sidebar-open');backdrop.classList.add('show');document.body.classList.add('sidebar-drawer-open');toggle.setAttribute('aria-expanded','true');};
- toggle.addEventListener('click',e=>{e.preventDefault();nav.classList.contains('sidebar-open')?close():open();});
+ const nav=document.querySelector('body > nav.no-print');
+ const toggle=document.getElementById('menuToggle');
+ const backdrop=document.getElementById('sidebarBackdrop');
+ if(!nav||!toggle||!backdrop||toggle.dataset.drawerBound==='1')return;
+ toggle.dataset.drawerBound='1';
+ const isMobile=()=>window.matchMedia('(max-width: 800px)').matches;
+ const close=()=>{
+   nav.classList.remove('sidebar-open');
+   backdrop.classList.remove('show');
+   document.body.classList.remove('sidebar-drawer-open');
+   toggle.setAttribute('aria-expanded','false');
+ };
+ const open=()=>{
+   if(!isMobile())return;
+   nav.classList.add('sidebar-open');
+   backdrop.classList.add('show');
+   document.body.classList.add('sidebar-drawer-open');
+   toggle.setAttribute('aria-expanded','true');
+ };
+ const toggleDrawer=(e)=>{e.preventDefault();e.stopPropagation();if(nav.classList.contains('sidebar-open'))close();else open();};
+ toggle.addEventListener('click',toggleDrawer);
  backdrop.addEventListener('click',close);
  nav.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',close));
  document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
- window.addEventListener('resize',()=>{if(window.innerWidth>800)close();});
+ window.addEventListener('resize',()=>{if(!isMobile())close();});
 })();
 </script>
 
