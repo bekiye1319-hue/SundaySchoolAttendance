@@ -662,6 +662,24 @@ body.app-dark-theme #attendance #attendanceTable table.attendance-four-column-ra
 @media print{#attendance #attendanceTable{box-shadow:none;border:1px solid #e5e7eb;}#attendance #attendanceTable table.attendance-four-column-radio{min-width:0!important;}#attendance #attendanceTable .attendance-radio-visual{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
 </style>
 
+
+<style id="attendance-row-hover-light-dark">
+/* Attendance table row highlight: mouse hover, touch press, and selected-row focus */
+.attendance-table-wrap tbody tr{transition:background-color .18s ease,box-shadow .18s ease;cursor:pointer}
+.attendance-table-wrap tbody tr:hover td,
+.attendance-table-wrap tbody tr:active td,
+.attendance-table-wrap tbody tr:focus-within td{background:#eaf7ef!important}
+.attendance-table-wrap tbody tr:hover td:first-child,
+.attendance-table-wrap tbody tr:active td:first-child,
+.attendance-table-wrap tbody tr:focus-within td:first-child{box-shadow:inset 3px 0 0 #20a66a}
+body.app-dark-theme .attendance-table-wrap tbody tr:hover td,
+body.app-dark-theme .attendance-table-wrap tbody tr:active td,
+body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td{background:#334b40!important;color:#f1f5f9!important}
+body.app-dark-theme .attendance-table-wrap tbody tr:hover td:first-child,
+body.app-dark-theme .attendance-table-wrap tbody tr:active td:first-child,
+body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{box-shadow:inset 3px 0 0 #4ade80}
+@media(hover:none){.attendance-table-wrap tbody tr:active td{background:#eaf7ef!important}body.app-dark-theme .attendance-table-wrap tbody tr:active td{background:#334b40!important}}
+</style>
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
