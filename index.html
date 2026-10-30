@@ -618,7 +618,18 @@ body.app-dark-theme [role=dialog],body.app-dark-theme .modal,body.app-dark-theme
 body.app-dark-theme [style*="background: white"],body.app-dark-theme [style*="background:#fff"],body.app-dark-theme [style*="background: #fff"]{background:#1e293b!important;color:#f1f5f9!important}
 </style>
 
-</head><body class="auth-loading">
+<style id="report-full-width-and-table-cleanup">
+/* Reports use all available content width, starting immediately after the sidebar. */
+#reports.report-page{display:block;width:100%;min-width:0;margin:0!important;padding:0!important;}
+#reports .report-container{display:flex;flex-direction:column;align-items:stretch;width:100%!important;max-width:none!important;margin:0!important;padding:12px 16px!important;gap:14px;}
+#reports .report-container>.report-card,#reports #reportResultCard{display:flex;width:100%!important;max-width:none!important;min-width:0;align-self:stretch;margin:0!important;}
+#reports .report-container>main.report-card{width:100%!important;max-width:none!important;margin:0!important;}
+#reports .report-filter-grid{width:100%;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+#reports .report-table-responsive{width:100%;max-width:100%;}
+#reports .report-table{width:100%;min-width:680px;}
+@media(max-width:800px){#reports .report-container{padding:10px!important;}#reports .report-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:480px){#reports .report-filter-grid{grid-template-columns:minmax(0,1fr);}}
+</style></head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><span class="header-badge">SS</span></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
   <div class="navbar-left"><i class="fa-solid fa-church"></i> ሰንበት ትምህርት ቤት</div>
@@ -1047,9 +1058,9 @@ function report(){
   const statLabels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};
   $('statistics').innerHTML=Object.keys(total).map(k=>`<div class="report-stat-card ${k.toLowerCase()}"><div class="report-stat-badge ${k.toLowerCase()}">${k}</div><div class="report-stat-info"><span class="report-stat-val">${total[k]}</span><span class="report-stat-label">${k} - ${statLabels[k]}</span></div></div>`).join('');renderReportVisuals(total,from,to,list);
   let reasonCaption=reasonFilter==='__ALL__'?'ሁሉም ምክንያቶች':reasonFilter;
-  let html=`<p class="report-range-note">ከ ${dateET(from)} እስከ ${dateET(to)} &nbsp; • &nbsp; የተመረጡ ተማሪዎች፦ ${list.length} &nbsp; • &nbsp; ምክንያት፦ ${esc(reasonCaption)}</p><table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>ፆታ</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመጨረሻ ሁኔታ</th><th>የመገኘት መጠን</th></tr></thead><tbody>`;
-  rows.forEach(({st,c,percent,studentDates})=>{const pc=percent>=100?'high':percent>=75?'mid':'low';const latest=studentDates.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];const genderText=st.gender==='female'?'ሴት':st.gender==='male'?'ወንድ':'—';const latestText=latest?genderedStatusLabel(latest.status,st.gender):'—';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${genderText}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td>${latestText}</td><td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
-  if(!rows.length)html+='<tr><td colspan="9">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
+  let html=`<p class="report-range-note">ከ ${dateET(from)} እስከ ${dateET(to)} &nbsp; • &nbsp; የተመረጡ ተማሪዎች፦ ${list.length} &nbsp; • &nbsp; ምክንያት፦ ${esc(reasonCaption)}</p><table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>`;
+  rows.forEach(({st,c,percent})=>{const pc=percent>=100?'high':percent>=75?'mid':'low';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
+  if(!rows.length)html+='<tr><td colspan="7">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   html+='</tbody></table>';
   if(selected){html+=`<h2 style="margin-top:22px">የ${esc(selected.student.name)} የዕለት በዕለት ሪፖርት</h2><p>የተመዘገቡ ቀናት፦ ${selected.marked} | የመገኘት መጠን፦ <strong>${selected.percent}%</strong></p><table class="report-table"><thead><tr><th>ቀን</th><th>የAttendance ሁኔታ</th></tr></thead><tbody>`;if(!selected.dates.length)html+='<tr><td colspan="2">በዚህ የቀን ክልል ውስጥ የተመዘገበ Attendance የለም።</td></tr>';else selected.dates.forEach(item=>{html+=`<tr><td>${dateET(item.date)}</td><td class="${item.status}"><strong>${item.status} - ${genderedStatusLabel(item.status,selected.student.gender)}</strong></td></tr>`;});html+='</tbody></table>';}
   $('reportResult').innerHTML=html;
