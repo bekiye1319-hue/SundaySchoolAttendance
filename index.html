@@ -680,6 +680,30 @@ body.app-dark-theme .attendance-table-wrap tbody tr:active td:first-child,
 body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{box-shadow:inset 3px 0 0 #4ade80}
 @media(hover:none){.attendance-table-wrap tbody tr:active td{background:#eaf7ef!important}body.app-dark-theme .attendance-table-wrap tbody tr:active td{background:#334b40!important}}
 </style>
+
+<style id="v17-mobile-bottom-navigation-and-pull-refresh">
+:root{--mobile-nav-bg:#ffffff;--mobile-nav-border:#e3ebe5;--mobile-nav-text:#718078;--mobile-nav-active:#167a45}
+#mobileBottomNav{display:none}
+#pullRefreshIndicator{position:fixed;z-index:120;top:8px;left:50%;transform:translate(-50%,-150%);opacity:0;pointer-events:none;display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:999px;background:#167a45;color:#fff;box-shadow:0 5px 18px #0002;font-size:12px;font-weight:800;transition:transform .18s ease,opacity .18s ease}
+#pullRefreshIndicator.show{transform:translate(-50%,0);opacity:1}
+#pullRefreshIndicator .pull-spinner{width:15px;height:15px;border:2px solid #ffffff70;border-top-color:#fff;border-radius:50%;display:inline-block}
+#pullRefreshIndicator.loading .pull-spinner{animation:v17spin .7s linear infinite}
+@keyframes v17spin{to{transform:rotate(360deg)}}
+@media(max-width:800px){
+ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+ #mobileBottomNav{position:fixed;z-index:45;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:7px 7px calc(7px + env(safe-area-inset-bottom));background:var(--mobile-nav-bg);border-top:1px solid var(--mobile-nav-border);box-shadow:0 -5px 20px #102d2210}
+ #mobileBottomNav button{min-width:0;min-height:53px;padding:5px 2px 4px;border:0;border-radius:11px;background:transparent;color:var(--mobile-nav-text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:700;line-height:1.15;white-space:nowrap}
+ #mobileBottomNav button .mobile-nav-icon{font-size:19px;line-height:1.1}
+ #mobileBottomNav button.active{background:#e9f5ed;color:var(--mobile-nav-active)}
+ #mobileBottomNav button:focus-visible{outline:3px solid #60a5fa;outline-offset:1px}
+ body.app-dark-theme #mobileBottomNav{--mobile-nav-bg:#111c2c;--mobile-nav-border:#35465c;--mobile-nav-text:#aab8c9;--mobile-nav-active:#6ee7a5;box-shadow:0 -5px 20px #0003}
+ body.app-dark-theme #mobileBottomNav button.active{background:#1e3b32;color:#8cf0b4}
+ body.app-dark-theme #pullRefreshIndicator{background:#176b40}
+}
+@media(min-width:801px){#mobileBottomNav,#pullRefreshIndicator{display:none!important}}
+@media print{#mobileBottomNav,#pullRefreshIndicator{display:none!important}body{padding-bottom:0!important}}
+</style>
+
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -1150,7 +1174,7 @@ function renderSupervisorClassStatus(){
 function updateDashboard(){const put=(id,value)=>{const el=$(id);if(el)el.textContent=value};const visibleStudents=students.filter(st=>!isClassScoped()||st.className===assignedClass);put('dashboardStudentCount',visibleStudents.length);put('dashboardClassCount',isClassScoped()?1:classes.length);const date=$('attDate')?dateISO($('attDate').value):null;const day=date?(attendance[date]||{}):{};let present=0,marked=0;visibleStudents.forEach(st=>{const v=day[String(st.id)];if(['P','A','L','E'].includes(v))marked++;if(v==='P')present++});let weighted=0;visibleStudents.forEach(st=>{const v=day[String(st.id)];if(v==='P')weighted+=100;else if(v==='L')weighted+=Number(appSettings.lateScore??75);else if(v==='E')weighted+=Number(appSettings.permissionScore??100)});put('dashboardPresentCount',present);put('dashboardAttendancePercent',marked?Math.round(weighted/marked)+'%':'0%');renderSupervisorClassStatus();const inactiveDays=Math.max(1,Number(appSettings.inactiveDays)||4);put('inactivePanelTitle',`🔴 ${inactiveDays} ተከታታይ Attendance ቀናት የቀሩ ተማሪዎች (Inactive)`);put('inactivePanelDescription',`በተመዘገቡ ${inactiveDays} ተከታታይ Attendance ቀናት A የተመረጠባቸው ተማሪዎች።`);const inactive=getInactiveStudents(),inactiveBox=$('inactiveStudentsList');if(inactiveBox)inactiveBox.innerHTML=inactive.length?'<table><thead><tr><th>ተማሪ</th><th>ID</th><th>ክፍል</th><th>ስልክ</th><th>ተከታታይ A</th></tr></thead><tbody>'+inactive.map(st=>`<tr><td><strong>${esc(st.name)}</strong></td><td>${esc(st.id)}</td><td>${esc(st.className)}</td><td>${st.phone?`<a href="tel:${esc(st.phone)}">${esc(st.phone)}</a>`:'—'}</td><td class="A"><strong>${st.missed} ቀናት · Inactive</strong></td></tr>`).join('')+'</tbody></table>':'<div class="notice">Inactive የሆነ ተማሪ የለም።</div>';const table=$('classComparisonTable');if(table&&!isClassScoped()){const dates=Object.keys(attendance).filter(d=>date&&d<=date).sort().slice(-7);const list=classes.map(c=>{const clsStudents=students.filter(st=>st.className===c);let p=0,m=0;dates.forEach(d=>clsStudents.forEach(st=>{const v=(attendance[d]||{})[String(st.id)];if(['P','A','L','E'].includes(v))m++;if(v==='P')p++}));return {c,n:clsStudents.length,p,m,pct:m?Math.round(p/m*100):0}});table.innerHTML='<table><thead><tr><th>ክፍል</th><th>ተማሪዎች</th><th>የተመዘገቡ Attendanceዎች (7 ቀን)</th><th>የመገኘት መጠን</th><th>ንጽጽር</th></tr></thead><tbody>'+list.map(x=>`<tr><td>${esc(x.c)}</td><td>${x.n}</td><td>${x.m}</td><td><strong>${x.pct}%</strong></td><td><div class="mini-bar"><span style="width:${x.pct}%"></span></div></td></tr>`).join('')+'</tbody></table>'}}
 $('attDate').value=today();$('fromDate').value=today();$('toDate').value=today();
 function navigateTo(page){const b=document.querySelector('nav button[data-page="'+page+'"]');if(b)b.click()}
-document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.page==='reports'){ $('statistics').classList.add('hidden'); $('reportVisualSection').classList.add('hidden'); $('reportResultCard').classList.add('hidden'); $('statistics').innerHTML=''; $('reportResult').innerHTML=''; }document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$(b.dataset.page).classList.remove('hidden')}));
+document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.page==='reports'){ $('statistics').classList.add('hidden'); $('reportVisualSection').classList.add('hidden'); $('reportResultCard').classList.add('hidden'); $('statistics').innerHTML=''; $('reportResult').innerHTML=''; }document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$(b.dataset.page).classList.remove('hidden');if(window.syncMobileBottomNavigation)window.syncMobileBottomNavigation()}));
 // Settings: Firebase-backed shared rules; personal theme remains device-local.
 async function loadAppSettings(){try{const snap=await db.collection('appSettings').doc('general').get();if(snap.exists)appSettings={...appSettings,...snap.data()};}catch(e){console.warn('Settings read unavailable; using local defaults',e.message)}try{const local=JSON.parse(localStorage.getItem('ss_app_settings')||'{}');/* Only theme is device-local. Inactive days and status weights must always come from shared Firestore settings; old local copies must never overwrite them. */if(local.theme)appSettings.theme=local.theme;localStorage.setItem('ss_app_settings',JSON.stringify({theme:appSettings.theme||'light'}));}catch(e){}applyTheme(appSettings.theme||'light');syncSettingsForm();await loadExtendedSettings();/* Refresh dashboard and class summaries after shared settings load. */await runAttendanceClosingCatchUp();updateDashboard();renderClasses();}
 function applyTheme(theme){const dark=theme==='dark';document.body.classList.toggle('app-dark-theme',dark);const toggle=$('quickThemeToggle');if(toggle){toggle.textContent=dark?'☀':'☾';toggle.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');toggle.title=dark?'Switch to light mode':'Switch to dark mode';toggle.setAttribute('aria-pressed',String(dark));}}
@@ -1935,6 +1959,79 @@ body.app-dark-theme #attendance .attendance-reference-legend{box-shadow:0 4px 16
 body.app-dark-theme #attendance .attendance-reference-legend .ref-pill{color:#fff!important;}
 body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5edf5!important;}
 </style>
+
+
+<div id="pullRefreshIndicator" class="no-print" aria-live="polite"><span class="pull-spinner"></span><span id="pullRefreshText">ለማደስ ወደታች ይጎትቱ</span></div>
+<nav id="mobileBottomNav" class="no-print" aria-label="የታችኛው ምናሌ">
+ <button type="button" data-mobile-page="dashboard" class="active"><span class="mobile-nav-icon">⌂</span><span>Home</span></button>
+ <button type="button" data-mobile-page="attendance"><span class="mobile-nav-icon">✓</span><span>Attendance</span></button>
+ <button type="button" data-mobile-page="students"><span class="mobile-nav-icon">♙</span><span>Students</span></button>
+ <button type="button" data-mobile-page="reports"><span class="mobile-nav-icon">▤</span><span>Reports</span></button>
+ <button type="button" data-mobile-more="true"><span class="mobile-nav-icon">☰</span><span>More</span></button>
+</nav>
+<script id="v17-mobile-navigation-and-pull-refresh">
+(()=>{
+ const bottom=document.getElementById('mobileBottomNav');
+ const sidebar=document.querySelector('body>nav.no-print');
+ const indicator=document.getElementById('pullRefreshIndicator');
+ const indicatorText=document.getElementById('pullRefreshText');
+ if(!bottom||!sidebar||!indicator)return;
+ const pageButtons=[...sidebar.querySelectorAll('button[data-page]')];
+ function setBottomActive(page){
+  bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
+ }
+ bottom.addEventListener('click',e=>{
+  const pageButton=e.target.closest('[data-mobile-page]');
+  if(pageButton){const target=sidebar.querySelector('button[data-page="'+pageButton.dataset.mobilePage+'"]');if(target&&!target.classList.contains('hidden'))target.click();return;}
+  if(e.target.closest('[data-mobile-more]')){
+   const toggle=document.getElementById('menuToggle');
+   if(toggle)toggle.click();
+  }
+ });
+ pageButtons.forEach(b=>b.addEventListener('click',()=>setBottomActive(b.dataset.page)));
+ const originalApplyRoleUI=window.applyRoleUI;
+ // Keep the mobile destinations in sync with role permissions after login.
+ const syncRoleNav=()=>{
+  const students=sidebar.querySelector('[data-page="students"]');
+  const studentsBtn=bottom.querySelector('[data-mobile-page="students"]');
+  if(studentsBtn)studentsBtn.classList.toggle('hidden',!!students?.classList.contains('hidden'));
+  const reports=sidebar.querySelector('[data-page="reports"]');
+  const reportsBtn=bottom.querySelector('[data-mobile-page="reports"]');
+  if(reportsBtn)reportsBtn.classList.toggle('hidden',!!reports?.classList.contains('hidden'));
+ };
+ const roleObserver=new MutationObserver(syncRoleNav);
+ roleObserver.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+ syncRoleNav();
+ // Pull-to-refresh: only when already at the top, and only after a deliberate downward pull.
+ let startY=0,startX=0,pulling=false,refreshing=false,armed=false;
+ const threshold=82;
+ document.addEventListener('touchstart',e=>{
+  if(e.touches.length!==1||window.scrollY>2||document.body.classList.contains('auth-locked'))return;
+  startY=e.touches[0].clientY;startX=e.touches[0].clientX;pulling=true;armed=false;
+ },{passive:true});
+ document.addEventListener('touchmove',e=>{
+  if(!pulling||refreshing||e.touches.length!==1)return;
+  const dy=e.touches[0].clientY-startY,dx=e.touches[0].clientX-startX;
+  if(Math.abs(dx)>Math.abs(dy)||dy<=0||window.scrollY>2){pulling=false;return;}
+  if(dy>25){indicator.classList.add('show');indicatorText.textContent=dy>=threshold?'ለማደስ አሁን ይልቀቁ':'ለማደስ ወደታች ይጎትቱ';armed=dy>=threshold;}
+ },{passive:true});
+ document.addEventListener('touchend',async()=>{
+  if(!pulling)return;pulling=false;
+  if(!armed||refreshing){indicator.classList.remove('show');return;}
+  refreshing=true;indicator.classList.add('loading','show');indicatorText.textContent='መረጃዎችን በማደስ ላይ…';
+  try{
+   if(!window.firebase?.auth?.().currentUser||typeof window.loadCloud!=='function')throw new Error('እባክዎ Sign In ያድርጉ።');
+   await window.loadCloud();
+   if(typeof window.loadAppSettings==='function')await window.loadAppSettings();
+   indicatorText.textContent='በተሳካ ሁኔታ ታድሷል ✓';
+  }catch(err){console.error('Pull refresh failed:',err);indicatorText.textContent='ማደስ አልተሳካም፤ Internet ያረጋግጡ';}
+  finally{setTimeout(()=>{indicator.classList.remove('show','loading');refreshing=false;armed=false;},1200);}
+ },{passive:true});
+ document.addEventListener('touchcancel',()=>{pulling=false;armed=false;indicator.classList.remove('show');},{passive:true});
+ // Expose a small sync hook for the existing navigation and role code.
+ window.syncMobileBottomNavigation=()=>{const active=sidebar.querySelector('button[data-page].active');if(active)setBottomActive(active.dataset.page);syncRoleNav();};
+})();
+</script>
 
 </body></html>
 
