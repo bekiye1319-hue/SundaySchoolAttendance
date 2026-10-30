@@ -1626,6 +1626,108 @@ body.app-dark-theme .hidden{display:none!important}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 </style>
+
+<style id="desktop-header-and-complete-darkmode-fix-v7">
+/* Desktop-site mode: keep page titles safely below the fixed top navigation. */
+@media (min-width:801px){
+  body>main{padding-top:116px!important}
+  body>main>.page{scroll-margin-top:125px}
+  body>main>.page>.page-heading,
+  body>main>.page>.students-ref-title,
+  body>main>.page>.attendance-reference-title{margin-top:10px!important;padding-top:4px!important}
+  body>main>#settings>.page-heading{margin-top:12px!important}
+  .desktop-navbar{height:62px!important;min-height:62px!important}
+  body>nav.no-print{top:62px!important;height:calc(100dvh - 62px)!important}
+}
+
+/* Dark mode: override later page-specific light surfaces and keep all text readable. */
+body.app-dark-theme #attendance,
+body.app-dark-theme #reports,
+body.app-dark-theme #backup,
+body.app-dark-theme #settings{background:#0b1220!important;color:#e5edf5!important}
+body.app-dark-theme #attendance .panel,
+body.app-dark-theme #attendance .attendance-filter-panel,
+body.app-dark-theme #attendance .attendance-list-panel,
+body.app-dark-theme #attendance .attendance-reference-form-card,
+body.app-dark-theme #attendance .attendance-search-wrap,
+body.app-dark-theme #attendance .attendance-search-field,
+body.app-dark-theme #attendance .attendance-note,
+body.app-dark-theme #attendance .status-legend,
+body.app-dark-theme #attendance .attendance-summary-panel,
+body.app-dark-theme #reports .report-card,
+body.app-dark-theme #reports .report-container,
+body.app-dark-theme #reports .report-app-header,
+body.app-dark-theme #backup .backup-status-note,
+body.app-dark-theme #settings .panel{
+  background:#172235!important;color:#e5edf5!important;border-color:#3b4b61!important;
+  box-shadow:0 3px 14px rgba(0,0,0,.22)!important
+}
+body.app-dark-theme #attendance .attendance-toolbar h3,
+body.app-dark-theme #attendance .attendance-summary-panel h3,
+body.app-dark-theme #attendance .attendance-reference-title,
+body.app-dark-theme #attendance .attendance-reference-table th,
+body.app-dark-theme #attendance .attendance-reference-table td,
+body.app-dark-theme #attendance .attendance-status-btn,
+body.app-dark-theme #attendance .attendance-status-btn span,
+body.app-dark-theme #attendance .section-caption,
+body.app-dark-theme #reports .report-card-title,
+body.app-dark-theme #reports .report-form-group label,
+body.app-dark-theme #reports .report-range-note,
+body.app-dark-theme #reports .report-stat-label,
+body.app-dark-theme #reports .report-table th,
+body.app-dark-theme #reports .report-table td,
+body.app-dark-theme #backup .backup-status-note,
+body.app-dark-theme #settings label,
+body.app-dark-theme #settings h2,
+body.app-dark-theme #settings h3,
+body.app-dark-theme #settings p,
+body.app-dark-theme #settings .small{color:#e5edf5!important}
+body.app-dark-theme #attendance .attendance-reference-table th,
+body.app-dark-theme #reports .report-table th{background:#26364d!important;border-color:#465873!important}
+body.app-dark-theme #attendance .attendance-reference-table td,
+body.app-dark-theme #reports .report-table td{background:#172235!important;border-color:#3b4b61!important}
+body.app-dark-theme #attendance .attendance-reference-table tr:nth-child(even) td,
+body.app-dark-theme #reports .report-table tr:nth-child(even) td{background:#1b2a40!important}
+body.app-dark-theme #attendance .attendance-search-field input,
+body.app-dark-theme #attendance input:not([type=radio]):not([type=checkbox]),
+body.app-dark-theme #attendance select,
+body.app-dark-theme #reports .report-control,
+body.app-dark-theme #settings input,
+body.app-dark-theme #settings select,
+body.app-dark-theme #settings textarea{
+  background:#0f1a2b!important;color:#f8fafc!important;border:1px solid #52647d!important
+}
+body.app-dark-theme #attendance input::placeholder,
+body.app-dark-theme #reports input::placeholder,
+body.app-dark-theme #settings input::placeholder{color:#aebdce!important}
+/* Four generated attendance status summary tiles must not remain white. */
+body.app-dark-theme #reports .report-stat-card,
+body.app-dark-theme #reports .report-stats-grid .report-stat-card{border:1px solid #465873!important}
+body.app-dark-theme #reports .report-stat-card.p{background:#183a2b!important;color:#bbf7d0!important}
+body.app-dark-theme #reports .report-stat-card.a{background:#42252b!important;color:#fecaca!important}
+body.app-dark-theme #reports .report-stat-card.l{background:#42351d!important;color:#fde68a!important}
+body.app-dark-theme #reports .report-stat-card.e{background:#35264b!important;color:#e9d5ff!important}
+body.app-dark-theme #reports .report-stat-card *{color:inherit!important}
+/* Backup / Restore action buttons: dark surfaces with high-contrast labels. */
+body.app-dark-theme #backup .backup-card button,
+body.app-dark-theme #backup .backup-card .restore-file-label,
+body.app-dark-theme #backup .backup-new-action{
+  background:#26364d!important;color:#f8fafc!important;border:1px solid #64748b!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.3)!important
+}
+body.app-dark-theme #backup .backup-card button:hover,
+body.app-dark-theme #backup .backup-card .restore-file-label:hover,
+body.app-dark-theme #backup .backup-new-action:hover{background:#334862!important;color:#fff!important}
+body.app-dark-theme #backup .backup-status-note{background:#172235!important;color:#e5edf5!important}
+body.app-dark-theme #backup .backup-status-note *{color:inherit!important}
+/* Preserve colored action buttons and visible focus indicators in dark mode. */
+body.app-dark-theme #attendance .attendance-actions button,
+body.app-dark-theme #reports .report-btn{color:#fff!important}
+body.app-dark-theme button:focus-visible,
+body.app-dark-theme select:focus-visible,
+body.app-dark-theme input:focus-visible{outline:2px solid #60a5fa!important;outline-offset:2px}
+</style>
+
 </body></html>
 
 <style id="requested-report-status-layout-fix">
