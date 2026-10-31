@@ -2731,4 +2731,99 @@ body.app-dark-theme #attendance .attendance-table-wrap tbody tr:active>td{backgr
  setTimeout(init,400);setTimeout(init,1200);
 })();
 </script>
+
+<style id="v6-final-mobile-navigation-login-fixes">
+/* Login overlay must always suppress all app navigation, even before auth-locked is toggled. */
+body:has(#cloudLogin.auth-overlay[style*="display: flex"]) #mobileBottomNav,
+body:has(#cloudLogin.auth-overlay:not([style*="display: none"])) #mobileBottomNav,
+body.auth-loading #mobileBottomNav,
+body.auth-locked #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+/* Stable non-blue focus treatment on login fields. */
+#cloudLogin input:focus,#cloudLogin input:focus-visible,#cloudLogin button:focus-visible{outline:none!important;box-shadow:none!important}
+#cloudLogin .input-wrapper input:focus,#cloudLogin .input-wrapper input:focus-visible{border-color:#d8e4db!important;box-shadow:none!important;outline:0!important}
+@media screen and (max-width:800px){
+ /* Fixed top bar: reserve space so page content never slides underneath it. */
+ body>header:not(.desktop-navbar){position:fixed!important;top:0!important;left:0!important;right:0!important;width:100%!important;min-height:68px!important;height:auto!important;z-index:2147481000!important}
+ body>main{padding-top:88px!important;scroll-margin-top:88px!important}
+ /* Drawer is a vertical flex column; Logout stays above the screen edge and scrolls into view. */
+ body>nav[aria-label="ዋና ምናሌ"]{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;top:0!important;bottom:0!important;height:100dvh!important;max-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important;padding:18px 16px calc(28px + env(safe-area-inset-bottom,0px))!important;overscroll-behavior:contain!important}
+ body>nav[aria-label="ዋና ምናሌ"] #topLogout{position:static!important;display:flex!important;flex:0 0 auto!important;width:100%!important;margin-top:auto!important;margin-bottom:8px!important;min-height:54px!important}
+ body.sidebar-drawer-open #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+}
+</style>
+<script id="v6-final-navigation-auth-sync">
+(()=>{
+ const boot=()=>{
+  const bottom=document.getElementById('mobileBottomNav');
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  const login=document.getElementById('cloudLogin');
+  const toggle=document.getElementById('menuToggle');
+  const backdrop=document.getElementById('sidebarBackdrop');
+  if(!bottom||!sidebar)return;
+  if(bottom.parentElement!==document.body)document.body.appendChild(bottom);
+  const loginVisible=()=>{
+   if(!login)return false;
+   const cs=getComputedStyle(login);
+   return cs.display!=='none' && cs.visibility!=='hidden' && login.getAttribute('aria-hidden')!=='true';
+  };
+  const syncVisibility=()=>{
+   const locked=document.body.classList.contains('auth-locked')||document.body.classList.contains('auth-loading')||loginVisible();
+   const drawer=sidebar.classList.contains('sidebar-open')||document.body.classList.contains('sidebar-drawer-open');
+   if(locked||drawer||!matchMedia('(max-width:800px)').matches){
+    bottom.style.setProperty('display','none','important');
+    bottom.style.setProperty('visibility','hidden','important');
+    bottom.style.setProperty('pointer-events','none','important');
+   }else{
+    bottom.style.setProperty('display','grid','important');
+    bottom.style.setProperty('position','fixed','important');
+    bottom.style.setProperty('inset','auto 0 0 0','important');
+    bottom.style.setProperty('width','100%','important');
+    bottom.style.setProperty('z-index','2147482000','important');
+    bottom.style.setProperty('visibility','visible','important');
+    bottom.style.setProperty('opacity','1','important');
+    bottom.style.setProperty('pointer-events','auto','important');
+   }
+  };
+  const syncActive=()=>{
+   const active=sidebar.querySelector('button[data-page].active');
+   bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',!!active&&b.dataset.mobilePage===active.dataset.page));
+  };
+  // Capture and stop older duplicate click handlers (which previously toggled More twice).
+  if(!bottom.dataset.v6Capture){
+   bottom.dataset.v6Capture='1';
+   bottom.addEventListener('click',e=>{
+    const page=e.target.closest('[data-mobile-page]');
+    const more=e.target.closest('[data-mobile-more]');
+    if(!page&&!more)return;
+    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    if(page){
+     const id=page.dataset.mobilePage;
+     const source=sidebar.querySelector('button[data-page="'+id+'"]');
+     if(source){source.click();setTimeout(()=>{syncActive();syncVisibility();},60);}
+     return;
+    }
+    if(more&&toggle){
+     if(sidebar.classList.contains('sidebar-open')){
+      sidebar.classList.remove('sidebar-open');document.body.classList.remove('sidebar-drawer-open');
+      if(backdrop)backdrop.classList.remove('show');toggle.setAttribute('aria-expanded','false');
+     }else{
+      toggle.click();
+     }
+     setTimeout(syncVisibility,30);
+    }
+   },true);
+  }
+  const observer=new MutationObserver(()=>{syncActive();syncVisibility();});
+  observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
+  sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{syncActive();syncVisibility();},30)));
+  if(backdrop)backdrop.addEventListener('click',()=>setTimeout(syncVisibility,30));
+  window.addEventListener('resize',syncVisibility);
+  syncActive();syncVisibility();
+  window.syncMobileBottomNavigation=()=>{syncActive();syncVisibility();};
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+ setTimeout(boot,500);setTimeout(boot,1400);
+})();
+</script>
+
 </body></html>
