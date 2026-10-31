@@ -1069,14 +1069,16 @@ function saveLocal(){try{localStorage.setItem('ss_students',JSON.stringify(stude
 function friendlyFirebaseError(error,context='save'){
  const code=String(error&&error.code||'').toLowerCase();
  if(code.includes('permission-denied')||code.includes('unauthorized')||code.includes('missing-or-insufficient-permissions'))
-   return 'የFirebase ፈቃድ አልተሰጠም (permission-denied)። የFirestore Rules የዚህን ተጠቃሚ Role እና ክፍል እንዲፈቅዱ ያረጋግጡ። የAttendance ማስቀመጥ ብቻ ለTeacher ይፈቀድ።';
+   return 'ይህን ተግባር ለማድረግ ፈቃድ የለዎትም። የተጠቃሚ መብትዎን ያረጋግጡ።';
  if(code.includes('unavailable')||code.includes('network-request-failed')||code.includes('deadline-exceeded'))
-   return 'የኢንተርኔት/Firebase ግንኙነት ተቋርጧል። ኢንተርኔትዎን ያረጋግጡና እንደገና ይሞክሩ።';
- if(code.includes('unauthenticated')||code.includes('not-authenticated'))
-   return 'የመግቢያ ጊዜዎ አልቋል። እንደገና Sign In ያድርጉ።';
+   return 'የኢንተርኔት ግንኙነት ተቋርጧል። ኢንተርኔትዎን ያረጋግጡና እንደገና ይሞክሩ።';
+ if(code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found')||code.includes('invalid-email'))
+   return 'የኢሜይል ወይም የይለፍ ቃል ትክክል አይደለም። እንደገና ያስገቡ።';
+ if(code.includes('unauthenticated')||code.includes('not-authenticated')||code.includes('user-token-expired'))
+   return 'የመግቢያ ጊዜዎ አልቋል። እንደገና ይግቡ።';
  if(code.includes('resource-exhausted'))
-   return 'የFirebase ጥያቄ ገደብ ተደርሷል። ጥቂት ጊዜ ጠብቀው እንደገና ይሞክሩ።';
- return (context==='login'?'መግባት':'ማስቀመጥ')+' አልተሳካም። '+String(error&&error.message||'ያልታወቀ ስህተት');
+   return 'ብዙ ጥያቄዎች ተልከዋል። ጥቂት ጊዜ ጠብቀው እንደገና ይሞክሩ።';
+ return (context==='login'?'መግባት':'ማስቀመጥ')+' አልተሳካም። እባክዎ እንደገና ይሞክሩ።';
 }
 async function cloudSave(scope='records'){
  if(!currentUser){alert('መጀመሪያ Sign In ያድርጉ።');return false;}
@@ -3004,4 +3006,56 @@ body.auth-locked #quickRefreshToggle,body.auth-loading #quickRefreshToggle{displ
 #reports #reportResult.individual-report-result th,#reports #reportResult.individual-report-result td{white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;padding:8px 5px!important}
 #reports #reportResultCard{scroll-margin-top:88px}
 @media(max-width:800px){#reports #reportResultCard{scroll-margin-top:78px}}
+</style>
+
+<style id="v12-clean-print-and-readable-individual-report">
+/* Print only the deliberately-created report sheet. Hide every app layer and overlay. */
+@media print {
+  @page { margin: 10mm; }
+  html, body { width:100%!important; min-height:0!important; height:auto!important; margin:0!important; padding:0!important; overflow:visible!important; background:#fff!important; color:#111!important; }
+  html body > *:not(#printCleanArea):not(#printAllAttendanceArea) {
+    display:none!important; visibility:hidden!important; opacity:0!important;
+    position:absolute!important; left:-100000px!important; top:0!important;
+    width:0!important; height:0!important; overflow:hidden!important;
+  }
+  html body #printCleanArea, html body #printAllAttendanceArea {
+    display:block!important; visibility:visible!important; opacity:1!important;
+    position:static!important; transform:none!important; width:100%!important;
+    max-width:100%!important; height:auto!important; max-height:none!important;
+    margin:0!important; padding:0!important; overflow:visible!important;
+    background:#fff!important; color:#111!important; box-shadow:none!important;
+  }
+  #printCleanArea table, #printAllAttendanceArea table {
+    width:100%!important; max-width:100%!important; border-collapse:collapse!important;
+    table-layout:fixed!important; font-size:9.5pt!important;
+  }
+  #printCleanArea th, #printCleanArea td, #printAllAttendanceArea th, #printAllAttendanceArea td {
+    color:#111!important; background:#fff!important; border:1px solid #555!important;
+    padding:5px 6px!important; white-space:normal!important; overflow-wrap:anywhere!important;
+  }
+  #printCleanArea th { background:#eee!important; }
+}
+/* Seven-column individual summary: give the attendance-rate label enough room. */
+#reports #reportResult.individual-report-result > table:first-of-type { width:100%!important; min-width:0!important; table-layout:fixed!important; }
+#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(1),
+#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(1) { width:13%!important; }
+#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(2),
+#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(2) { width:27%!important; }
+#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(3),
+#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(3),
+#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(4),
+#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(4),
+#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(5),
+#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(5),
+#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(6),
+#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(6) { width:7%!important; text-align:center!important; }
+#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(7),
+#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(7) { width:25%!important; min-width:0!important; white-space:normal!important; line-height:1.35!important; text-align:center!important; }
+#reports #reportResult.individual-report-result > table:first-of-type th,
+#reports #reportResult.individual-report-result > table:first-of-type td { padding:7px 4px!important; overflow-wrap:anywhere!important; word-break:normal!important; }
+@media(max-width:480px){
+ #reports #reportResult.individual-report-result > table:first-of-type { font-size:12px!important; }
+ #reports #reportResult.individual-report-result > table:first-of-type th:nth-child(7),
+ #reports #reportResult.individual-report-result > table:first-of-type td:nth-child(7) { font-size:11px!important; }
+}
 </style>
