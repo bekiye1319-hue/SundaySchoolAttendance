@@ -705,12 +705,38 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
 </style>
 
 
-<style id="v17-mobile-navigation-visibility-fix">
+<style id="v20-mobile-bottom-nav-fixed-visibility">
+/* Override the general nav.no-print sidebar styling for the bottom navigation. */
 @media screen and (max-width:800px){
- #mobileBottomNav{display:grid!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:9999!important;visibility:visible!important;opacity:1!important;}
- body{padding-bottom:calc(78px + env(safe-area-inset-bottom))!important;}
+ html body #mobileBottomNav{
+  display:grid!important;position:fixed!important;
+  top:auto!important;left:0!important;right:0!important;bottom:0!important;
+  width:100%!important;height:auto!important;max-height:86px!important;
+  min-height:66px!important;box-sizing:border-box!important;
+  z-index:2147483000!important;visibility:visible!important;opacity:1!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  flex-direction:row!important;align-items:stretch!important;justify-content:stretch!important;
+  margin:0!important;overflow:visible!important;
+  padding:6px 7px calc(6px + env(safe-area-inset-bottom))!important;
+  background:var(--mobile-nav-bg,#fff)!important;
+  border-top:1px solid var(--mobile-nav-border,#e3ebe5)!important;
+  box-shadow:0 -5px 20px #102d2218!important;
+ }
+ html body #mobileBottomNav button{
+  display:flex!important;min-width:0!important;width:auto!important;height:auto!important;
+  min-height:52px!important;max-height:68px!important;margin:0!important;
+  padding:4px 2px!important;border:0!important;border-radius:10px!important;
+  flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:3px!important;background:transparent;color:var(--mobile-nav-text,#718078)!important;
+  font-size:10px!important;line-height:1.15!important;white-space:nowrap!important;
+ }
+ html body #mobileBottomNav button.active{background:#e9f5ed!important;color:var(--mobile-nav-active,#167a45)!important}
+ html body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
+ body.app-dark-theme #mobileBottomNav{--mobile-nav-bg:#111c2c;--mobile-nav-border:#35465c;--mobile-nav-text:#aab8c9;--mobile-nav-active:#6ee7a5}
+ body.app-dark-theme #mobileBottomNav button.active{background:#1e3b32!important;color:#8cf0b4!important}
 }
-@media screen and (min-width:801px){#mobileBottomNav{display:none!important;}}
+@media screen and (min-width:801px){html body #mobileBottomNav{display:none!important}}
+@media print{html body #mobileBottomNav{display:none!important}}
 </style>
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
@@ -1984,46 +2010,68 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
  <button type="button" data-mobile-page="reports"><span class="mobile-nav-icon">▤</span><span>Reports</span></button>
  <button type="button" data-mobile-more="true"><span class="mobile-nav-icon">☰</span><span>More</span></button>
 </nav>
-<script id="v17-mobile-navigation-and-pull-refresh">
+<script id="v20-mobile-navigation-and-fast-refresh">
 (()=>{
- const bottom=document.getElementById('mobileBottomNav');
- const sidebar=document.querySelector('body>nav.no-print');
- const indicator=document.getElementById('pullRefreshIndicator');
- const indicatorText=document.getElementById('pullRefreshText');
- if(!bottom||!sidebar||!indicator)return;
- const setActive=page=>bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
- const sync=()=>{
-  ['students','reports'].forEach(page=>{const source=sidebar.querySelector('[data-page="'+page+'"]');const target=bottom.querySelector('[data-mobile-page="'+page+'"]');if(target)target.classList.toggle('hidden',!source||source.classList.contains('hidden'));});
-  const active=sidebar.querySelector('button[data-page].active');if(active)setActive(active.dataset.page);
+ const init=()=>{
+  const bottom=document.getElementById('mobileBottomNav');
+  const sidebar=document.querySelector('nav[aria-label="ዋና ምናሌ"]')||document.querySelector('body>nav.no-print:not(#mobileBottomNav)');
+  const indicator=document.getElementById('pullRefreshIndicator');
+  const indicatorText=document.getElementById('pullRefreshText');
+  if(!bottom)return;
+  // Make sure the fixed navigation is a direct child of body, outside transformed page panels.
+  if(bottom.parentElement!==document.body)document.body.appendChild(bottom);
+  const showNav=()=>{if(window.matchMedia('(max-width: 800px)').matches){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('position','fixed','important');bottom.style.setProperty('top','auto','important');bottom.style.setProperty('bottom','0','important');bottom.style.setProperty('left','0','important');bottom.style.setProperty('right','0','important');bottom.style.setProperty('width','100%','important');bottom.style.setProperty('z-index','2147483000','important');}};
+  const setActive=page=>bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
+  const sync=()=>{
+   if(!sidebar){showNav();return;}
+   ['students','reports'].forEach(page=>{const source=sidebar.querySelector('[data-page="'+page+'"]');const target=bottom.querySelector('[data-mobile-page="'+page+'"]');if(target)target.classList.toggle('hidden',!source||source.classList.contains('hidden'));});
+   const active=sidebar.querySelector('button[data-page].active');if(active)setActive(active.dataset.page);
+   showNav();
+  };
+  bottom.addEventListener('click',e=>{
+   const btn=e.target.closest('[data-mobile-page]');
+   if(btn&&sidebar){const target=sidebar.querySelector('button[data-page="'+btn.dataset.mobilePage+'"]');if(target&&!target.classList.contains('hidden'))target.click();return;}
+   if(e.target.closest('[data-mobile-more]')){const toggle=document.getElementById('menuToggle');if(toggle)toggle.click();}
+  });
+  if(sidebar){
+   sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>{setActive(b.dataset.page);setTimeout(sync,0);}));
+   new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+  }
+  sync();window.syncMobileBottomNavigation=sync;
+  window.addEventListener('resize',showNav,{passive:true});
+  // Pull refresh only from the top; wait for Firebase to finish before hiding the indicator.
+  if(!indicator||!indicatorText)return;
+  let startY=0,startX=0,pulling=false,refreshing=false,armed=false;
+  const threshold=58;
+  document.addEventListener('touchstart',e=>{
+   if(e.touches.length!==1||window.scrollY>2||document.body.classList.contains('auth-locked'))return;
+   startY=e.touches[0].clientY;startX=e.touches[0].clientX;pulling=true;armed=false;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+   if(!pulling||refreshing||e.touches.length!==1)return;
+   const dy=e.touches[0].clientY-startY,dx=e.touches[0].clientX-startX;
+   if(Math.abs(dx)>Math.abs(dy)||dy<=0||window.scrollY>2){pulling=false;return;}
+   if(dy>18){indicator.classList.add('show');indicatorText.textContent=dy>=threshold?'ለማደስ አሁን ይልቀቁ':'ለማደስ ወደታች ይጎትቱ';armed=dy>=threshold;}
+  },{passive:true});
+  document.addEventListener('touchend',async()=>{
+   if(!pulling)return;pulling=false;
+   if(!armed||refreshing){indicator.classList.remove('show');return;}
+   refreshing=true;indicator.classList.add('loading','show');indicatorText.textContent='መረጃዎችን በማደስ ላይ…';
+   const began=Date.now();
+   try{
+    if(!window.firebase?.auth?.().currentUser||typeof window.loadCloud!=='function')throw new Error('እባክዎ Sign In ያድርጉ።');
+    await window.loadCloud();
+    indicatorText.textContent='በተሳካ ሁኔታ ታድሷል ✓';
+   }catch(err){console.error('Pull refresh failed:',err);indicatorText.textContent='ማደስ አልተሳካም፤ Internet ያረጋግጡ';}
+   finally{
+    // Keep the status visible briefly after the actual data request finishes.
+    const wait=Math.max(250,650-(Date.now()-began));
+    setTimeout(()=>{indicator.classList.remove('show','loading');refreshing=false;armed=false;},wait);
+   }
+  },{passive:true});
+  document.addEventListener('touchcancel',()=>{pulling=false;armed=false;indicator.classList.remove('show');},{passive:true});
  };
- bottom.addEventListener('click',e=>{
-  const btn=e.target.closest('[data-mobile-page]');
-  if(btn){const target=sidebar.querySelector('button[data-page="'+btn.dataset.mobilePage+'"]');if(target&&!target.classList.contains('hidden'))target.click();return;}
-  if(e.target.closest('[data-mobile-more]')){const toggle=document.getElementById('menuToggle');if(toggle)toggle.click();}
- });
- sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>{setActive(b.dataset.page);setTimeout(sync,0);}));
- new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
- sync();window.syncMobileBottomNavigation=sync;
- // Pull-to-refresh is accepted only from the top of the page and for a deliberate downward pull.
- let startY=0,startX=0,pulling=false,refreshing=false,armed=false;const threshold=58;
- document.addEventListener('touchstart',e=>{
-  if(e.touches.length!==1||window.scrollY>2||document.body.classList.contains('auth-locked'))return;
-  startY=e.touches[0].clientY;startX=e.touches[0].clientX;pulling=true;armed=false;
- },{passive:true});
- document.addEventListener('touchmove',e=>{
-  if(!pulling||refreshing||e.touches.length!==1)return;
-  const dy=e.touches[0].clientY-startY,dx=e.touches[0].clientX-startX;
-  if(Math.abs(dx)>Math.abs(dy)||dy<=0||window.scrollY>2){pulling=false;return;}
-  if(dy>18){indicator.classList.add('show');indicatorText.textContent=dy>=threshold?'ለማደስ አሁን ይልቀቁ':'ለማደስ ወደታች ይጎትቱ';armed=dy>=threshold;}
- },{passive:true});
- document.addEventListener('touchend',async()=>{
-  if(!pulling)return;pulling=false;if(!armed||refreshing){indicator.classList.remove('show');return;}
-  refreshing=true;indicator.classList.add('loading','show');indicatorText.textContent='መረጃዎችን በፍጥነት በማደስ ላይ…';
-  try{if(!window.firebase?.auth?.().currentUser||typeof window.loadCloud!=='function')throw new Error('እባክዎ Sign In ያድርጉ።');await window.loadCloud();indicatorText.textContent='በተሳካ ሁኔታ ታድሷል ✓';}
-  catch(err){console.error('Pull refresh failed:',err);indicatorText.textContent='ማደስ አልተሳካም፤ Internet ያረጋግጡ';}
-  finally{setTimeout(()=>{indicator.classList.remove('show','loading');refreshing=false;armed=false;},650);}
- },{passive:true});
- document.addEventListener('touchcancel',()=>{pulling=false;armed=false;indicator.classList.remove('show');},{passive:true});
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
 
