@@ -1650,9 +1650,19 @@ function applyReportPeriod(){
 $('reportPeriod').addEventListener('change',applyReportPeriod);$('fromDate').addEventListener('change',()=>{if($('reportPeriod').value!=='custom')applyReportPeriod()});$('reportClass').addEventListener('change',()=>{const selected=$('reportStudent').value;const cls=$('reportClass').value;const eligible=students.filter(st=>cls==='__ALL__'||st.className===cls);$('reportStudent').innerHTML='<option value="__ALL__">ሁሉም ተማሪዎች</option>'+eligible.map(st=>`<option value="${esc(st.id)}">${esc(st.name)}</option>`).join('');if(eligible.some(st=>String(st.id)===selected))$('reportStudent').value=selected;});
 function isolatePrintContent(){
  const target=document.getElementById('printCleanArea')||document.getElementById('printAllAttendanceArea');
- window.__printBodyChildren=[];
- [...document.body.children].forEach(el=>{if(el!==target){window.__printBodyChildren.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);el.style.setProperty('display','none','important');}});
- if(target){target.style.setProperty('display','block','important');target.style.setProperty('visibility','visible','important');}
+ // Move every app element out of the live body, rather than relying only on print CSS.
+ // Android WebView's native print pipeline can otherwise capture transformed drawers/overlays.
+ if(!target) return;
+ if(window.__printOriginalBodyNodes) return;
+ window.__printOriginalBodyNodes=Array.from(document.body.childNodes).filter(node=>node!==target);
+ window.__printOriginalBodyNodes.forEach(node=>{try{node.remove();}catch(e){}});
+ target.style.setProperty('display','block','important');
+ target.style.setProperty('visibility','visible','important');
+ target.style.setProperty('position','static','important');
+ target.style.setProperty('transform','none','important');
+ document.body.appendChild(target);
+ document.body.style.setProperty('background','#fff','important');
+ document.body.style.setProperty('color','#111','important');
 }
 function requestNativePrint(){
  isolatePrintContent();
@@ -1688,7 +1698,17 @@ $('printReport').onclick=()=>{
  });
  document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');requestNativePrint();
 };
-window.addEventListener('afterprint',()=>{document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');(window.__printHiddenElements||[]).forEach(([el,value,priority])=>{if(value)el.style.setProperty('display',value,priority);else el.style.removeProperty('display')});window.__printHiddenElements=[];(window.__printBodyChildren||[]).forEach(([el,value,priority])=>{if(value)el.style.setProperty('display',value,priority);else el.style.removeProperty('display')});window.__printBodyChildren=[];['printAllAttendanceArea','printCleanArea'].forEach(id=>document.getElementById(id)?.remove());});
+window.addEventListener('afterprint',()=>{
+ document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
+ (window.__printHiddenElements||[]).forEach(([el,value,priority])=>{if(value)el.style.setProperty('display',value,priority);else el.style.removeProperty('display')});window.__printHiddenElements=[];
+ const printTarget=document.getElementById('printCleanArea')||document.getElementById('printAllAttendanceArea');
+ if(printTarget)printTarget.remove();
+ const originals=window.__printOriginalBodyNodes||[];
+ originals.forEach(node=>document.body.appendChild(node));
+ window.__printOriginalBodyNodes=null;
+ document.body.style.removeProperty('background');document.body.style.removeProperty('color');
+ ['printAllAttendanceArea','printCleanArea'].forEach(id=>document.getElementById(id)?.remove());
+});
 $('printAttendance').onclick=()=>{
  const iso=dateISO($('attDate').value);if(!iso)return alert('ከመታተም በፊት ትክክለኛ ቀን ያስገቡ።');
  if(!$('attendanceTable').querySelector('table'))drawAttendance();
@@ -3057,5 +3077,15 @@ body.auth-locked #quickRefreshToggle,body.auth-loading #quickRefreshToggle{displ
  #reports #reportResult.individual-report-result > table:first-of-type { font-size:12px!important; }
  #reports #reportResult.individual-report-result > table:first-of-type th:nth-child(7),
  #reports #reportResult.individual-report-result > table:first-of-type td:nth-child(7) { font-size:11px!important; }
+}
+</style>
+
+<style id="v13-print-data-only">
+@media print {
+  @page { margin: 8mm; }
+  html, body { margin:0!important; padding:0!important; width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; background:#fff!important; color:#111!important; }
+  body.print-clean-sheet > #printCleanArea, body.print-clean-sheet > #printAllAttendanceArea { display:block!important; position:static!important; width:100%!important; max-width:100%!important; margin:0!important; padding:0!important; transform:none!important; box-shadow:none!important; }
+  #printCleanArea table, #printAllAttendanceArea table { width:100%!important; border-collapse:collapse!important; table-layout:auto!important; }
+  #printCleanArea th, #printCleanArea td, #printAllAttendanceArea th, #printAllAttendanceArea td { color:#111!important; background:#fff!important; border:1px solid #444!important; padding:4px 5px!important; }
 }
 </style>
