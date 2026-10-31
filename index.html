@@ -2278,6 +2278,66 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
 })();
 </script>
 
+
+<style id="bottom-nav-final-visual-fix-v3">
+@media screen and (max-width:800px){
+  /* Match the exact dark navy used by the sidebar. */
+  html body nav#mobileBottomNav,
+  html body nav#mobileBottomNav.no-print{
+    background:#111827!important;
+    background-color:#111827!important;
+    border-color:#111827!important;
+  }
+  /* Remove the small green status dots above each icon. */
+  html body nav#mobileBottomNav>button::before,
+  html body nav#mobileBottomNav>button::after,
+  html body nav#mobileBottomNav>button .mobile-nav-icon::after{
+    content:none!important;display:none!important;
+  }
+  html body nav#mobileBottomNav>button{
+    position:relative!important;
+    padding-top:5px!important;
+    gap:5px!important;
+  }
+  html body nav#mobileBottomNav>button .mobile-nav-icon{
+    margin:0!important;padding:0!important;
+  }
+  html body nav#mobileBottomNav>button.active{
+    background:#10b981!important;color:#fff!important;
+  }
+}
+</style>
+
+
+<style id="bottom-nav-full-width-position-fix-v4">
+/* Full-width bottom navigation: flush with both screen edges and bottom edge. */
+@media screen and (max-width:800px){
+  html, body { width:100% !important; max-width:100% !important; overflow-x:hidden !important; }
+  body > nav#mobileBottomNav, html body nav#mobileBottomNav {
+    position:fixed !important;
+    left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
+    inset-inline:0 !important;
+    width:auto !important; min-width:0 !important; max-width:none !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    align-items:stretch !important; justify-content:stretch !important;
+    height:76px !important; min-height:76px !important; max-height:none !important;
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius:16px 16px 0 0 !important;
+    background:#111827 !important;
+    z-index:2147483647 !important;
+    transform:none !important;
+  }
+  body > nav#mobileBottomNav > button {
+    width:100% !important; min-width:0 !important; max-width:none !important;
+    height:100% !important; min-height:0 !important; margin:0 !important;
+    box-sizing:border-box !important;
+  }
+  body { padding-bottom:calc(86px + env(safe-area-inset-bottom, 0px)) !important; }
+}
+</style>
 </body></html>
 
 <style id="requested-report-status-layout-fix">
