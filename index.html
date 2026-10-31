@@ -738,6 +738,98 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
 @media screen and (min-width:801px){html body #mobileBottomNav{display:none!important}}
 @media print{html body #mobileBottomNav{display:none!important}}
 </style>
+
+<style id="v21-bottom-nav-override-sidebar-drawer">
+/* The bottom bar shares nav.no-print with the sidebar. Explicitly cancel
+   the sidebar's off-canvas transform so the fixed bar remains on-screen. */
+@media screen and (max-width:800px){
+ html body nav#mobileBottomNav.no-print{
+  display:grid!important;
+  position:fixed!important;
+  inset:auto 0 0 0!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:66px!important;
+  max-height:calc(86px + env(safe-area-inset-bottom))!important;
+  transform:translate3d(0,0,0)!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  overflow:visible!important;
+  z-index:2147483000!important;
+  flex-direction:row!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  padding:6px 7px calc(6px + env(safe-area-inset-bottom))!important;
+  box-sizing:border-box!important;
+ }
+ html body nav#mobileBottomNav.no-print button{
+  display:flex!important;width:auto!important;min-width:0!important;
+  min-height:52px!important;margin:0!important;
+  flex:initial!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  padding:4px 2px!important;
+ }
+ body.sidebar-drawer-open nav#mobileBottomNav.no-print{
+  visibility:visible!important;pointer-events:auto!important;
+  transform:translate3d(0,0,0)!important;
+ }
+}
+@media screen and (min-width:801px){html body nav#mobileBottomNav{display:none!important}}
+@media print{html body nav#mobileBottomNav{display:none!important}}
+</style>
+
+<style id="v22-mobile-bottom-navigation-final-fix">
+/* Keep the app's bottom bar independent from the sidebar's nav.no-print rules. */
+@media screen and (max-width: 800px) {
+  html, body { padding-bottom: 82px !important; }
+  body > #mobileBottomNav, #mobileBottomNav.mobile-bottom-navigation {
+    display: grid !important;
+    position: fixed !important;
+    inset: auto 0 0 0 !important;
+    width: 100vw !important;
+    min-width: 0 !important;
+    height: 72px !important;
+    min-height: 72px !important;
+    max-height: 82px !important;
+    margin: 0 !important;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    gap: 2px !important;
+    overflow: visible !important;
+    background: #fff !important;
+    border-top: 1px solid #dce7df !important;
+    box-shadow: 0 -4px 18px rgba(0,0,0,.10) !important;
+    transform: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 2147483647 !important;
+  }
+  #mobileBottomNav > button {
+    display: flex !important; position: relative !important;
+    width: 100% !important; min-width: 0 !important;
+    min-height: 54px !important; height: 100% !important;
+    margin: 0 !important; padding: 4px 1px !important;
+    flex: none !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important;
+    gap: 3px !important; border: 0 !important; border-radius: 10px !important;
+    background: transparent !important; color: #56645c !important;
+    font-size: 11px !important; line-height: 1.2 !important;
+    white-space: nowrap !important; overflow: hidden !important;
+  }
+  #mobileBottomNav > button .mobile-nav-icon { display:block !important; font-size:21px !important; line-height:1.1 !important; }
+  #mobileBottomNav > button.active { background:#e8f5ec !important; color:#087943 !important; font-weight:800 !important; }
+  body.app-dark-theme > #mobileBottomNav { background:#111c2c !important; border-color:#35465c !important; }
+  body.app-dark-theme > #mobileBottomNav > button { color:#bdc9d5 !important; }
+  body.app-dark-theme > #mobileBottomNav > button.active { background:#1e3b32 !important; color:#8cf0b4 !important; }
+}
+@media screen and (min-width: 801px), print { #mobileBottomNav { display:none !important; } }
+</style>
+
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -2003,7 +2095,7 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
 
 
 <div id="pullRefreshIndicator" class="no-print" aria-live="polite"><span class="pull-spinner"></span><span id="pullRefreshText">ለማደስ ወደታች ይጎትቱ</span></div>
-<nav id="mobileBottomNav" class="no-print" aria-label="የታችኛው ምናሌ">
+<nav id="mobileBottomNav" class="mobile-bottom-navigation" aria-label="የታችኛው ምናሌ">
  <button type="button" data-mobile-page="dashboard" class="active"><span class="mobile-nav-icon">⌂</span><span>Home</span></button>
  <button type="button" data-mobile-page="attendance"><span class="mobile-nav-icon">✓</span><span>Attendance</span></button>
  <button type="button" data-mobile-page="students"><span class="mobile-nav-icon">♙</span><span>Students</span></button>
@@ -2020,7 +2112,7 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
   if(!bottom)return;
   // Make sure the fixed navigation is a direct child of body, outside transformed page panels.
   if(bottom.parentElement!==document.body)document.body.appendChild(bottom);
-  const showNav=()=>{if(window.matchMedia('(max-width: 800px)').matches){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('position','fixed','important');bottom.style.setProperty('top','auto','important');bottom.style.setProperty('bottom','0','important');bottom.style.setProperty('left','0','important');bottom.style.setProperty('right','0','important');bottom.style.setProperty('width','100%','important');bottom.style.setProperty('z-index','2147483000','important');}};
+  const showNav=()=>{if(window.matchMedia('(max-width: 800px)').matches){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('position','fixed','important');bottom.style.setProperty('top','auto','important');bottom.style.setProperty('bottom','0','important');bottom.style.setProperty('left','0','important');bottom.style.setProperty('right','0','important');bottom.style.setProperty('width','100%','important');bottom.style.setProperty('z-index','2147483000','important');bottom.style.setProperty('transform','translate3d(0,0,0)','important');bottom.style.setProperty('visibility','visible','important');bottom.style.setProperty('opacity','1','important');bottom.style.setProperty('pointer-events','auto','important');}};
   const setActive=page=>bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
   const sync=()=>{
    if(!sidebar){showNav();return;}
