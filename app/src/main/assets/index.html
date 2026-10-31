@@ -460,6 +460,10 @@ body.auth-loading #menuToggle,
 body.auth-loading #sidebarBackdrop,
 body.auth-loading main { display:none !important; }
 body.auth-loading #cloudLogin { display:none !important; }
+body.auth-loading{min-height:100vh;background:#f3f7f4!important}
+body.auth-loading:before{content:"ሰንበት ትምህርት ቤት\A በመጫን ላይ…";white-space:pre;position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding-top:78px;color:#176b40;font:700 18px Arial,"Noto Sans Ethiopic",sans-serif;background:#f3f7f4;z-index:99999}
+body.auth-loading:after{content:"";position:fixed;left:calc(50% - 19px);top:calc(50% - 43px);width:38px;height:38px;border:4px solid #cfe6d7;border-top-color:#087a50;border-radius:50%;animation:ssBootSpin .7s linear infinite;z-index:100000}
+@keyframes ssBootSpin{to{transform:rotate(360deg)}}
 body.auth-locked nav.no-print,
 body.auth-locked #supervisorDesktopNavbar,
 body.auth-locked header:not(.desktop-navbar),
@@ -824,6 +828,30 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
 @media screen and (min-width: 801px), print { #mobileBottomNav { display:none !important; } }
 </style>
 
+
+<style id="v11-user-fixes">
+/* Reliable refresh animation */
+#quickRefreshToggle.is-refreshing .refresh-glyph{animation:ssRefreshSpin .55s linear infinite!important;transform-origin:50% 50%;will-change:transform}
+#quickRefreshToggle.is-refreshing{opacity:1!important}
+/* Give the attendance-rate column more room in an individual report on phones. */
+#reports #reportResult.individual-report-result table{table-layout:fixed!important;width:100%!important}
+#reports #reportResult.individual-report-result th:last-child,#reports #reportResult.individual-report-result td:last-child{width:42%!important;min-width:132px!important;white-space:normal!important;line-height:1.35}
+#reports #reportResult.individual-report-result th:first-child,#reports #reportResult.individual-report-result td:first-child{width:58%!important}
+/* Modern alert dialog */
+#ssModernNotice{display:none;position:fixed;inset:0;z-index:100500}
+#ssModernNotice.show{display:block}
+#ssModernNotice .ss-notice-backdrop{position:absolute;inset:0;background:#07130dcc;display:grid;place-items:center;padding:22px}
+#ssModernNotice .ss-notice-dialog{width:min(360px,100%);background:#fff;color:#182522;border-radius:22px;padding:25px 22px 20px;text-align:center;box-shadow:0 18px 60px #0005;animation:ssNoticeIn .18s ease-out}
+#ssModernNotice .ss-notice-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;background:#e5f5eb;color:#087a50;font-size:25px;font-weight:900}
+#ssModernNotice .ss-notice-dialog h2{margin:0 0 9px;font-size:19px}
+#ssModernNotice .ss-notice-dialog p{margin:0 0 19px;line-height:1.6;overflow-wrap:anywhere}
+#ssModernNotice .ss-notice-dialog button{min-width:100px;padding:11px 22px;border-radius:12px}
+body.app-dark-theme #ssModernNotice .ss-notice-dialog{background:#18243a;color:#e5edf5}
+body.app-dark-theme #ssModernNotice .ss-notice-icon{background:#234333;color:#8ee0b1}
+@keyframes ssNoticeIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#quickRefreshToggle.is-refreshing .refresh-glyph{animation:none!important}}
+@media print{body.print-clean-sheet>*:not(#printCleanArea):not(#printAllAttendanceArea){display:none!important;visibility:hidden!important}}
+</style>
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickRefreshToggle" class="header-badge refresh-quick-toggle no-print" aria-label="Refresh data" title="Refresh data"><span class="refresh-glyph" aria-hidden="true">↻</span></button><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -1618,9 +1646,18 @@ function applyReportPeriod(){
   // For monthly reports, keep the dates user-selected so the range can exceed 30 days.
 }
 $('reportPeriod').addEventListener('change',applyReportPeriod);$('fromDate').addEventListener('change',()=>{if($('reportPeriod').value!=='custom')applyReportPeriod()});$('reportClass').addEventListener('change',()=>{const selected=$('reportStudent').value;const cls=$('reportClass').value;const eligible=students.filter(st=>cls==='__ALL__'||st.className===cls);$('reportStudent').innerHTML='<option value="__ALL__">ሁሉም ተማሪዎች</option>'+eligible.map(st=>`<option value="${esc(st.id)}">${esc(st.name)}</option>`).join('');if(eligible.some(st=>String(st.id)===selected))$('reportStudent').value=selected;});
+function isolatePrintContent(){
+ const target=document.getElementById('printCleanArea')||document.getElementById('printAllAttendanceArea');
+ window.__printBodyChildren=[];
+ [...document.body.children].forEach(el=>{if(el!==target){window.__printBodyChildren.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);el.style.setProperty('display','none','important');}});
+ if(target){target.style.setProperty('display','block','important');target.style.setProperty('visibility','visible','important');}
+}
 function requestNativePrint(){
- if(window.Android && typeof Android.printPage==='function'){try{Android.printPage();return;}catch(e){console.error('Native print failed',e);}}
- if(typeof window.print==='function')window.print();else alert('Print በዚህ browser ላይ አይደገፍም።');
+ isolatePrintContent();
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(window.Android && typeof Android.printPage==='function'){try{Android.printPage();return;}catch(e){console.error('Native print failed',e);}}
+  if(typeof window.print==='function')window.print();else window.alert('Print በዚህ browser ላይ አይደገፍም።');
+ }));
 }
 function saveWorkbookFile(workbook,filename){
  const mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -1649,7 +1686,7 @@ $('printReport').onclick=()=>{
  });
  document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');requestNativePrint();
 };
-window.addEventListener('afterprint',()=>{document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');(window.__printHiddenElements||[]).forEach(([el,value,priority])=>{if(value)el.style.setProperty('display',value,priority);else el.style.removeProperty('display')});window.__printHiddenElements=[];['printAllAttendanceArea','printCleanArea'].forEach(id=>document.getElementById(id)?.remove());});
+window.addEventListener('afterprint',()=>{document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');(window.__printHiddenElements||[]).forEach(([el,value,priority])=>{if(value)el.style.setProperty('display',value,priority);else el.style.removeProperty('display')});window.__printHiddenElements=[];(window.__printBodyChildren||[]).forEach(([el,value,priority])=>{if(value)el.style.setProperty('display',value,priority);else el.style.removeProperty('display')});window.__printBodyChildren=[];['printAllAttendanceArea','printCleanArea'].forEach(id=>document.getElementById(id)?.remove());});
 $('printAttendance').onclick=()=>{
  const iso=dateISO($('attDate').value);if(!iso)return alert('ከመታተም በፊት ትክክለኛ ቀን ያስገቡ።');
  if(!$('attendanceTable').querySelector('table'))drawAttendance();
@@ -1717,11 +1754,30 @@ auth.onAuthStateChanged(async user=>{
   ['backupUserEmail','globalUserEmail','sidebarEmail'].forEach(id=>{if($(id))$(id).textContent=user.email||'';});
   ['backupUserRole','globalUserRole','sidebarRole'].forEach(id=>{if($(id))$(id).textContent=roleName;});
   if($('sidebarAvatar'))$('sidebarAvatar').textContent=(user.email||'S').charAt(0).toUpperCase();
-  await loadCloud();await loadAppSettings();setLogin(false);applyRoleUI();runAutoBackupIfDue();msg('');
+  await loadCloud();setLogin(false);applyRoleUI();runAutoBackupIfDue();msg('');
   await loadAppSettings();syncSettingsForm();if(role==='supervisor'){renderActivityLogs();renderRecentActivityStream();}
  }catch(e){console.error('Session restore failed:',e);setLogin(true);msg(friendlyFirebaseError(e,'login'));}
  finally{restoringAuthSession=false;}
 });
+// Fast header refresh: bind inside the app scope so it can call the real Firebase loaders.
+const quickRefreshButton=$('quickRefreshToggle');
+if(quickRefreshButton&&!quickRefreshButton.dataset.boundInsideApp){
+ quickRefreshButton.dataset.boundInsideApp='1';
+ quickRefreshButton.addEventListener('click',async()=>{
+  if(!currentUser||quickRefreshButton.classList.contains('is-refreshing'))return;
+  quickRefreshButton.classList.add('is-refreshing');quickRefreshButton.setAttribute('aria-busy','true');
+  try{await loadCloud();await loadAppSettings();syncSettingsForm();updateDashboard();renderClasses();renderStats();quickRefreshButton.title='Data refreshed';}
+  catch(err){console.error('Quick refresh failed:',err);showModernNotice('መረጃውን ማደስ አልተሳካም። ኢንተርኔትዎን ያረጋግጡ።');}
+  finally{quickRefreshButton.classList.remove('is-refreshing');quickRefreshButton.removeAttribute('aria-busy');}
+ });
+}
+// Replace browser alert boxes with a small, accessible in-app dialog.
+function showModernNotice(message){
+ let wrap=document.getElementById('ssModernNotice');
+ if(!wrap){wrap=document.createElement('div');wrap.id='ssModernNotice';wrap.innerHTML='<div class="ss-notice-backdrop"><section class="ss-notice-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ssNoticeTitle"><div class="ss-notice-icon">✓</div><h2 id="ssNoticeTitle">ማሳወቂያ</h2><p id="ssNoticeText"></p><button type="button" id="ssNoticeOk">እሺ</button></section></div>';document.body.appendChild(wrap);wrap.querySelector('#ssNoticeOk').addEventListener('click',()=>{wrap.classList.remove('show');});wrap.addEventListener('click',e=>{if(e.target.classList.contains('ss-notice-backdrop'))wrap.classList.remove('show')});}
+ wrap.querySelector('#ssNoticeText').textContent=String(message??'');wrap.classList.add('show');wrap.querySelector('#ssNoticeOk').focus();
+}
+window.alert=showModernNotice;
 renderAll();
 })();
 </script>
