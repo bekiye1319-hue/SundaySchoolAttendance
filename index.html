@@ -800,8 +800,8 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
     justify-content: stretch !important;
     gap: 2px !important;
     overflow: visible !important;
-    background: #fff !important;
-    border-top: 1px solid #dce7df !important;
+    background: #102d22 !important;
+    border-top: 1px solid #102d22 !important;
     box-shadow: 0 -4px 18px rgba(0,0,0,.10) !important;
     transform: none !important;
     visibility: visible !important;
@@ -817,12 +817,12 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
     flex: none !important; flex-direction: column !important;
     align-items: center !important; justify-content: center !important;
     gap: 3px !important; border: 0 !important; border-radius: 10px !important;
-    background: transparent !important; color: #56645c !important;
+    background: transparent !important; color: #ffffff !important;
     font-size: 11px !important; line-height: 1.2 !important;
     white-space: nowrap !important; overflow: hidden !important;
   }
   #mobileBottomNav > button .mobile-nav-icon { display:block !important; font-size:21px !important; line-height:1.1 !important; }
-  #mobileBottomNav > button.active { background:#e8f5ec !important; color:#087943 !important; font-weight:800 !important; }
+  #mobileBottomNav > button.active { background:#10b981 !important; color:#ffffff !important; font-weight:800 !important; }
   body.app-dark-theme > #mobileBottomNav { background:#111c2c !important; border-color:#35465c !important; }
   body.app-dark-theme > #mobileBottomNav > button { color:#bdc9d5 !important; }
   body.app-dark-theme > #mobileBottomNav > button.active { background:#1e3b32 !important; color:#8cf0b4 !important; }
@@ -1652,7 +1652,7 @@ auth.onAuthStateChanged(async user=>{
  if(!user){if(!currentUser){clearAuthSession();setLogin(true);}return;}
  if(currentUser&&currentUser.uid===user.uid)return;
  if(restoringAuthSession)return;
- restoringAuthSession=true;msg('የቀድሞ መግቢያዎን በመመለስ ላይ...');
+ restoringAuthSession=true; // Restore the saved Firebase session silently; manual login alone shows 'በመግባት ላይ...'.
  try{
   if(authSessionExpired()){clearAuthSession();currentUser=null;role=null;assignedClass='';await auth.signOut();setLogin(true);msg('የመግቢያ ጊዜዎ 24 ሰዓት አልፏል። እንደገና Login ያድርጉ።');return;}
   const profile=await db.collection('users').doc(user.uid).get();
@@ -1666,7 +1666,7 @@ auth.onAuthStateChanged(async user=>{
   ['backupUserEmail','globalUserEmail','sidebarEmail'].forEach(id=>{if($(id))$(id).textContent=user.email||'';});
   ['backupUserRole','globalUserRole','sidebarRole'].forEach(id=>{if($(id))$(id).textContent=roleName;});
   if($('sidebarAvatar'))$('sidebarAvatar').textContent=(user.email||'S').charAt(0).toUpperCase();
-  await loadCloud();await loadAppSettings();setLogin(false);applyRoleUI();runAutoBackupIfDue();msg('የቀድሞ መግቢያዎ ተመልሷል።');
+  await loadCloud();await loadAppSettings();setLogin(false);applyRoleUI();runAutoBackupIfDue();msg('');
   await loadAppSettings();syncSettingsForm();if(role==='supervisor'){renderActivityLogs();renderRecentActivityStream();}
  }catch(e){console.error('Session restore failed:',e);setLogin(true);msg(friendlyFirebaseError(e,'login'));}
  finally{restoringAuthSession=false;}
@@ -2095,12 +2095,12 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
 
 
 <div id="pullRefreshIndicator" class="no-print" aria-live="polite"><span class="pull-spinner"></span><span id="pullRefreshText">ለማደስ ወደታች ይጎትቱ</span></div>
-<nav id="mobileBottomNav" class="mobile-bottom-navigation" aria-label="የታችኛው ምናሌ">
- <button type="button" data-mobile-page="dashboard" class="active"><span class="mobile-nav-icon">⌂</span><span>Home</span></button>
- <button type="button" data-mobile-page="attendance"><span class="mobile-nav-icon">✓</span><span>Attendance</span></button>
- <button type="button" data-mobile-page="students"><span class="mobile-nav-icon">♙</span><span>Students</span></button>
- <button type="button" data-mobile-page="reports"><span class="mobile-nav-icon">▤</span><span>Reports</span></button>
- <button type="button" data-mobile-more="true"><span class="mobile-nav-icon">☰</span><span>More</span></button>
+<nav id="mobileBottomNav" class="mobile-bottom-navigation no-print" aria-label="የታችኛው ምናሌ">
+ <button type="button" data-mobile-page="dashboard" class="active"><i class="fa-solid fa-house mobile-nav-icon" aria-hidden="true"></i><span>ዋና ገጽ</span></button>
+ <button type="button" data-mobile-page="students"><i class="fa-solid fa-users mobile-nav-icon" aria-hidden="true"></i><span>ተማሪዎች</span></button>
+ <button type="button" data-mobile-page="reports"><i class="fa-solid fa-chart-column mobile-nav-icon" aria-hidden="true"></i><span>ሪፖርት</span></button>
+ <button type="button" data-mobile-page="settings"><i class="fa-solid fa-gear mobile-nav-icon" aria-hidden="true"></i><span>ቅንብሮች</span></button>
+ <button type="button" data-mobile-logout="true"><i class="fa-solid fa-right-from-bracket mobile-nav-icon" aria-hidden="true"></i><span>ውጣ</span></button>
 </nav>
 <script id="v20-mobile-navigation-and-fast-refresh">
 (()=>{
@@ -2164,6 +2164,117 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
   document.addEventListener('touchcancel',()=>{pulling=false;armed=false;indicator.classList.remove('show');},{passive:true});
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
+
+<style id="final-sidebar-and-bottom-navigation-theme">
+:root{--ss-navy:#111827;--ss-navy-card:#1e293b;--ss-green:#10b981;--ss-red:#e51f26;}
+/* Sidebar drawer: dark navy, profile card, matching icon colors and green active item. */
+@media screen and (max-width:800px){
+ body>nav[aria-label="ዋና ምናሌ"]{
+  background:var(--ss-navy)!important;color:#f8fafc!important;
+  width:min(300px,86vw)!important;padding:20px 16px 22px!important;
+  gap:9px!important;box-sizing:border-box!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:stretch!important;justify-content:flex-start!important;
+  overflow-y:auto!important;overscroll-behavior:contain!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-user{
+  background:var(--ss-navy-card)!important;border:1px solid #334155!important;
+  border-radius:18px!important;padding:15px!important;margin:4px 0 20px!important;gap:12px!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-avatar{width:48px!important;height:48px!important;background:#10b981!important;color:#fff!important;font-size:18px!important}
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-user strong{color:#fff!important;font-size:15px!important}
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-user small{color:#a8b3c5!important;font-size:12px!important}
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label{display:none!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
+  display:flex!important;align-items:center!important;gap:17px!important;
+  width:100%!important;min-height:57px!important;padding:12px 15px!important;
+  border:0!important;border-radius:15px!important;background:transparent!important;
+  color:#d5dbe5!important;text-align:left!important;font-size:15px!important;font-weight:700!important;
+  white-space:normal!important;box-shadow:none!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page] .sidebar-nav-icon{width:27px!important;flex:0 0 27px!important;text-align:center!important;font-size:23px!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="dashboard"] .sidebar-nav-icon{color:#fff!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="attendance"] .sidebar-nav-icon{color:#60a5fa!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="students"] .sidebar-nav-icon{color:#f472b6!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="classes"] .sidebar-nav-icon{color:#fbbf24!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="reports"] .sidebar-nav-icon{color:#a78bfa!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="backup"] .sidebar-nav-icon{color:#38bdf8!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="settings"] .sidebar-nav-icon{color:#fbbf24!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page].active{background:#10b981!important;color:#fff!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page].active .sidebar-nav-icon{color:#fff!important}
+ body>nav[aria-label="ዋና ምናሌ"] #topLogout{
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:12px!important;
+  margin-top:auto!important;min-height:58px!important;border-radius:15px!important;
+  background:#e51f26!important;color:#fff!important;font-size:15px!important;font-weight:800!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] #topLogout .sidebar-nav-icon{font-size:20px!important}
+ /* Red fixed bottom bar; its icons are the same Font Awesome icons used in the drawer. */
+ html body nav#mobileBottomNav{
+  display:grid!important;position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;
+  width:100%!important;height:auto!important;min-height:78px!important;max-height:calc(88px + env(safe-area-inset-bottom))!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;flex-direction:row!important;gap:2px!important;
+  padding:7px 6px calc(7px + env(safe-area-inset-bottom))!important;box-sizing:border-box!important;
+  background:#102d22!important;border:0!important;border-radius:18px 18px 0 0!important;
+  box-shadow:0 -5px 20px #0003!important;z-index:2147483647!important;
+  transform:none!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;overflow:visible!important;
+ }
+ html body nav#mobileBottomNav>button{
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:5px!important;width:100%!important;min-width:0!important;height:64px!important;min-height:64px!important;
+  margin:0!important;padding:4px 1px!important;border:0!important;border-radius:10px!important;
+  background:transparent!important;color:#fff!important;font-size:11px!important;font-weight:800!important;
+  line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;box-shadow:none!important;
+ }
+ html body nav#mobileBottomNav>button .mobile-nav-icon{display:block!important;font-size:23px!important;line-height:1!important;color:#fff!important}
+ html body nav#mobileBottomNav>button.active{background:#10b981!important;color:#fff!important}
+ html body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
+}
+@media screen and (min-width:801px),print{html body nav#mobileBottomNav{display:none!important}}
+</style>
+<script id="final-matching-sidebar-bottom-icons">
+(()=>{
+ const iconMap={
+  dashboard:'fa-house',attendance:'fa-calendar-check',students:'fa-users',classes:'fa-cubes',
+  reports:'fa-chart-line',activityLogs:'fa-list-check',backup:'fa-cloud-arrow-up',settings:'fa-gear'
+ };
+ function applyIcons(){
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  const bottom=document.getElementById('mobileBottomNav');
+  if(!sidebar||!bottom)return;
+  sidebar.querySelectorAll('button[data-page]').forEach(btn=>{
+   const page=btn.dataset.page,icon=iconMap[page]||'fa-circle';
+   let el=btn.querySelector('.sidebar-nav-icon');
+   if(!el){el=document.createElement('i');el.className='fa-solid sidebar-nav-icon';el.setAttribute('aria-hidden','true');btn.prepend(el)}
+   el.className='fa-solid '+icon+' sidebar-nav-icon';
+  });
+  const logout=sidebar.querySelector('#topLogout');
+  if(logout&&!logout.querySelector('.sidebar-nav-icon')){const i=document.createElement('i');i.className='fa-solid fa-right-from-bracket sidebar-nav-icon';i.setAttribute('aria-hidden','true');logout.prepend(i)}
+  const sync=()=>{
+   sidebar.querySelectorAll('button[data-page]').forEach(src=>{
+    const dest=bottom.querySelector('[data-mobile-page="'+src.dataset.page+'"]');
+    if(dest)dest.classList.toggle('hidden',src.classList.contains('hidden'));
+   });
+   const active=sidebar.querySelector('button[data-page].active');
+   if(active)bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===active.dataset.page));
+  };
+  if(!bottom.dataset.finalBound){
+   bottom.dataset.finalBound='1';
+   bottom.addEventListener('click',e=>{
+    const logoutBtn=e.target.closest('[data-mobile-logout]');
+    if(logoutBtn){const out=sidebar.querySelector('#topLogout');if(out)out.click();return;}
+    const btn=e.target.closest('[data-mobile-page]');
+    if(btn){const source=sidebar.querySelector('button[data-page="'+btn.dataset.mobilePage+'"]');if(source&&!source.classList.contains('hidden'))source.click();}
+   });
+   sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(sync,0)));
+   new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+  }
+  sync();window.syncMobileBottomNavigation=sync;
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyIcons,{once:true});else applyIcons();
+ setTimeout(applyIcons,500);setTimeout(applyIcons,1500);
 })();
 </script>
 
