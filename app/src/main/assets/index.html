@@ -800,8 +800,8 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
     justify-content: stretch !important;
     gap: 2px !important;
     overflow: visible !important;
-    background: #fff !important;
-    border-top: 1px solid #dce7df !important;
+    background: #102d22 !important;
+    border-top: 1px solid #102d22 !important;
     box-shadow: 0 -4px 18px rgba(0,0,0,.10) !important;
     transform: none !important;
     visibility: visible !important;
@@ -817,12 +817,12 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
     flex: none !important; flex-direction: column !important;
     align-items: center !important; justify-content: center !important;
     gap: 3px !important; border: 0 !important; border-radius: 10px !important;
-    background: transparent !important; color: #56645c !important;
+    background: transparent !important; color: #ffffff !important;
     font-size: 11px !important; line-height: 1.2 !important;
     white-space: nowrap !important; overflow: hidden !important;
   }
   #mobileBottomNav > button .mobile-nav-icon { display:block !important; font-size:21px !important; line-height:1.1 !important; }
-  #mobileBottomNav > button.active { background:#e8f5ec !important; color:#087943 !important; font-weight:800 !important; }
+  #mobileBottomNav > button.active { background:#10b981 !important; color:#ffffff !important; font-weight:800 !important; }
   body.app-dark-theme > #mobileBottomNav { background:#111c2c !important; border-color:#35465c !important; }
   body.app-dark-theme > #mobileBottomNav > button { color:#bdc9d5 !important; }
   body.app-dark-theme > #mobileBottomNav > button.active { background:#1e3b32 !important; color:#8cf0b4 !important; }
@@ -1652,7 +1652,7 @@ auth.onAuthStateChanged(async user=>{
  if(!user){if(!currentUser){clearAuthSession();setLogin(true);}return;}
  if(currentUser&&currentUser.uid===user.uid)return;
  if(restoringAuthSession)return;
- restoringAuthSession=true;msg('የቀድሞ መግቢያዎን በመመለስ ላይ...');
+ restoringAuthSession=true; // Restore the saved Firebase session silently; manual login alone shows 'በመግባት ላይ...'.
  try{
   if(authSessionExpired()){clearAuthSession();currentUser=null;role=null;assignedClass='';await auth.signOut();setLogin(true);msg('የመግቢያ ጊዜዎ 24 ሰዓት አልፏል። እንደገና Login ያድርጉ።');return;}
   const profile=await db.collection('users').doc(user.uid).get();
@@ -1666,7 +1666,7 @@ auth.onAuthStateChanged(async user=>{
   ['backupUserEmail','globalUserEmail','sidebarEmail'].forEach(id=>{if($(id))$(id).textContent=user.email||'';});
   ['backupUserRole','globalUserRole','sidebarRole'].forEach(id=>{if($(id))$(id).textContent=roleName;});
   if($('sidebarAvatar'))$('sidebarAvatar').textContent=(user.email||'S').charAt(0).toUpperCase();
-  await loadCloud();await loadAppSettings();setLogin(false);applyRoleUI();runAutoBackupIfDue();msg('የቀድሞ መግቢያዎ ተመልሷል።');
+  await loadCloud();await loadAppSettings();setLogin(false);applyRoleUI();runAutoBackupIfDue();msg('');
   await loadAppSettings();syncSettingsForm();if(role==='supervisor'){renderActivityLogs();renderRecentActivityStream();}
  }catch(e){console.error('Session restore failed:',e);setLogin(true);msg(friendlyFirebaseError(e,'login'));}
  finally{restoringAuthSession=false;}
@@ -2095,12 +2095,12 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
 
 
 <div id="pullRefreshIndicator" class="no-print" aria-live="polite"><span class="pull-spinner"></span><span id="pullRefreshText">ለማደስ ወደታች ይጎትቱ</span></div>
-<nav id="mobileBottomNav" class="mobile-bottom-navigation" aria-label="የታችኛው ምናሌ">
- <button type="button" data-mobile-page="dashboard" class="active"><span class="mobile-nav-icon">⌂</span><span>Home</span></button>
- <button type="button" data-mobile-page="attendance"><span class="mobile-nav-icon">✓</span><span>Attendance</span></button>
- <button type="button" data-mobile-page="students"><span class="mobile-nav-icon">♙</span><span>Students</span></button>
- <button type="button" data-mobile-page="reports"><span class="mobile-nav-icon">▤</span><span>Reports</span></button>
- <button type="button" data-mobile-more="true"><span class="mobile-nav-icon">☰</span><span>More</span></button>
+<nav id="mobileBottomNav" class="mobile-bottom-navigation no-print" aria-label="የታችኛው ምናሌ">
+ <button type="button" data-mobile-page="dashboard" class="active"><i class="fa-solid fa-house mobile-nav-icon" aria-hidden="true"></i><span>ዋና ገጽ</span></button>
+ <button type="button" data-mobile-page="attendance"><i class="fa-solid fa-calendar-check mobile-nav-icon" aria-hidden="true"></i><span>Attendance</span></button>
+ <button type="button" data-mobile-page="students"><i class="fa-solid fa-users mobile-nav-icon" aria-hidden="true"></i><span>ተማሪዎች</span></button>
+ <button type="button" data-mobile-page="reports"><i class="fa-solid fa-chart-column mobile-nav-icon" aria-hidden="true"></i><span>ሪፖርት</span></button>
+ <button type="button" data-mobile-more="true"><i class="fa-solid fa-ellipsis mobile-nav-icon" aria-hidden="true"></i><span>More</span></button>
 </nav>
 <script id="v20-mobile-navigation-and-fast-refresh">
 (()=>{
@@ -2167,7 +2167,178 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
 })();
 </script>
 
-</body></html>
+
+<style id="final-sidebar-and-bottom-navigation-theme">
+:root{--ss-navy:#111827;--ss-navy-card:#1e293b;--ss-green:#10b981;--ss-red:#e51f26;}
+/* Sidebar drawer: dark navy, profile card, matching icon colors and green active item. */
+@media screen and (max-width:800px){
+ body>nav[aria-label="ዋና ምናሌ"]{
+  background:var(--ss-navy)!important;color:#f8fafc!important;
+  width:min(300px,86vw)!important;padding:20px 16px 22px!important;
+  gap:9px!important;box-sizing:border-box!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:stretch!important;justify-content:flex-start!important;
+  overflow-y:auto!important;overscroll-behavior:contain!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-user{
+  background:var(--ss-navy-card)!important;border:1px solid #334155!important;
+  border-radius:18px!important;padding:15px!important;margin:4px 0 20px!important;gap:12px!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-avatar{width:48px!important;height:48px!important;background:#10b981!important;color:#fff!important;font-size:18px!important}
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-user strong{color:#fff!important;font-size:15px!important}
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-user small{color:#a8b3c5!important;font-size:12px!important}
+ body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label{display:none!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
+  display:flex!important;align-items:center!important;gap:17px!important;
+  width:100%!important;min-height:57px!important;padding:12px 15px!important;
+  border:0!important;border-radius:15px!important;background:transparent!important;
+  color:#d5dbe5!important;text-align:left!important;font-size:15px!important;font-weight:700!important;
+  white-space:normal!important;box-shadow:none!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page] .sidebar-nav-icon{width:27px!important;flex:0 0 27px!important;text-align:center!important;font-size:23px!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="dashboard"] .sidebar-nav-icon{color:#fff!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="attendance"] .sidebar-nav-icon{color:#60a5fa!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="students"] .sidebar-nav-icon{color:#f472b6!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="classes"] .sidebar-nav-icon{color:#fbbf24!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="reports"] .sidebar-nav-icon{color:#a78bfa!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="backup"] .sidebar-nav-icon{color:#38bdf8!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page="settings"] .sidebar-nav-icon{color:#fbbf24!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page].active{background:#10b981!important;color:#fff!important}
+ body>nav[aria-label="ዋና ምናሌ"] button[data-page].active .sidebar-nav-icon{color:#fff!important}
+ body>nav[aria-label="ዋና ምናሌ"] #topLogout{
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:12px!important;
+  margin-top:auto!important;min-height:58px!important;border-radius:15px!important;
+  background:#e51f26!important;color:#fff!important;font-size:15px!important;font-weight:800!important;
+ }
+ body>nav[aria-label="ዋና ምናሌ"] #topLogout .sidebar-nav-icon{font-size:20px!important}
+ /* Red fixed bottom bar; its icons are the same Font Awesome icons used in the drawer. */
+ html body nav#mobileBottomNav{
+  display:grid!important;position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;
+  width:100%!important;height:auto!important;min-height:78px!important;max-height:calc(88px + env(safe-area-inset-bottom))!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;flex-direction:row!important;gap:2px!important;
+  padding:7px 6px calc(7px + env(safe-area-inset-bottom))!important;box-sizing:border-box!important;
+  background:#102d22!important;border:0!important;border-radius:18px 18px 0 0!important;
+  box-shadow:0 -5px 20px #0003!important;z-index:2147483647!important;
+  transform:none!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;overflow:visible!important;
+ }
+ html body nav#mobileBottomNav>button{
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:5px!important;width:100%!important;min-width:0!important;height:64px!important;min-height:64px!important;
+  margin:0!important;padding:4px 1px!important;border:0!important;border-radius:10px!important;
+  background:transparent!important;color:#fff!important;font-size:11px!important;font-weight:800!important;
+  line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;box-shadow:none!important;
+ }
+ html body nav#mobileBottomNav>button .mobile-nav-icon{display:block!important;font-size:23px!important;line-height:1!important;color:#fff!important}
+ html body nav#mobileBottomNav>button.active{background:#10b981!important;color:#fff!important}
+ html body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
+}
+@media screen and (min-width:801px),print{html body nav#mobileBottomNav{display:none!important}}
+</style>
+<script id="final-matching-sidebar-bottom-icons">
+(()=>{
+ const iconMap={
+  dashboard:'fa-house',attendance:'fa-calendar-check',students:'fa-users',classes:'fa-cubes',
+  reports:'fa-chart-line',activityLogs:'fa-list-check',backup:'fa-cloud-arrow-up',settings:'fa-gear'
+ };
+ function applyIcons(){
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  const bottom=document.getElementById('mobileBottomNav');
+  if(!sidebar||!bottom)return;
+  sidebar.querySelectorAll('button[data-page]').forEach(btn=>{
+   const page=btn.dataset.page,icon=iconMap[page]||'fa-circle';
+   let el=btn.querySelector('.sidebar-nav-icon');
+   if(!el){el=document.createElement('i');el.className='fa-solid sidebar-nav-icon';el.setAttribute('aria-hidden','true');btn.prepend(el)}
+   el.className='fa-solid '+icon+' sidebar-nav-icon';
+  });
+  const logout=sidebar.querySelector('#topLogout');
+  if(logout&&!logout.querySelector('.sidebar-nav-icon')){const i=document.createElement('i');i.className='fa-solid fa-right-from-bracket sidebar-nav-icon';i.setAttribute('aria-hidden','true');logout.prepend(i)}
+  const sync=()=>{
+   sidebar.querySelectorAll('button[data-page]').forEach(src=>{
+    const dest=bottom.querySelector('[data-mobile-page="'+src.dataset.page+'"]');
+    if(dest)dest.classList.toggle('hidden',src.classList.contains('hidden'));
+   });
+   const active=sidebar.querySelector('button[data-page].active');
+   if(active)bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===active.dataset.page));
+  };
+  if(!bottom.dataset.finalBound){
+   bottom.dataset.finalBound='1';
+   bottom.addEventListener('click',e=>{
+    const logoutBtn=e.target.closest('[data-mobile-logout]');
+    if(logoutBtn){const out=sidebar.querySelector('#topLogout');if(out)out.click();return;}
+    const btn=e.target.closest('[data-mobile-page]');
+    if(btn){const source=sidebar.querySelector('button[data-page="'+btn.dataset.mobilePage+'"]');if(source&&!source.classList.contains('hidden'))source.click();}
+   });
+   sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(sync,0)));
+   new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+  }
+  sync();window.syncMobileBottomNavigation=sync;
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyIcons,{once:true});else applyIcons();
+ setTimeout(applyIcons,500);setTimeout(applyIcons,1500);
+})();
+</script>
+
+
+<style id="bottom-nav-final-visual-fix-v3">
+@media screen and (max-width:800px){
+  /* Match the exact dark navy used by the sidebar. */
+  html body nav#mobileBottomNav,
+  html body nav#mobileBottomNav.no-print{
+    background:#111827!important;
+    background-color:#111827!important;
+    border-color:#111827!important;
+  }
+  /* Remove the small green status dots above each icon. */
+  html body nav#mobileBottomNav>button::before,
+  html body nav#mobileBottomNav>button::after,
+  html body nav#mobileBottomNav>button .mobile-nav-icon::after{
+    content:none!important;display:none!important;
+  }
+  html body nav#mobileBottomNav>button{
+    position:relative!important;
+    padding-top:5px!important;
+    gap:5px!important;
+  }
+  html body nav#mobileBottomNav>button .mobile-nav-icon{
+    margin:0!important;padding:0!important;
+  }
+  html body nav#mobileBottomNav>button.active{
+    background:#10b981!important;color:#fff!important;
+  }
+}
+</style>
+
+
+<style id="bottom-nav-full-width-position-fix-v4">
+/* Full-width bottom navigation: flush with both screen edges and bottom edge. */
+@media screen and (max-width:800px){
+  html, body { width:100% !important; max-width:100% !important; overflow-x:hidden !important; }
+  body > nav#mobileBottomNav, html body nav#mobileBottomNav {
+    position:fixed !important;
+    left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
+    inset-inline:0 !important;
+    width:auto !important; min-width:0 !important; max-width:none !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    align-items:stretch !important; justify-content:stretch !important;
+    height:76px !important; min-height:76px !important; max-height:none !important;
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius:16px 16px 0 0 !important;
+    background:#111827 !important;
+    z-index:2147483647 !important;
+    transform:none !important;
+  }
+  body > nav#mobileBottomNav > button {
+    width:100% !important; min-width:0 !important; max-width:none !important;
+    height:100% !important; min-height:0 !important; margin:0 !important;
+    box-sizing:border-box !important;
+  }
+  body { padding-bottom:calc(86px + env(safe-area-inset-bottom, 0px)) !important; }
+}
+</style>
+
 
 <style id="requested-report-status-layout-fix">
 /* Report status cards: two side-by-side columns on desktop and mobile. */
@@ -2462,3 +2633,102 @@ body.app-dark-theme #students .students-ref-footer *{color:#e5edf5!important}
 body.app-dark-theme .header-badge.theme-quick-toggle{background:#26364d!important;color:#facc15!important;border-color:#52647d!important}
 @media(max-width:420px){.header-badge.theme-quick-toggle{display:grid!important;flex-basis:38px!important;width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important}}
 </style>
+<style id="final-v5-requested-fixes">
+/* Keep the login overlay and its original compact sign-in card clear of app navigation. */
+body.auth-locked #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.auth-locked header:not(.desktop-navbar),
+body.auth-locked header.desktop-navbar{visibility:hidden!important}
+#cloudLogin.auth-overlay{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex;align-items:center;justify-content:center;padding:18px!important;overflow-y:auto!important;background:linear-gradient(145deg,#0b3927,#176b40 65%,#20804b)!important;font-family:Arial,"Noto Sans Ethiopic",sans-serif!important}
+#cloudLogin .login-box{width:min(410px,100%)!important;max-width:410px!important;margin:auto!important;padding:32px 25px 26px!important;border-radius:20px!important;background:#fff!important;box-shadow:0 18px 48px #001e1040!important;text-align:center!important;color:#2c3e50!important}
+#cloudLogin .icon-circle{width:68px!important;height:68px!important;margin:0 auto 16px!important;border-radius:20px!important;background:#e8f5e9!important;color:#0b6637!important;font-size:30px!important}
+#cloudLogin .login-box h2{font-size:22px!important;line-height:1.45!important;margin:0 0 6px!important;color:#173d2b!important}
+#cloudLogin .login-box .small{font-size:13px!important;line-height:1.6!important;margin:0 0 20px!important;color:#607d8b!important}
+#cloudLogin .form-group{margin:0 0 15px!important;text-align:left!important}
+#cloudLogin .login-box label{display:block!important;margin:0 0 6px!important;font-size:13px!important;color:#2c4938!important}
+#cloudLogin .input-wrapper{position:relative!important;display:flex!important;align-items:center!important;width:100%!important}
+#cloudLogin .input-wrapper input{width:100%!important;min-height:48px!important;padding:12px 43px 12px 40px!important;border:1px solid #d8e4db!important;border-radius:10px!important;background:#f9fbf9!important;color:#172b22!important;font-size:15px!important;box-shadow:none!important}
+#cloudLogin .input-wrapper>i{position:absolute!important;left:13px!important;color:#6b8b76!important;pointer-events:none!important}
+#cloudLogin .password-toggle{position:absolute!important;right:6px!important;top:50%!important;transform:translateY(-50%)!important;width:34px!important;min-height:34px!important;padding:3px!important;background:transparent!important;color:#65806d!important}
+#cloudLogin #cloudLoginBtn{width:100%!important;min-height:49px!important;margin-top:12px!important;border-radius:10px!important;background:#0b6637!important;color:#fff!important;font-size:15px!important;box-shadow:none!important}
+#cloudLogin .alert-message{margin-top:13px!important;line-height:1.55!important}
+@media(max-width:420px){#cloudLogin.auth-overlay{padding:14px!important}#cloudLogin .login-box{padding:27px 19px 22px!important}}
+
+/* Fixed app header/top bar; content starts below it. */
+@media screen and (max-width:800px){
+ body>header:not(.desktop-navbar){position:sticky!important;top:0!important;z-index:40!important;width:100%!important}
+ body>main{scroll-margin-top:78px}
+}
+/* Bottom navigation: exactly the five requested destinations. */
+@media screen and (max-width:800px){
+ html body nav#mobileBottomNav{display:grid!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;height:76px!important;min-height:76px!important;max-height:calc(84px + env(safe-area-inset-bottom,0px))!important;margin:0!important;padding:5px 5px calc(5px + env(safe-area-inset-bottom,0px))!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;align-items:stretch!important;background:#102d22!important;border:0!important;border-radius:15px 15px 0 0!important;box-shadow:0 -4px 16px #0002!important;z-index:2147482000!important;transform:none!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;overflow:visible!important}
+ html body nav#mobileBottomNav>button{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;width:100%!important;min-width:0!important;height:100%!important;min-height:0!important;margin:0!important;padding:4px 1px!important;border:0!important;border-radius:10px!important;background:transparent!important;color:#fff!important;font-size:10.5px!important;font-weight:750!important;line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;box-shadow:none!important}
+ html body nav#mobileBottomNav>button .mobile-nav-icon{display:block!important;font-size:21px!important;line-height:1!important;color:inherit!important}
+ html body nav#mobileBottomNav>button.active{background:#16804a!important;color:#fff!important}
+ body.app-dark-theme nav#mobileBottomNav{background:#102d22!important}
+ body.auth-locked nav#mobileBottomNav{display:none!important}
+ /* When More opens the drawer, hide the bottom bar so Logout can never sit behind it. */
+ body.sidebar-drawer-open nav#mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important}
+ body>nav[aria-label="ዋና ምናሌ"]{padding-bottom:22px!important;overscroll-behavior:contain!important}
+ body>nav[aria-label="ዋና ምናሌ"] #topLogout{margin-bottom:4px!important;flex:0 0 auto!important}
+ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
+}
+@media screen and (min-width:801px),print{html body nav#mobileBottomNav{display:none!important}}
+
+/* Comparative-analysis checkbox should remain a small native checkbox. */
+#reports #showComparativeAnalysis{appearance:auto!important;-webkit-appearance:checkbox!important;width:18px!important;height:18px!important;min-width:18px!important;min-height:18px!important;max-width:18px!important;max-height:18px!important;flex:0 0 18px!important;padding:0!important;margin:0!important;accent-color:#16804a!important;}
+#reports label:has(#showComparativeAnalysis){display:flex!important;align-items:center!important;gap:9px!important;font-size:13px!important;line-height:1.4!important}
+
+/* Student list: stable whole-row highlight on touch and pointer; distinct in both themes. */
+#students .students-ref-table-wrap tbody tr{transition:background-color .12s ease!important;transform:none!important;}
+#students .students-ref-table-wrap tbody tr>td{transition:background-color .12s ease!important;}
+#students .students-ref-table-wrap tbody tr:hover>td,
+#students .students-ref-table-wrap tbody tr:focus-within>td{background:#e8f5ec!important;color:#173d2b!important;}
+#students .students-ref-table-wrap tbody tr:active>td{background:#d6eddf!important;}
+body.app-dark-theme #students .students-ref-table-wrap tbody tr>td{background:#172536!important;color:#dbe7f0!important;border-bottom-color:#34475a!important;}
+body.app-dark-theme #students .students-ref-table-wrap tbody tr:hover>td,
+body.app-dark-theme #students .students-ref-table-wrap tbody tr:focus-within>td{background:#254535!important;color:#f3fff7!important;}
+body.app-dark-theme #students .students-ref-table-wrap tbody tr:active>td{background:#315c43!important;}
+
+/* Attendance row hover: a subtle, readable highlight without moving rows. */
+#attendance .attendance-table-wrap tbody tr{transform:none!important;transition:background-color .12s ease!important;}
+#attendance .attendance-table-wrap tbody tr:hover>td,
+#attendance .attendance-table-wrap tbody tr:focus-within>td{background:#edf7f0!important;}
+#attendance .attendance-table-wrap tbody tr:active>td{background:#e1f0e6!important;}
+body.app-dark-theme #attendance .attendance-table-wrap tbody tr:hover>td,
+body.app-dark-theme #attendance .attendance-table-wrap tbody tr:focus-within>td{background:#263d34!important;color:#f1f7f3!important;}
+body.app-dark-theme #attendance .attendance-table-wrap tbody tr:active>td{background:#315342!important;}
+@media(prefers-reduced-motion:reduce){#students .students-ref-table-wrap tbody tr,#students .students-ref-table-wrap tbody tr>td,#attendance .attendance-table-wrap tbody tr{transition:none!important}}
+</style>
+<script id="final-v5-bottom-navigation-behavior">
+(()=>{
+ const init=()=>{
+  const bottom=document.getElementById('mobileBottomNav');
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  const toggle=document.getElementById('menuToggle');
+  if(!bottom||!sidebar)return;
+  const pageButtons=[...bottom.querySelectorAll('[data-mobile-page]')];
+  const sync=()=>{
+   pageButtons.forEach(b=>{const source=sidebar.querySelector('[data-page="'+b.dataset.mobilePage+'"]');b.classList.toggle('hidden',!source||source.classList.contains('hidden'));});
+   const active=sidebar.querySelector('button[data-page].active');
+   if(active)pageButtons.forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===active.dataset.page));
+  };
+  if(!bottom.dataset.v5Bound){
+   bottom.dataset.v5Bound='1';
+   bottom.addEventListener('click',e=>{
+    const page=e.target.closest('[data-mobile-page]');
+    if(page){const source=sidebar.querySelector('button[data-page="'+page.dataset.mobilePage+'"]');if(source&&!source.classList.contains('hidden'))source.click();return;}
+    if(e.target.closest('[data-mobile-more]')){if(toggle)toggle.click();}
+   });
+   sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(sync,0)));
+   new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+   if(toggle){toggle.addEventListener('click',()=>setTimeout(()=>{document.body.classList.toggle('sidebar-drawer-open',sidebar.classList.contains('sidebar-open'));},0));}
+   const backdrop=document.getElementById('sidebarBackdrop');if(backdrop)backdrop.addEventListener('click',()=>document.body.classList.remove('sidebar-drawer-open'));
+   sidebar.querySelectorAll('button[data-page],#topLogout').forEach(b=>b.addEventListener('click',()=>document.body.classList.remove('sidebar-drawer-open')));
+  }
+  sync();window.syncMobileBottomNavigation=sync;
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+ setTimeout(init,400);setTimeout(init,1200);
+})();
+</script>
+</body></html>
