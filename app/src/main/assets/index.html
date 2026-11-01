@@ -857,8 +857,8 @@ body.app-dark-theme #ssModernNotice .ss-notice-icon{background:#234333;color:#8e
 body.app-dark-theme .attendance-unlock-btn{background:#422006;color:#fed7aa;border-color:#92400e}
 </style>
 \n<style id="modern-notification-system">
-#modernToastRegion{position:fixed;top:18px;right:18px;z-index:999999;display:grid;gap:10px;width:min(390px,calc(100vw - 28px));pointer-events:none}
-.modern-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:11px;padding:13px 15px;border:1px solid var(--toast-border);border-left:4px solid var(--toast-accent);border-radius:14px;background:var(--toast-bg);color:var(--toast-text);box-shadow:0 12px 34px rgba(15,23,42,.18);font:500 14px/1.5 inherit;animation:toastIn .24s ease-out;backdrop-filter:blur(12px)}
+#modernToastRegion{position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;padding:20px;box-sizing:border-box;pointer-events:none;background:transparent}
+.modern-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:11px;width:min(440px,calc(100vw - 40px));max-width:100%;box-sizing:border-box;padding:17px 19px;border:1px solid var(--toast-border);border-left:5px solid var(--toast-accent);border-radius:16px;background:var(--toast-bg);color:var(--toast-text);box-shadow:0 18px 55px rgba(15,23,42,.28);font:500 15px/1.55 inherit;animation:toastIn .24s ease-out;backdrop-filter:blur(12px)}
 .modern-toast.success{--toast-accent:#16a34a;--toast-border:#bbf7d0;--toast-bg:#f0fdf4;--toast-text:#166534}.modern-toast.error{--toast-accent:#dc2626;--toast-border:#fecaca;--toast-bg:#fef2f2;--toast-text:#991b1b}.modern-toast.warning{--toast-accent:#d97706;--toast-border:#fed7aa;--toast-bg:#fff7ed;--toast-text:#9a3412}.modern-toast.info{--toast-accent:#2563eb;--toast-border:#bfdbfe;--toast-bg:#eff6ff;--toast-text:#1e40af}
 body.app-dark-theme .modern-toast{--toast-bg:#172033;--toast-text:#e5e7eb;--toast-border:#334155}
 .modern-toast-icon{font-size:18px;line-height:1.3}.modern-toast-message{flex:1;overflow-wrap:anywhere}.modern-toast-close{border:0;background:transparent;color:inherit;opacity:.65;font-size:18px;cursor:pointer;padding:0 2px}.modern-toast-close:hover{opacity:1}
@@ -866,7 +866,7 @@ body.app-dark-theme .modern-toast{--toast-bg:#172033;--toast-text:#e5e7eb;--toas
 #modernConfirmBox{width:min(420px,100%);padding:22px;border-radius:18px;background:var(--card-bg,#fff);color:var(--text-color,inherit);box-shadow:0 24px 70px rgba(0,0,0,.28);animation:toastIn .18s ease-out}#modernConfirmBox p{margin:0 0 20px;line-height:1.65;white-space:pre-wrap}#modernConfirmBox .confirm-actions{display:flex;justify-content:flex-end;gap:10px}#modernConfirmBox button{min-width:90px;padding:10px 16px;border-radius:10px;border:1px solid #cbd5e1;cursor:pointer;font:inherit}#modernConfirmYes{background:#2563eb;color:white;border-color:#2563eb}
 button,input[type=button],input[type=submit],[role=button]{transition:transform .13s ease,filter .13s ease,box-shadow .13s ease}button:active,input[type=button]:active,input[type=submit]:active,[role=button]:active{transform:scale(.97);filter:brightness(.96)}
 @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(max-width:600px){#modernToastRegion{top:10px;right:10px;width:calc(100vw - 20px)}}
+@media(max-width:600px){#modernToastRegion{padding:16px} .modern-toast{width:min(440px,calc(100vw - 32px));padding:16px;font-size:14px}}
 </style>
 
 <style id="modern-button-feedback">
@@ -1706,15 +1706,29 @@ const NOTO_ETHIOPIC_TTF_BASE64 = 'AAEAAAASAQAABAAgRFNJRwAAAAEABTx4AAAACEdERUYs6S
 async function exportTablePdf(filename,title,meta,table){
  if(!window.jspdf||!window.jspdf.jsPDF){alert('PDF library did not load. Connect to the internet and try again.');return;}
  const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
- // Embed Noto Sans Ethiopic so Amharic names, headings and table cells render in the PDF.
+ // Keep the report's own columns and values. Daily, summary, and individual reports
+ // intentionally have different information/status columns; export every table as rendered.
  doc.addFileToVFS('NotoSansEthiopic-Regular.ttf',NOTO_ETHIOPIC_TTF_BASE64);
  doc.addFont('NotoSansEthiopic-Regular.ttf','NotoEthiopic','normal');
  doc.setFont('NotoEthiopic','normal');doc.setFontSize(16);doc.text(String(title||'Attendance Report'),40,38);
  doc.setFontSize(9);if(meta)doc.text(String(meta).replace(/\s+/g,' ').slice(0,180),40,56);
- const head=Array.from(table.querySelectorAll('thead tr:first-child th, thead tr:first-child td')).map(x=>x.innerText.trim());
- const body=Array.from(table.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>td.innerText.trim()));
- if(!head.length){alert('Report table is empty.');return;}
- doc.autoTable({head:[head],body,startY:72,styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166]},margin:{left:35,right:35}});
+ const tables=Array.from((table&&table.closest('#reportResult')||document.getElementById('reportResult')||document).querySelectorAll('table'));
+ if(!tables.length){alert('Report table is empty.');return;}
+ let cursorY=72;
+ for(let index=0;index<tables.length;index++){
+  const current=tables[index];
+  const heading=current.previousElementSibling&&/^H[1-4]$/.test(current.previousElementSibling.tagName)?current.previousElementSibling.innerText.trim():'';
+  if(heading){
+   if(cursorY>doc.internal.pageSize.getHeight()-70){doc.addPage();cursorY=42;}
+   doc.setFont('NotoEthiopic','normal');doc.setFontSize(11);doc.text(heading.slice(0,150),40,cursorY);cursorY+=16;
+  }
+  const head=Array.from(current.querySelectorAll('thead tr:first-child th, thead tr:first-child td')).map(x=>x.innerText.trim());
+  const body=Array.from(current.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>td.innerText.trim()));
+  if(!head.length)continue;
+  if(index>0&&cursorY>doc.internal.pageSize.getHeight()-100){doc.addPage();cursorY=42;}
+  doc.autoTable({head:[head],body,startY:cursorY,styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},margin:{left:35,right:35,bottom:35},rowPageBreak:'avoid',showHead:'everyPage',horizontalPageBreak:true,horizontalPageBreakRepeat:0});
+  cursorY=(doc.lastAutoTable&&doc.lastAutoTable.finalY?doc.lastAutoTable.finalY:cursorY)+18;
+ }
  const uri=doc.output('datauristring');const pdfBase64=uri.substring(uri.indexOf(',')+1);
  if(window.Android&&typeof Android.saveBase64File==='function') Android.saveBase64File(filename,pdfBase64,'application/pdf');
  else {const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
@@ -1731,7 +1745,7 @@ $('printReport').onclick=()=>{
    window.__printHiddenElements.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);
    el.style.setProperty('display','none','important');
  });
- document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,table).catch(err=>{console.error(err);alert('PDF export failed: '+err.message)});
+ document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,$('reportResult')).catch(err=>{console.error(err);alert('PDF export failed: '+err.message)});
 };
 window.addEventListener('afterprint',()=>{
  document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
@@ -1828,13 +1842,7 @@ if(quickRefreshButton&&!quickRefreshButton.dataset.boundInsideApp){
   finally{quickRefreshButton.classList.remove('is-refreshing');quickRefreshButton.removeAttribute('aria-busy');}
  });
 }
-// Replace browser alert boxes with a small, accessible in-app dialog.
-function showModernNotice(message){
- let wrap=document.getElementById('ssModernNotice');
- if(!wrap){wrap=document.createElement('div');wrap.id='ssModernNotice';wrap.innerHTML='<div class="ss-notice-backdrop"><section class="ss-notice-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ssNoticeTitle"><div class="ss-notice-icon">✓</div><h2 id="ssNoticeTitle">ማሳወቂያ</h2><p id="ssNoticeText"></p><button type="button" id="ssNoticeOk">እሺ</button></section></div>';document.body.appendChild(wrap);wrap.querySelector('#ssNoticeOk').addEventListener('click',()=>{wrap.classList.remove('show');});wrap.addEventListener('click',e=>{if(e.target.classList.contains('ss-notice-backdrop'))wrap.classList.remove('show')});}
- wrap.querySelector('#ssNoticeText').textContent=String(message??'');wrap.classList.add('show');wrap.querySelector('#ssNoticeOk').focus();
-}
-window.alert=showModernNotice;
+// All legacy alert() calls are routed to the centered modern notification runtime loaded below.
 renderAll();
 })();
 </script>
