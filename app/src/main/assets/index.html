@@ -1085,11 +1085,15 @@ function friendlyFirebaseError(error,context='save'){
    return 'ብዙ ጥያቄዎች ተልከዋል። ጥቂት ጊዜ ጠብቀው እንደገና ይሞክሩ።';
  return (context==='login'?'መግባት':'ማስቀመጥ')+' አልተሳካም። እባክዎ እንደገና ይሞክሩ።';
 }
+// Tracks attendance documents already loaded from Firestore so normal saves never
+// turn a create-only teacher operation into an accidental update.
+let cloudAttendanceKeys=new Set();
 async function cloudSave(scope='records'){
  if(!currentUser){alert('መጀመሪያ Sign In ያድርጉ።');return false;}
  if(scope==='attendance'&&!['supervisor','teacher','class_teacher','class_assistant'].includes(role)){alert('Attendance ለመመዝገብ ፈቃድ የለዎትም።');return false;}
  try{
    const batch=db.batch();
+   const writtenAttendanceKeys=new Set();
    // Attendance-only saves let teachers save attendance without attempting to write
    // the students/classes collections, which are supervisor-only in Firestore Rules.
    if(scope==='attendance'){
@@ -1098,7 +1102,10 @@ async function cloudSave(scope='records'){
        for(const id of Object.keys(attendance[date]||{})){
          const status=attendance[date][id];
          const student=students.find(st=>String(st.id)===String(id));
-         if(['P','A','L','E'].includes(status) && student && student.className && (!isClassScoped()||student.className===assignedClass)){
+         const recordKey=attendanceRecordKey(date,id);
+         const isNewRecord=!cloudAttendanceKeys.has(recordKey);
+         const supervisorUnlocked=role==='supervisor'&&isAttendanceRecordUnlocked(date,id);
+         if(['P','A','L','E'].includes(status) && student && student.className && (!isClassScoped()||student.className===assignedClass) && (isNewRecord||supervisorUnlocked)){
            const docId=encodeURIComponent(date+'_'+id);
            batch.set(db.collection('attendance').doc(docId),{
              date, studentId:String(id), className:String(student.className), status,
@@ -1106,6 +1113,7 @@ async function cloudSave(scope='records'){
              updatedBy:currentUser.uid,
              updatedAt:firebase.firestore.FieldValue.serverTimestamp()
            },{merge:true});
+           writtenAttendanceKeys.add(recordKey);
          }
        }
      }
@@ -1130,6 +1138,11 @@ async function cloudSave(scope='records'){
      }
    }
    await batch.commit();
+   if(scope==='attendance'){
+     // Mark only records actually included in this successful batch. Local-only
+     // records must not be mistaken for documents already stored in Firestore.
+     writtenAttendanceKeys.forEach(key=>cloudAttendanceKeys.add(key));
+   }
    return true;
  }catch(e){
    console.error('Firebase save failed:',e);
@@ -1170,7 +1183,7 @@ async function loadCloud(){
  }
  classes=cc.docs.map(d=>d.data().name||d.id);if(isClassScoped()&&!classes.includes(assignedClass))classes=[assignedClass];if(!classes.length)classes=['አጠቃላይ'];
  cc.docs.forEach(d=>{const x=d.data(),name=x.name||d.id;if(x.prefix)classPrefixes[name]=String(x.prefix).toUpperCase();else if(!classPrefixes[name]){const generated=defaultPrefixForClass(name);if(generated)classPrefixes[name]=generated;}});
- attendance={};attendanceReasons={};attendanceDocs.forEach(d=>{let x=d.data();if(x.date&&x.studentId&&labels[x.status]){attendance[x.date]=attendance[x.date]||{};attendance[x.date][x.studentId]=x.status;if(x.className&&x.reasonType){attendanceReasons[x.date]=attendanceReasons[x.date]||{};attendanceReasons[x.date][x.className]={type:x.reasonType,other:x.reasonOther||''}}}});saveLocal();renderAll()
+ attendance={};attendanceReasons={};cloudAttendanceKeys=new Set();attendanceDocs.forEach(d=>{let x=d.data();if(x.date&&x.studentId&&labels[x.status]){attendance[x.date]=attendance[x.date]||{};attendance[x.date][x.studentId]=x.status;cloudAttendanceKeys.add(attendanceRecordKey(x.date,x.studentId));if(x.className&&x.reasonType){attendanceReasons[x.date]=attendanceReasons[x.date]||{};attendanceReasons[x.date][x.className]={type:x.reasonType,other:x.reasonOther||''}}}});saveLocal();renderAll()
 }
 async function signup(){
  let email=$('cloudEmail').value.trim(), password=$('cloudPassword').value;
