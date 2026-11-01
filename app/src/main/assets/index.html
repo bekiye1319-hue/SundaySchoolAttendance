@@ -1746,7 +1746,7 @@ $('printReport').onclick=()=>{
    window.__printHiddenElements.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);
    el.style.setProperty('display','none','important');
  });
- document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,$('reportResult')).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
+ document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,table).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
 };
 window.addEventListener('afterprint',()=>{
  document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
@@ -3201,3 +3201,64 @@ body.app-dark-theme #modernToastRegion .modern-toast{background:#172033!importan
   #printCleanArea th, #printCleanArea td, #printAllAttendanceArea th, #printAllAttendanceArea td { color:#111!important; background:#fff!important; border:1px solid #444!important; padding:4px 5px!important; }
 }
 </style>
+
+<style id="final-page-isolation-and-drawer-fix">
+/* Each top-level page occupies the content area alone; never let inactive sections leak below. */
+main>.page{display:none!important}
+main>.page:not(.hidden){display:block!important}
+body.sidebar-drawer-open{overflow:hidden!important}
+@media(max-width:800px){
+ body>nav[aria-label="ዋና ምናሌ"]{position:fixed!important;inset:0 auto 0 0!important;width:min(290px,84vw)!important;height:100dvh!important;z-index:2147483100!important;transform:translateX(-110%)!important;visibility:hidden!important;pointer-events:none!important;transition:transform .22s ease,visibility .22s ease!important}
+ body>nav[aria-label="ዋና ምናሌ"].sidebar-open{transform:translateX(0)!important;visibility:visible!important;pointer-events:auto!important}
+ #sidebarBackdrop{z-index:2147483000!important}
+ body.sidebar-drawer-open #sidebarBackdrop{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+}
+</style>
+<script id="final-single-owner-navigation-fix">
+(()=>{
+ const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+ const backdrop=document.getElementById('sidebarBackdrop');
+ const menu=document.getElementById('menuToggle');
+ const bottom=document.getElementById('mobileBottomNav');
+ if(!sidebar)return;
+ const drawerOpen=()=>sidebar.classList.contains('sidebar-open');
+ function drawer(open){
+  sidebar.classList.toggle('sidebar-open',!!open);
+  document.body.classList.toggle('sidebar-drawer-open',!!open);
+  document.body.classList.toggle('sidebar-is-open',!!open);
+  if(backdrop){backdrop.classList.toggle('show',!!open);backdrop.style.pointerEvents=open?'auto':'none';}
+  if(menu)menu.setAttribute('aria-expanded',String(!!open));
+ }
+ // Own the menu and More taps once, preventing older competing handlers from toggling twice.
+ document.addEventListener('click',e=>{
+  const menuTap=e.target.closest('#menuToggle');
+  const moreTap=e.target.closest('#mobileBottomNav [data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
+  if(menuTap||moreTap){e.preventDefault();e.stopImmediatePropagation();drawer(!drawerOpen());return;}
+  if(e.target===backdrop||e.target.closest('#sidebarBackdrop')){drawer(false);}
+ },true);
+ // Ensure only one content page is visible after any existing navigation handler runs.
+ function enforcePage(page){
+  document.querySelectorAll('main>.page').forEach(el=>{
+   const active=el.id===page;
+   el.classList.toggle('hidden',!active);
+   el.style.setProperty('display',active?'block':'none','important');
+  });
+  sidebar.querySelectorAll('button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  if(bottom)bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
+  drawer(false);
+  window.scrollTo({top:0,left:0,behavior:'instant'});
+  document.documentElement.scrollTop=0;document.body.scrollTop=0;
+ }
+ sidebar.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-page]');if(!b)return;
+  const page=b.dataset.page;setTimeout(()=>enforcePage(page),0);
+ });
+ if(bottom)bottom.addEventListener('click',e=>{
+  const b=e.target.closest('[data-mobile-page]');if(!b)return;
+  const page=b.dataset.mobilePage;setTimeout(()=>enforcePage(page),0);
+ });
+ backdrop?.addEventListener('click',()=>drawer(false));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')drawer(false)});
+})();
+</script>
+
