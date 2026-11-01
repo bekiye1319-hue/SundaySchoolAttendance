@@ -1094,6 +1094,7 @@ async function cloudSave(scope='records'){
  try{
    const batch=db.batch();
    const writtenAttendanceKeys=new Set();
+   const unlockDocIdsToClear=[];
    // Attendance-only saves let teachers save attendance without attempting to write
    // the students/classes collections, which are supervisor-only in Firestore Rules.
    if(scope==='attendance'){
@@ -1114,6 +1115,7 @@ async function cloudSave(scope='records'){
              updatedAt:firebase.firestore.FieldValue.serverTimestamp()
            },{merge:true});
            writtenAttendanceKeys.add(recordKey);
+           if(supervisorUnlocked)unlockDocIdsToClear.push(docId);
          }
        }
      }
@@ -1142,6 +1144,12 @@ async function cloudSave(scope='records'){
      // Mark only records actually included in this successful batch. Local-only
      // records must not be mistaken for documents already stored in Firestore.
      writtenAttendanceKeys.forEach(key=>cloudAttendanceKeys.add(key));
+     // Remove each one-time Supervisor unlock after the corresponding attendance
+     // correction has been accepted by Firestore. Unlocks also expire server-side.
+     for(const unlockId of unlockDocIdsToClear){
+       try{await db.collection('attendanceUnlocks').doc(unlockId).delete();}
+       catch(cleanupError){console.warn('Could not clear attendance unlock:',cleanupError);}
+     }
    }
    return true;
  }catch(e){
@@ -1276,11 +1284,12 @@ function drawAttendance(){
  const radioCell=(st,code)=>{const w=getLateWindow(st.className),now=localNowHHMM(),today=iso===localTodayISO(),current=day[String(st.id)],recorded=!!current,unlocked=isAttendanceRecordUnlocked(iso,st.id),close=isAttendanceClosePassed(st.className,iso);let timeBlocked=false;if(today&&!unlocked&&w.enabled!==false&&w.lateStart&&w.end){if(code==='P')timeBlocked=!(now>=w.classStart&&now<w.lateStart);if(code==='L')timeBlocked=!(now>=w.lateStart&&now<=w.end)}if(today&&!unlocked&&close)timeBlocked=true;const disabled=(recorded&&!unlocked)||timeBlocked;return `<td class="attendance-radio-td"><label class="attendance-radio-option status-${code}" title="${recorded&&!unlocked?'ይህ Status ተመዝግቧል። Supervisor Unlock ያስፈልጋል።':timeBlocked?'ይህ Status በአሁኑ ሰዓት አይፈቀድም።':code}"><input type="radio" name="st-${esc(st.id)}" value="${code}" aria-label="${esc(st.name)} ${code}" ${disabled?'disabled':''} ${current===code?'checked':''}><span class="attendance-radio-visual" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label></td>`};
  $('attendanceTable').innerHTML=`<table class="attendance-reference-table attendance-four-column-radio"><thead><tr>
  <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th>
- <th class="radio-head head-P">P</th><th class="radio-head head-A">A</th><th class="radio-head head-L">L</th><th class="radio-head head-E">E</th>
- </tr></thead><tbody>${list.map((st,i)=>`<tr>
+ <th class="radio-head head-P">P</th><th class="radio-head head-A">A</th><th class="radio-head head-L">L</th><th class="radio-head head-E">E</th><th style="width:90px">Unlock</th>
+ </tr></thead><tbody>${list.map((st,i)=>{const recorded=!!day[String(st.id)],unlocked=isAttendanceRecordUnlocked(iso,st.id);return `<tr>
  <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="text-align:left;unicode-bidi:isolate">${esc(st.name)}</td><td>${esc(st.className||'')}</td>
  ${['P','A','L','E'].map(code=>radioCell(st,code)).join('')}
- </tr>`).join('')||'<tr><td colspan="8" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
+ <td>${role==='supervisor'&&recorded&&!unlocked?`<button type="button" class="attendance-unlock-btn" data-attendance-unlock="${esc(st.id)}" title="Unlock this attendance">🔓 Unlock</button>`:unlocked?'<span class="small">Unlocked</span>':''}</td>
+ </tr>`}).join('')||'<tr><td colspan="9" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
  renderAttendanceSummary(list,day,iso)
 }
 function renderAttendanceSummary(list,day,iso){const counts={P:0,A:0,L:0,E:0};list.forEach(st=>{const v=day[String(st.id)];if(counts[v]!==undefined)counts[v]++});const labels={P:'ተገኝቷል',A:'ቀርቷል',L:'ዘግይቷል',E:'ፈቃድ'};$('attendanceSummary').innerHTML=Object.keys(counts).map(k=>`<div class="summary-row summary-${k}"><span class="summary-letter">${k}</span><strong>${labels[k]}</strong><b>${counts[k]}</b></div>`).join('');$('attendanceSummaryFooter').innerHTML=iso?`📅 ቀን፦ ${dateET(iso)} &nbsp; | &nbsp; ክፍል፦ ${esc(isClassScoped()?assignedClass:($('attClass').selectedOptions[0]?.textContent||'ሁሉም ክፍሎች'))}`:''}
@@ -1579,7 +1588,7 @@ $('desktopNavbarLogout').addEventListener('click',()=>{const logout=$('topLogout
 /* Mobile drawer events are handled once by mobile-sidebar-drawer-reliable-handler below. */
 setInterval(()=>{if(currentUser)runAttendanceClosingCatchUp();},60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentUser)runAttendanceClosingCatchUp();});window.addEventListener('focus',()=>{if(currentUser)runAttendanceClosingCatchUp();});
 $('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attendanceReason').addEventListener('change',()=>{$('attendanceReasonOtherWrap').classList.toggle('hidden',$('attendanceReason').value!=='ሌላ')});$('showComparativeAnalysis').addEventListener('change',e=>{$('comparativeAnalysisCard').classList.toggle('hidden',!e.target.checked)});$('reportReason').addEventListener('change',()=>{if(!$('reportResultCard').classList.contains('hidden'))report()});$('attDate').addEventListener('change',drawAttendance);if($('attendanceSearch'))$('attendanceSearch').addEventListener('input',drawAttendance);if($('attendanceStatusFilter'))$('attendanceStatusFilter').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;if($('studentsClassFilter'))$('studentsClassFilter').onchange=renderStudents;$('attendanceTable').addEventListener('change',e=>{if(e.target.matches('input[type=radio]')){const iso=dateISO($('attDate').value);const c=isClassScoped()?assignedClass:$('attClass').value;const list=students.filter(st=>c==='__ALL__'||st.className===c);const day={...(attendance[iso]||{})};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);renderAttendanceSummary(list,day,iso)}});$('allPresent').onclick=()=>{const iso=dateISO($('attDate').value),c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(st=>c==='__ALL__'||st.className===c),day={...(attendance[iso]||{})};list.forEach(st=>{if(!day[String(st.id)]&&!isAttendanceRecordUnlocked(iso,st.id))day[String(st.id)]='P';});document.querySelectorAll('#attendanceTable input[type=radio]').forEach(x=>{const id=x.name.slice(3);x.checked=day[id]===x.value});renderAttendanceSummary(list,day,iso)};
-$('attendanceTable').addEventListener('click',async e=>{const btn=e.target.closest('[data-attendance-unlock]');if(!btn)return;if(role!=='supervisor')return alert('Supervisor ብቻ Unlock ማድረግ ይችላል።');const iso=dateISO($('attDate').value),id=String(btn.dataset.attendanceUnlock);if(!attendance[iso]||!attendance[iso][id])return;unlockedAttendanceRecords.add(attendanceRecordKey(iso,id));drawAttendance();});
+$('attendanceTable').addEventListener('click',async e=>{const btn=e.target.closest('[data-attendance-unlock]');if(!btn)return;if(role!=='supervisor')return alert('Supervisor ብቻ Unlock ማድረግ ይችላል።');const iso=dateISO($('attDate').value),id=String(btn.dataset.attendanceUnlock),st=students.find(x=>String(x.id)===id);if(!attendance[iso]||!attendance[iso][id]||!st)return;btn.disabled=true;try{const docId=encodeURIComponent(iso+'_'+id);await db.collection('attendanceUnlocks').doc(docId).set({date:iso,studentId:id,className:String(st.className||''),unlockedBy:currentUser.uid,expiresAt:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+10*60*1000)),createdAt:firebase.firestore.FieldValue.serverTimestamp()});unlockedAttendanceRecords.add(attendanceRecordKey(iso,id));drawAttendance();}catch(error){console.error('Attendance unlock failed:',error);alert(friendlyFirebaseError(error,'save'));btn.disabled=false;}});
 $('saveAtt').onclick=async()=>{
  if(!currentUser)return alert('መጀመሪያ Sign In ያድርጉ።');
  const iso=dateISO($('attDate').value);
