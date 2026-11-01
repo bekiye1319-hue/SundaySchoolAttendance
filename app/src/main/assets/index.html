@@ -1079,7 +1079,7 @@ function friendlyFirebaseError(error,context='save'){
    return 'የመግቢያ ጊዜዎ አልቋል። እንደገና ይግቡ።';
  if(code.includes('resource-exhausted'))
    return 'ብዙ ጥያቄዎች ተልከዋል። ጥቂት ጊዜ ጠብቀው እንደገና ይሞክሩ።';
- return (context==='login'?'መግባት':'ማስቀመጥ')+' አልተሳካም። እባክዎ እንደገና ይሞክሩ።';
+ return (context==='login'?'መግባት':'ማስቀመጥ')+' አልተሳካም። የስህተት ኮድ: '+(code||'unknown')+'. እባክዎ ይህን ኮድ ለSupervisor ያሳዩ።';
 }
 async function cloudSave(scope='records'){
  if(!currentUser){alert('መጀመሪያ Sign In ያድርጉ።');return false;}
