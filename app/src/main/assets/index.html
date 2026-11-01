@@ -858,15 +858,15 @@ body.app-dark-theme .attendance-unlock-btn{background:#422006;color:#fed7aa;bord
 </style>
 \n<style id="modern-notification-system">
 #modernToastRegion{position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;padding:20px;box-sizing:border-box;pointer-events:none;background:transparent}
-.modern-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:11px;width:min(560px,calc(100vw - 32px));max-width:100%;box-sizing:border-box;padding:22px 24px;min-height:84px;border:1px solid var(--toast-border);border-left:5px solid var(--toast-accent);border-radius:16px;background:var(--toast-bg);color:var(--toast-text);box-shadow:0 18px 55px rgba(15,23,42,.28);font-family:inherit;font-size:18px;font-weight:650;line-height:1.6;animation:toastIn .24s ease-out;backdrop-filter:blur(12px)}
+.modern-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:11px;width:min(440px,calc(100vw - 40px));max-width:100%;box-sizing:border-box;padding:17px 19px;border:1px solid var(--toast-border);border-left:5px solid var(--toast-accent);border-radius:16px;background:var(--toast-bg);color:var(--toast-text);box-shadow:0 18px 55px rgba(15,23,42,.28);font:500 15px/1.55 inherit;animation:toastIn .24s ease-out;backdrop-filter:blur(12px)}
 .modern-toast.success{--toast-accent:#16a34a;--toast-border:#bbf7d0;--toast-bg:#f0fdf4;--toast-text:#166534}.modern-toast.error{--toast-accent:#dc2626;--toast-border:#fecaca;--toast-bg:#fef2f2;--toast-text:#991b1b}.modern-toast.warning{--toast-accent:#d97706;--toast-border:#fed7aa;--toast-bg:#fff7ed;--toast-text:#9a3412}.modern-toast.info{--toast-accent:#2563eb;--toast-border:#bfdbfe;--toast-bg:#eff6ff;--toast-text:#1e40af}
 body.app-dark-theme .modern-toast{--toast-bg:#172033;--toast-text:#e5e7eb;--toast-border:#334155}
-.modern-toast-icon{font-size:25px;line-height:1.3;min-width:28px;text-align:center}.modern-toast-message{font-size:18px;font-weight:600}.modern-toast-message{flex:1;overflow-wrap:anywhere}.modern-toast-close{border:0;background:transparent;color:inherit;opacity:.65;font-size:18px;cursor:pointer;padding:0 2px}.modern-toast-close:hover{opacity:1}
+.modern-toast-icon{font-size:18px;line-height:1.3}.modern-toast-message{flex:1;overflow-wrap:anywhere}.modern-toast-close{border:0;background:transparent;color:inherit;opacity:.65;font-size:18px;cursor:pointer;padding:0 2px}.modern-toast-close:hover{opacity:1}
 #modernConfirmBackdrop{position:fixed;inset:0;z-index:1000000;background:rgba(15,23,42,.52);display:grid;place-items:center;padding:18px;backdrop-filter:blur(3px)}
 #modernConfirmBox{width:min(420px,100%);padding:22px;border-radius:18px;background:var(--card-bg,#fff);color:var(--text-color,inherit);box-shadow:0 24px 70px rgba(0,0,0,.28);animation:toastIn .18s ease-out}#modernConfirmBox p{margin:0 0 20px;line-height:1.65;white-space:pre-wrap}#modernConfirmBox .confirm-actions{display:flex;justify-content:flex-end;gap:10px}#modernConfirmBox button{min-width:90px;padding:10px 16px;border-radius:10px;border:1px solid #cbd5e1;cursor:pointer;font:inherit}#modernConfirmYes{background:#2563eb;color:white;border-color:#2563eb}
 button,input[type=button],input[type=submit],[role=button]{transition:transform .13s ease,filter .13s ease,box-shadow .13s ease}button:active,input[type=button]:active,input[type=submit]:active,[role=button]:active{transform:scale(.97);filter:brightness(.96)}
 @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(max-width:600px){#modernToastRegion{padding:14px}.modern-toast{width:calc(100vw - 28px);padding:21px 20px;min-height:88px;font-size:18px}.modern-toast-message{font-size:18px}.modern-toast-icon{font-size:26px}}
+@media(max-width:600px){#modernToastRegion{padding:16px} .modern-toast{width:min(440px,calc(100vw - 32px));padding:16px;font-size:14px}}
 </style>
 
 <style id="modern-button-feedback">
@@ -1721,10 +1721,11 @@ async function exportTablePdf(filename,title,meta,table){
  let cursorY=72;
  for(let index=0;index<tables.length;index++){
   const current=tables[index];
-  const heading=current.previousElementSibling&&/^H[1-4]$/.test(current.previousElementSibling.tagName)?current.previousElementSibling.innerText.trim():'';
+  const heading=current.previousElementSibling&&/^H[1-4]$/.test(current.previousElementSibling.tagName)?(current.previousElementSibling.innerText||current.previousElementSibling.textContent||'').trim():'';
   if(heading){if(cursorY>doc.internal.pageSize.getHeight()-70){doc.addPage();cursorY=42;}doc.setFont('NotoEthiopic','normal');doc.setFontSize(11);doc.text(heading.slice(0,150),40,cursorY);cursorY+=16;}
-  const head=Array.from(current.querySelectorAll('thead tr:first-child th, thead tr:first-child td')).map(x=>x.innerText.trim());
-  const body=Array.from(current.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>td.innerText.trim()));
+  const cellText=(cell)=>{const visible=(cell.innerText||'').trim();if(visible)return visible;return (cell.textContent||'').replace(/\s+/g,' ').trim();};
+  const head=Array.from(current.querySelectorAll('thead tr:first-child th, thead tr:first-child td')).map(cellText);
+  const body=Array.from(current.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll(':scope > th, :scope > td')).map(cellText));
   if(!head.length)continue;
   if(index>0&&cursorY>doc.internal.pageSize.getHeight()-100){doc.addPage();cursorY=42;}
   doc.autoTable({head:[head],body,startY:cursorY,styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},margin:{left:35,right:35,bottom:35},rowPageBreak:'avoid',showHead:'everyPage',horizontalPageBreak:true,horizontalPageBreakRepeat:0});
@@ -1737,16 +1738,16 @@ async function exportTablePdf(filename,title,meta,table){
 $('makeReport').onclick=()=>{report();logActivity('Report generated','የAttendance ሪፖርት ተፈጠረ')};
 $('printReport').onclick=()=>{
  if($('reportResultCard').classList.contains('hidden')){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
- const table=$('reportResult').querySelector('table');if(!table){showModernNotification('የሚታተም ሪፖርት አልተገኘም።');return;}
+ const reportContainer=$('reportResult');const tables=Array.from(reportContainer.querySelectorAll('table'));if(!tables.length){showModernNotification('የሚታተም ሪፖርት አልተገኘም።');return;}
  const meta=$('reportResult').querySelector('.report-range-note')?.textContent||'';
- makeCleanPrintSheet('የAttendance ሪፖርት',meta,table.outerHTML);
+ makeCleanPrintSheet('የAttendance ሪፖርት',meta,tables.map(t=>t.outerHTML).join(''));
  // Hide drawer layers inline as well as through print CSS; restore after the print dialog closes.
  window.__printHiddenElements=[];
  document.querySelectorAll('nav[aria-label="ዋና ምናሌ"],#sidebarBackdrop,#mobileBottomNav,#supervisorDesktopNavbar,#globalProfileNavbar,.sidebar-backdrop').forEach(el=>{
    window.__printHiddenElements.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);
    el.style.setProperty('display','none','important');
  });
- document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,table).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
+ document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,reportContainer).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
 };
 window.addEventListener('afterprint',()=>{
  document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
@@ -1769,11 +1770,11 @@ $('printAttendance').onclick=()=>{
  const query=($('attendanceSearch')?.value||'').trim().toLocaleLowerCase(),filter=$('attendanceStatusFilter')?.value||'ALL',day=attendance[iso]||{};
  const list=students.filter(st=>(cls==='__ALL__'||st.className===cls)&&(!query||[st.name,st.id,st.className,st.phone].some(v=>String(v||'').toLocaleLowerCase().includes(query)))&&(filter==='ALL'||(filter==='NONE'?!day[String(st.id)]:day[String(st.id)]===filter)));
  const labels={P:'Present',A:'Absent',L:'Late',E:'Permission'};
- const table=`<table><thead><tr><th>#</th><th>Student Name</th><th>Attendance Status</th></tr></thead><tbody>${list.map((st,i)=>{const status=day[String(st.id)]||'Not recorded';return `<tr><td>${i+1}</td><td>${esc(st.name)}</td><td><strong>${esc(labels[status]||status)}${['P','A','L','E'].includes(status)?` (${status})`:''}</strong></td></tr>`;}).join('')||'<tr><td colspan="3">No students found</td></tr>'}</tbody></table>`;
+ const table=`<table><thead><tr><th>#</th><th>ID</th><th>Student Name</th><th>Class</th><th>Reason</th><th>Attendance Status</th></tr></thead><tbody>${list.map((st,i)=>{const status=day[String(st.id)]||'Not recorded',rr=getAttendanceReason(iso,st.className),why=rr?(rr.type==='ሌላ'&&rr.other?`ሌላ: ${rr.other}`:rr.type):'—';return `<tr><td>${i+1}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td>${esc(st.className||'')}</td><td>${esc(why)}</td><td>${esc(labels[status]||status)}${['P','A','L','E'].includes(status)?` (${status})`:''}</td></tr>`;}).join('')||'<tr><td colspan="6">No students found</td></tr>'}</tbody></table>`;
  const pdfArea=makeCleanPrintSheet('የዕለቱ Attendance መዝገብ',`ቀን፦ ${dateET(iso)} | ክፍል፦ ${esc(clsLabel)} | ምክንያት፦ ${esc(reasonLabel)}`,table);
  document.body.classList.remove('print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const pdfTable=pdfArea.querySelector('table');const classPart=cls==='__ALL__'?'All-Classes':safeFilePart(cls);exportTablePdf(`Attendance_EC-${dateETFile(iso)}_${classPart}.pdf`,'Daily Attendance',`Date: ${iso} | Class: ${clsLabel} | Reason: ${reasonLabel}`,pdfTable).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
 };
-$('printAllAttendance').onclick=()=>{const iso=dateISO($('attDate').value);if(!iso)return showModernNotification('ከመታተም በፊት ትክክለኛ ቀን ያስገቡ።');const dateLabel=dateET(iso);const visibleClasses=isClassScoped()?[assignedClass]:classes;const area=document.createElement('div');area.id='printAllAttendanceArea';let html=`<h1>ሰንበት ትምህርት ቤት</h1><h2>የAttendance መዝገብ — ሁሉም ክፍሎች</h2><p>ቀን: ${esc(dateLabel)}</p>`;visibleClasses.forEach(cls=>{const list=students.filter(st=>st.className===cls);html+=`<section class="print-class"><h2>${esc(cls)}</h2><table><thead><tr><th>ተ.ቁ</th><th>ID</th><th>ሙሉ ስም</th><th>Attendance Status (P/A/L/E)</th></tr></thead><tbody>${list.map((st,i)=>{const status=(attendance[iso]||{})[String(st.id)]||'';return `<tr><td>${i+1}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td>${status==='P'?'✓':''}</td><td>${status==='A'?'✓':''}</td><td>${status==='L'?'✓':''}</td><td>${status==='E'?'✓':''}</td></tr>`}).join('')}</tbody></table></section>`});area.innerHTML=html;const prior=$('printAllAttendanceArea');if(prior)prior.remove();document.body.appendChild(area);document.body.classList.remove('print-attendance','print-report');document.body.classList.add('print-all-attendance');const allTables=Array.from(area.querySelectorAll('table'));const combined=document.createElement('table');combined.innerHTML='<thead><tr><th>Class</th><th>Student ID</th><th>Student Name</th><th>Attendance Status</th></tr></thead><tbody>'+visibleClasses.flatMap(cls=>students.filter(st=>st.className===cls).map(st=>{const v=(attendance[iso]||{})[String(st.id)]||'';const statusLabel={P:'Present (P)',A:'Absent (A)',L:'Late (L)',E:'Permission (E)'};return `<tr><td>${esc(cls)}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td><strong>${esc(statusLabel[v]||'Not recorded')}</strong></td></tr>`})).join('')+'</tbody>';exportTablePdf(`Attendance_EC-${dateETFile(iso)}_All-Classes.pdf`,'All Classes Attendance',`Date: ${iso}`,combined).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});};
+$('printAllAttendance').onclick=()=>{const iso=dateISO($('attDate').value);if(!iso)return showModernNotification('ከመታተም በፊት ትክክለኛ ቀን ያስገቡ።');const dateLabel=dateET(iso);const visibleClasses=isClassScoped()?[assignedClass]:classes;const area=document.createElement('div');area.id='printAllAttendanceArea';let html=`<h1>ሰንበት ትምህርት ቤት</h1><h2>የAttendance መዝገብ — ሁሉም ክፍሎች</h2><p>ቀን: ${esc(dateLabel)}</p>`;visibleClasses.forEach(cls=>{const list=students.filter(st=>st.className===cls);html+=`<section class="print-class"><h2>${esc(cls)}</h2><table><thead><tr><th>ተ.ቁ</th><th>ID</th><th>ሙሉ ስም</th><th>Attendance Status (P/A/L/E)</th></tr></thead><tbody>${list.map((st,i)=>{const status=(attendance[iso]||{})[String(st.id)]||'';return `<tr><td>${i+1}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td>${status==='P'?'✓':''}</td><td>${status==='A'?'✓':''}</td><td>${status==='L'?'✓':''}</td><td>${status==='E'?'✓':''}</td></tr>`}).join('')}</tbody></table></section>`});area.innerHTML=html;const prior=$('printAllAttendanceArea');if(prior)prior.remove();document.body.appendChild(area);document.body.classList.remove('print-attendance','print-report');document.body.classList.add('print-all-attendance');const allTables=Array.from(area.querySelectorAll('table'));const combined=document.createElement('table');combined.innerHTML='<thead><tr><th>Class</th><th>Student ID</th><th>Student Name</th><th>Present</th><th>Absent</th><th>Late</th><th>Permission</th></tr></thead><tbody>'+visibleClasses.flatMap(cls=>students.filter(st=>st.className===cls).map(st=>{const v=(attendance[iso]||{})[String(st.id)]||'';return `<tr><td>${esc(cls)}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td><strong>${esc(v||'—')}</strong></td></tr>`})).join('')+'</tbody>';exportTablePdf(`Attendance_EC-${dateETFile(iso)}_All-Classes.pdf`,'All Classes Attendance',`Date: ${iso}`,combined).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});};
 $('exportExcel').onclick=()=>{if(typeof XLSX==='undefined')return showModernNotification('Excel መሳሪያው አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።');const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);if(!from||!to||from>to)return showModernNotification('Excel ለማውረድ የቀን ክልሉን ያስተካክሉ።');const rangeDays=Math.round((Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000)+1;if($('reportPeriod').value==='monthly'&&rangeDays<=30)return showModernNotification('ወርሃዊ Excel ለማውረድ ከ30 ቀናት በላይ የሆነ የቀን ክልል ይምረጡ (ቢያንስ 31 ቀናት)።');const dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort();const sid=$('reportStudent').value;const classFilter=$('reportClass').value;const reasonFilter=$('reportReason')?.value||'__ALL__';const list=students.filter(st=>(!isClassScoped()||st.className===assignedClass)&&(classFilter==='__ALL__'||st.className===classFilter)&&(sid==='__ALL__'||String(st.id)===sid));const rows=[['Student ID','Full Name','Phone','Class','Attendance Reason','Other Reason','P Present','A Absent','L Late','E Permission','Recorded Days','Attendance %','From','To']];list.forEach(st=>{const c={P:0,A:0,L:0,E:0};dates.filter(d=>reasonFilter==='__ALL__'||(getAttendanceReason(d,st.className)||{}).type===reasonFilter).forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(c[v]!==undefined)c[v]++});const marked=c.P+c.A+c.L+c.E;const pct=marked?Math.round((c.P*100+c.L*Number(appSettings.lateScore??75)+c.E*Number(appSettings.permissionScore??100))/marked):0;const reasonEntries=dates.map(d=>getAttendanceReason(d,st.className)).filter(r=>r&&(reasonFilter==='__ALL__'||r.type===reasonFilter));const reasonLabel=[...new Set(reasonEntries.map(r=>r.type))].join(', '),otherLabel=[...new Set(reasonEntries.map(r=>r.other).filter(Boolean))].join(', ');rows.push([st.id,st.name,st.phone||'',st.className||'',reasonLabel,otherLabel,c.P,c.A,c.L,c.E,marked,pct+'%',dateET(from),dateET(to)])});const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:14},{wch:28},{wch:18},{wch:18},{wch:20},{wch:24},{wch:12},{wch:12},{wch:12},{wch:14},{wch:16},{wch:16},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,ws,'Attendance Report');saveWorkbookFile(wb,`Attendance_EC-${dateETFile(from)}_to_EC-${dateETFile(to)}_Report.xlsx`)};
 function download(name,text){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 const BACKUP_PREF_KEY='ss_backup_preferences_v2',BACKUP_LAST_KEY='ss_last_backup_v2';
@@ -3094,15 +3095,6 @@ body>nav.no-print{z-index:2147482500!important}
 })();
 </script>
 
-
-<style id="notification-large-visible-fix">
-#modernToastRegion{z-index:2147483647!important;position:fixed!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;pointer-events:none!important;padding:16px!important}
-#modernToastRegion .modern-toast{width:min(560px,calc(100vw - 28px))!important;min-height:88px!important;padding:22px 24px!important;font-size:18px!important;font-weight:650!important;line-height:1.6!important;box-shadow:0 20px 65px rgba(0,0,0,.42)!important;border-width:2px!important}
-#modernToastRegion .modern-toast-message{font-size:18px!important;font-weight:650!important;line-height:1.6!important}
-#modernToastRegion .modern-toast-icon{font-size:26px!important;min-width:30px!important}
-body.app-dark-theme #modernToastRegion .modern-toast{background:#172033!important;color:#fff!important;border-color:#64748b!important}
-@media(max-width:600px){#modernToastRegion .modern-toast{width:calc(100vw - 28px)!important;padding:21px 19px!important;min-height:90px!important}}
-</style>
 </body></html>
 
 <style id="v8-clean-attendance-print">
@@ -3201,64 +3193,3 @@ body.app-dark-theme #modernToastRegion .modern-toast{background:#172033!importan
   #printCleanArea th, #printCleanArea td, #printAllAttendanceArea th, #printAllAttendanceArea td { color:#111!important; background:#fff!important; border:1px solid #444!important; padding:4px 5px!important; }
 }
 </style>
-
-<style id="final-page-isolation-and-drawer-fix">
-/* Each top-level page occupies the content area alone; never let inactive sections leak below. */
-main>.page{display:none!important}
-main>.page:not(.hidden){display:block!important}
-body.sidebar-drawer-open{overflow:hidden!important}
-@media(max-width:800px){
- body>nav[aria-label="ዋና ምናሌ"]{position:fixed!important;inset:0 auto 0 0!important;width:min(290px,84vw)!important;height:100dvh!important;z-index:2147483100!important;transform:translateX(-110%)!important;visibility:hidden!important;pointer-events:none!important;transition:transform .22s ease,visibility .22s ease!important}
- body>nav[aria-label="ዋና ምናሌ"].sidebar-open{transform:translateX(0)!important;visibility:visible!important;pointer-events:auto!important}
- #sidebarBackdrop{z-index:2147483000!important}
- body.sidebar-drawer-open #sidebarBackdrop{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
-}
-</style>
-<script id="final-single-owner-navigation-fix">
-(()=>{
- const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
- const backdrop=document.getElementById('sidebarBackdrop');
- const menu=document.getElementById('menuToggle');
- const bottom=document.getElementById('mobileBottomNav');
- if(!sidebar)return;
- const drawerOpen=()=>sidebar.classList.contains('sidebar-open');
- function drawer(open){
-  sidebar.classList.toggle('sidebar-open',!!open);
-  document.body.classList.toggle('sidebar-drawer-open',!!open);
-  document.body.classList.toggle('sidebar-is-open',!!open);
-  if(backdrop){backdrop.classList.toggle('show',!!open);backdrop.style.pointerEvents=open?'auto':'none';}
-  if(menu)menu.setAttribute('aria-expanded',String(!!open));
- }
- // Own the menu and More taps once, preventing older competing handlers from toggling twice.
- document.addEventListener('click',e=>{
-  const menuTap=e.target.closest('#menuToggle');
-  const moreTap=e.target.closest('#mobileBottomNav [data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
-  if(menuTap||moreTap){e.preventDefault();e.stopImmediatePropagation();drawer(!drawerOpen());return;}
-  if(e.target===backdrop||e.target.closest('#sidebarBackdrop')){drawer(false);}
- },true);
- // Ensure only one content page is visible after any existing navigation handler runs.
- function enforcePage(page){
-  document.querySelectorAll('main>.page').forEach(el=>{
-   const active=el.id===page;
-   el.classList.toggle('hidden',!active);
-   el.style.setProperty('display',active?'block':'none','important');
-  });
-  sidebar.querySelectorAll('button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
-  if(bottom)bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
-  drawer(false);
-  window.scrollTo({top:0,left:0,behavior:'instant'});
-  document.documentElement.scrollTop=0;document.body.scrollTop=0;
- }
- sidebar.addEventListener('click',e=>{
-  const b=e.target.closest('button[data-page]');if(!b)return;
-  const page=b.dataset.page;setTimeout(()=>enforcePage(page),0);
- });
- if(bottom)bottom.addEventListener('click',e=>{
-  const b=e.target.closest('[data-mobile-page]');if(!b)return;
-  const page=b.dataset.mobilePage;setTimeout(()=>enforcePage(page),0);
- });
- backdrop?.addEventListener('click',()=>drawer(false));
- document.addEventListener('keydown',e=>{if(e.key==='Escape')drawer(false)});
-})();
-</script>
-
