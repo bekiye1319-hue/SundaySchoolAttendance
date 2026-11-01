@@ -990,6 +990,7 @@ body.app-dark-theme .attendance-unlock-btn{background:#422006;color:#fed7aa;bord
 </div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1095,7 +1096,14 @@ async function cloudSave(scope='records'){
          const student=students.find(st=>String(st.id)===String(id));
          if(['P','A','L','E'].includes(status) && student && student.className && (!isClassScoped()||student.className===assignedClass)){
            const docId=encodeURIComponent(date+'_'+id);
-           batch.set(db.collection('attendance').doc(docId),{
+           const ref=db.collection('attendance').doc(docId);
+           // Teachers may create a daily record once, but cannot update an existing
+           // record. A Supervisor update is sent only after the explicit UI Unlock.
+           const existing=await ref.get();
+           const unlocked=isAttendanceRecordUnlocked(date,id);
+           if(existing.exists && !(role==='supervisor' && unlocked)) continue;
+           if(existing.exists && role!=='supervisor') continue;
+           batch.set(ref,{
              date, studentId:String(id), className:String(student.className), status,
              reasonType:(getAttendanceReason(date,student.className)||{}).type||'', reasonOther:(getAttendanceReason(date,student.className)||{}).other||'',
              updatedBy:currentUser.uid,
@@ -1198,7 +1206,7 @@ function renderStudents(){
  $('totalStudentsCount').textContent=list.length;
  const headers='<th>#</th><th>ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>ስልክ</th><th>የመመዝገቢያ ቀን</th><th>እርምጃ</th>';
  if(!list.length){box.innerHTML=`<table><thead><tr>${headers}</tr></thead><tbody><tr><td colspan="7" class="students-ref-empty">${q||selectedClass!=='__ALL__'?'በዚህ ማጣሪያ የተገኘ ተማሪ የለም።':'ገና ተማሪ አልተመዘገበም።'}</td></tr></tbody></table>`;return;}
- box.innerHTML='<table><thead><tr>'+headers+'</tr></thead><tbody>'+list.map((st,idx)=>`<tr><td>${idx+1}</td><td class="students-ref-id">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="text-align:left;unicode-bidi:isolate">${esc(st.name)}${day[String(st.id)]&&role==='supervisor'?` <button type="button" class="attendance-unlock-btn no-print" data-attendance-unlock="${esc(st.id)}" title="Unlock">🔓</button>`:''}</td><td>${esc(st.className)}</td><td>${esc(st.phone||'-')}</td><td>${esc(st.regDate||st.createdAt||'—')}</td><td><div class="students-ref-actions">${role==='supervisor'?`<button type="button" class="students-ref-action" data-edit-student="${esc(st.id)}" title="አስተካክል" aria-label="${esc(st.name)} አስተካክል"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button><button type="button" class="students-ref-action" data-delete-student="${esc(st.id)}" title="ሰርዝ" aria-label="${esc(st.name)} ሰርዝ"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>`:'—'}</div></td></tr>`).join('')+'</tbody></table>';
+ box.innerHTML='<table><thead><tr>'+headers+'</tr></thead><tbody>'+list.map((st,idx)=>`<tr><td>${idx+1}</td><td class="students-ref-id">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="text-align:left;unicode-bidi:isolate">${esc(st.name)}${day[String(st.id)]&&role==='supervisor'?` <button type="button" class="attendance-unlock-btn no-print" data-attendance-unlock="${esc(st.id)}" title="Supervisor Unlock">🔓</button>`:''}</td><td>${esc(st.className)}</td><td>${esc(st.phone||'-')}</td><td>${esc(st.regDate||st.createdAt||'—')}</td><td><div class="students-ref-actions">${role==='supervisor'?`<button type="button" class="students-ref-action" data-edit-student="${esc(st.id)}" title="አስተካክል" aria-label="${esc(st.name)} አስተካክል"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button><button type="button" class="students-ref-action" data-delete-student="${esc(st.id)}" title="ሰርዝ" aria-label="${esc(st.name)} ሰርዝ"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>`:'—'}</div></td></tr>`).join('')+'</tbody></table>';
 }
 function renderClasses(){const visibleClasses=isClassScoped()?[assignedClass]:classes;const overview=$('classOverview');if(overview){overview.innerHTML=visibleClasses.map(c=>{const roster=students.filter(st=>st.className===c);let p=0,marked=0,last='—';Object.keys(attendance).sort().forEach(d=>{let any=false;roster.forEach(st=>{const v=(attendance[d]||{})[String(st.id)];if(['P','A','L','E'].includes(v)){marked++;if(v==='P')p++;any=true;}});if(any)last=d;});const active=roster.length;const pct=marked?Math.round(p/marked*100):0;return `<div class="class-overview-card"><h3>${esc(c)}</h3><div class="class-metrics"><div>👨‍🎓 <b>${active}</b><span>Total Students</span></div><div>🟢 <b>${active-inactiveForClass(c).length}</b><span>Active Students</span></div><div>🔴 <b>${inactiveForClass(c).length}</b><span>Inactive Students</span></div><div>📊 <b>${pct}%</b><span>Attendance Percentage</span></div><div>📅 <b>${esc(last==='—'?'—':dateET(last))}</b><span>የመጨረሻው Attendance ቀን</span></div></div></div>`}).join('');} $('classesTable').innerHTML='<table><thead><tr><th>ክፍል</th><th>Total Students</th><th>Active</th><th>Inactive</th><th>Attendance %</th><th>የመጨረሻ Attendance</th><th>እርምጃ</th></tr></thead><tbody>'+visibleClasses.map(c=>{const roster=students.filter(st=>st.className===c);let p=0,m=0,last='—';Object.keys(attendance).sort().forEach(d=>{let any=false;roster.forEach(st=>{const v=(attendance[d]||{})[String(st.id)];if(['P','A','L','E'].includes(v)){m++;if(v==='P')p++;any=true}});if(any)last=d});const inactive=inactiveForClass(c).length;return `<tr><td>${esc(c)}</td><td>${roster.length}</td><td>${roster.length-inactive}</td><td class="A">${inactive}</td><td>${m?Math.round(p/m*100):0}%</td><td>${last==='—'?'—':dateET(last)}</td><td>${role==='supervisor'?`<button class="class-delete-btn" data-delete-class="${esc(c)}">ሰርዝ</button>`:''}</td></tr>`}).join('')+'</tbody></table>'}
 function inactiveForClass(className){const threshold=Math.max(1,Number(appSettings.inactiveDays??4));return students.filter(st=>st.className===className&&consecutiveAbsentCount(st)>=threshold)}
@@ -1261,7 +1269,7 @@ function drawAttendance(){
  <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th>
  <th class="radio-head head-P">P</th><th class="radio-head head-A">A</th><th class="radio-head head-L">L</th><th class="radio-head head-E">E</th>
  </tr></thead><tbody>${list.map((st,i)=>`<tr>
- <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="text-align:left;unicode-bidi:isolate">${esc(st.name)}${day[String(st.id)]&&role==='supervisor'?` <button type="button" class="attendance-unlock-btn no-print" data-attendance-unlock="${esc(st.id)}" title="Unlock">🔓</button>`:''}</td><td>${esc(st.className||'')}</td>
+ <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="text-align:left;unicode-bidi:isolate">${esc(st.name)}${day[String(st.id)]&&role==='supervisor'?` <button type="button" class="attendance-unlock-btn no-print" data-attendance-unlock="${esc(st.id)}" title="Supervisor Unlock">🔓</button>`:''}</td><td>${esc(st.className||'')}</td>
  ${['P','A','L','E'].map(code=>radioCell(st,code)).join('')}
  </tr>`).join('')||'<tr><td colspan="8" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
  renderAttendanceSummary(list,day,iso)
@@ -1654,18 +1662,27 @@ function makeCleanPrintSheet(title,meta,tableHtml){
  document.body.appendChild(area);return area;
 }
 $('makeReport').onclick=()=>{report();logActivity('Report generated','የAttendance ሪፖርት ተፈጠረ')};
-$('printReport').onclick=()=>{
+$('printReport').onclick=async()=>{
  if($('reportResultCard').classList.contains('hidden')){alert('መጀመሪያ ሪፖርት አውጣ።');return;}
- const table=$('reportResult').querySelector('table');if(!table){alert('የሚታተም ሪፖርት አልተገኘም።');return;}
+ const table=$('reportResult').querySelector('table');if(!table){alert('የሚወርድ ሪፖርት አልተገኘም።');return;}
+ if(typeof html2pdf==='undefined'){alert('PDF መሳሪያው አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።');return;}
+ const from=dateISO($('fromDate').value)||dateISO($('attDate')?.value)||localTodayISO();
+ const to=dateISO($('toDate').value)||from;
+ const classValue=$('reportClass')?.value||'__ALL__';
+ const classLabel=classValue==='__ALL__'?'All-Classes':classValue;
+ const slug=String(classLabel).normalize('NFKD').replace(/[^A-Za-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'')||'All-Classes';
+ const filename=`Attendance_${from}${to!==from?'_'+to:''}_${slug}.pdf`;
  const meta=$('reportResult').querySelector('.report-range-note')?.textContent||'';
- makeCleanPrintSheet('የAttendance ሪፖርት',meta,table.outerHTML);
- // Hide drawer layers inline as well as through print CSS; restore after the print dialog closes.
- window.__printHiddenElements=[];
- document.querySelectorAll('nav[aria-label="ዋና ምናሌ"],#sidebarBackdrop,#mobileBottomNav,#supervisorDesktopNavbar,#globalProfileNavbar,.sidebar-backdrop').forEach(el=>{
-   window.__printHiddenElements.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);
-   el.style.setProperty('display','none','important');
- });
- document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');requestNativePrint();
+ const area=document.createElement('section');area.id='directPdfExportArea';
+ area.style.cssText='position:fixed;left:-10000px;top:0;width:1100px;background:#fff;color:#111;padding:24px;font-family:Arial,sans-serif;z-index:-1';
+ area.innerHTML=`<h1 style="text-align:center">ሰንበት ትምህርት ቤት</h1><h2>የAttendance ሪፖርት</h2><p>${esc(meta)}</p>`;
+ const cloned=table.cloneNode(true);cloned.style.cssText='width:100%;border-collapse:collapse;font-size:11px';
+ cloned.querySelectorAll('th,td').forEach(cell=>cell.style.cssText+=';border:1px solid #999;padding:6px;text-align:left');
+ area.appendChild(cloned);document.body.appendChild(area);
+ try{
+   await html2pdf().set({margin:8,filename,image:{type:'jpeg',quality:0.96},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'}}).from(area).save();
+ }catch(err){console.error('PDF export failed',err);alert('PDF ማውረድ አልተሳካም። '+(err.message||''));}
+ finally{area.remove();}
 };
 window.addEventListener('afterprint',()=>{
  document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
@@ -1693,7 +1710,7 @@ $('printAttendance').onclick=()=>{
  document.body.classList.remove('print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');requestNativePrint();
 };
 $('printAllAttendance').onclick=()=>{const iso=dateISO($('attDate').value);if(!iso)return alert('ከመታተም በፊት ትክክለኛ ቀን ያስገቡ።');const dateLabel=dateET(iso);const visibleClasses=isClassScoped()?[assignedClass]:classes;const area=document.createElement('div');area.id='printAllAttendanceArea';let html=`<h1>ሰንበት ትምህርት ቤት</h1><h2>የAttendance መዝገብ — ሁሉም ክፍሎች</h2><p>ቀን: ${esc(dateLabel)}</p>`;visibleClasses.forEach(cls=>{const list=students.filter(st=>st.className===cls);html+=`<section class="print-class"><h2>${esc(cls)}</h2><table><thead><tr><th>ተ.ቁ</th><th>ID</th><th>ሙሉ ስም</th><th>ተገኝቷል (P)</th><th>ቀርቷል (A)</th><th>ዘግይቷል (L)</th><th>ፈቃድ (E)</th></tr></thead><tbody>${list.map((st,i)=>{const status=(attendance[iso]||{})[String(st.id)]||'';return `<tr><td>${i+1}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td>${status==='P'?'✓':''}</td><td>${status==='A'?'✓':''}</td><td>${status==='L'?'✓':''}</td><td>${status==='E'?'✓':''}</td></tr>`}).join('')}</tbody></table></section>`});area.innerHTML=html;const prior=$('printAllAttendanceArea');if(prior)prior.remove();document.body.appendChild(area);document.body.classList.remove('print-attendance','print-report');document.body.classList.add('print-all-attendance');requestNativePrint();};
-$('exportExcel').onclick=()=>{if(typeof XLSX==='undefined')return alert('Excel መሳሪያው አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።');const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);if(!from||!to||from>to)return alert('Excel ለማውረድ የቀን ክልሉን ያስተካክሉ።');const rangeDays=Math.round((Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000)+1;if($('reportPeriod').value==='monthly'&&rangeDays<=30)return alert('ወርሃዊ Excel ለማውረድ ከ30 ቀናት በላይ የሆነ የቀን ክልል ይምረጡ (ቢያንስ 31 ቀናት)።');const dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort();const sid=$('reportStudent').value;const classFilter=$('reportClass').value;const reasonFilter=$('reportReason')?.value||'__ALL__';const list=students.filter(st=>(!isClassScoped()||st.className===assignedClass)&&(classFilter==='__ALL__'||st.className===classFilter)&&(sid==='__ALL__'||String(st.id)===sid));const rows=[['Student ID','Full Name','Phone','Class','Attendance Reason','Other Reason','P Present','A Absent','L Late','E Permission','Recorded Days','Attendance %','From','To']];list.forEach(st=>{const c={P:0,A:0,L:0,E:0};dates.filter(d=>reasonFilter==='__ALL__'||(getAttendanceReason(d,st.className)||{}).type===reasonFilter).forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(c[v]!==undefined)c[v]++});const marked=c.P+c.A+c.L+c.E;const pct=marked?Math.round((c.P*100+c.L*Number(appSettings.lateScore??75)+c.E*Number(appSettings.permissionScore??100))/marked):0;const reasonEntries=dates.map(d=>getAttendanceReason(d,st.className)).filter(r=>r&&(reasonFilter==='__ALL__'||r.type===reasonFilter));const reasonLabel=[...new Set(reasonEntries.map(r=>r.type))].join(', '),otherLabel=[...new Set(reasonEntries.map(r=>r.other).filter(Boolean))].join(', ');rows.push([st.id,st.name,st.phone||'',st.className||'',reasonLabel,otherLabel,c.P,c.A,c.L,c.E,marked,pct+'%',dateET(from),dateET(to)])});const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:14},{wch:28},{wch:18},{wch:18},{wch:20},{wch:24},{wch:12},{wch:12},{wch:12},{wch:14},{wch:16},{wch:16},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,ws,'Attendance Report');saveWorkbookFile(wb,'SundaySchool_Attendance_Report.xlsx')};
+$('exportExcel').onclick=()=>{if(typeof XLSX==='undefined')return alert('Excel መሳሪያው አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።');const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);if(!from||!to||from>to)return alert('Excel ለማውረድ የቀን ክልሉን ያስተካክሉ።');const rangeDays=Math.round((Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000)+1;if($('reportPeriod').value==='monthly'&&rangeDays<=30)return alert('ወርሃዊ Excel ለማውረድ ከ30 ቀናት በላይ የሆነ የቀን ክልል ይምረጡ (ቢያንስ 31 ቀናት)።');const dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort();const sid=$('reportStudent').value;const classFilter=$('reportClass').value;const reasonFilter=$('reportReason')?.value||'__ALL__';const list=students.filter(st=>(!isClassScoped()||st.className===assignedClass)&&(classFilter==='__ALL__'||st.className===classFilter)&&(sid==='__ALL__'||String(st.id)===sid));const rows=[['Student ID','Full Name','Phone','Class','Attendance Reason','Other Reason','P Present','A Absent','L Late','E Permission','Recorded Days','Attendance %','From','To']];list.forEach(st=>{const c={P:0,A:0,L:0,E:0};dates.filter(d=>reasonFilter==='__ALL__'||(getAttendanceReason(d,st.className)||{}).type===reasonFilter).forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(c[v]!==undefined)c[v]++});const marked=c.P+c.A+c.L+c.E;const pct=marked?Math.round((c.P*100+c.L*Number(appSettings.lateScore??75)+c.E*Number(appSettings.permissionScore??100))/marked):0;const reasonEntries=dates.map(d=>getAttendanceReason(d,st.className)).filter(r=>r&&(reasonFilter==='__ALL__'||r.type===reasonFilter));const reasonLabel=[...new Set(reasonEntries.map(r=>r.type))].join(', '),otherLabel=[...new Set(reasonEntries.map(r=>r.other).filter(Boolean))].join(', ');rows.push([st.id,st.name,st.phone||'',st.className||'',reasonLabel,otherLabel,c.P,c.A,c.L,c.E,marked,pct+'%',dateET(from),dateET(to)])});const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:14},{wch:28},{wch:18},{wch:18},{wch:20},{wch:24},{wch:12},{wch:12},{wch:12},{wch:14},{wch:16},{wch:16},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,ws,'Attendance Report');saveWorkbookFile(wb,`Attendance_${from}${to!==from?'_'+to:''}_${(classFilter==='__ALL__'?'All-Classes':String(classFilter).normalize('NFKD').replace(/[^A-Za-z0-9_-]+/g,'-').replace(/^-+|-+$/g,''))||'All-Classes'}.xlsx`)};
 function download(name,text){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 const BACKUP_PREF_KEY='ss_backup_preferences_v2',BACKUP_LAST_KEY='ss_last_backup_v2';
 function backupPayload(){return {app:'SundaySchoolAttendance',schemaVersion:2,createdAt:new Date().toISOString(),students,classes,classPrefixes,attendance,appSettings,extendedSettings};}
