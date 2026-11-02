@@ -1750,22 +1750,55 @@ async function exportTablePdf(filename,title,meta,table){
  else{const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
 }
 async function exportGeneratedReportPdf(filename){
- const data=window.__lastReportPdfData;
- if(!data||!Array.isArray(data.tables)||!data.tables.length){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
- if(!window.jspdf||!window.jspdf.jsPDF){showModernNotification('PDF library did not load. Connect to the internet and try again.');return;}
- const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
- doc.addFileToVFS('NotoSansEthiopic-Regular.ttf',NOTO_ETHIOPIC_TTF_BASE64);doc.addFont('NotoSansEthiopic-Regular.ttf','NotoEthiopic','normal');
- const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight();
- const drawHeader=()=>{doc.setFont('NotoEthiopic','normal');doc.setFontSize(15);doc.text('ሰንበት ትምህርት ቤት',35,30);doc.setFontSize(12);doc.text(data.title||'የAttendance ሪፖርት',35,49);doc.setFontSize(8);const lines=doc.splitTextToSize(String(data.meta||''),pageW-70);doc.text(lines,35,65);return 65+lines.length*11+12;};
+ // Always export the exact tables currently visible in the generated report.
+ // Do not rely on a second/stale PDF data model.
+ const reportRoot=document.getElementById('reportResult');
+ if(!reportRoot){showModernNotification('የሪፖርት ውጤት አልተገኘም።');return;}
+ const domTables=Array.from(reportRoot.querySelectorAll('table'));
+ if(!domTables.length){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
+ if(!window.jspdf||!window.jspdf.jsPDF||!window.jspdf.jsPDF.API.autoTable){showModernNotification('PDF library did not load. Connect to the internet and try again.');return;}
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
+ doc.addFileToVFS('NotoSansEthiopic-Regular.ttf',NOTO_ETHIOPIC_TTF_BASE64);
+ doc.addFont('NotoSansEthiopic-Regular.ttf','NotoEthiopic','normal');
+ const pageW=doc.internal.pageSize.getWidth();
+ const meta=reportRoot.querySelector('.report-range-note')?.innerText?.trim()||'';
+ const title='የAttendance ሪፖርት';
+ const readCell=cell=>(cell.innerText||cell.textContent||'').replace(/\s+/g,' ').trim();
+ const tables=domTables.map((table,index)=>{
+   const headingNode=(()=>{let n=table.previousElementSibling;while(n&&!/^H[1-6]$/.test(n.tagName))n=n.previousElementSibling;return n;})();
+   const head=Array.from(table.querySelectorAll('thead tr:last-child th, thead tr:last-child td')).map(readCell);
+   const body=Array.from(table.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(readCell));
+   return {heading:headingNode?readCell(headingNode):(index===0?'የሪፖርት ውጤት':'ተጨማሪ ዝርዝር'),head,body};
+ }).filter(t=>t.head.length);
+ if(!tables.length){showModernNotification('የPDF ሰንጠረዥ አልተነበበም። ሪፖርቱን እንደገና አውጡ።');return;}
+ const drawHeader=()=>{
+   doc.setFont('NotoEthiopic','normal');doc.setFontSize(15);
+   doc.text('ሰንበት ትምህርት ቤት',30,28);
+   doc.setFontSize(12);doc.text(title,30,46);
+   doc.setFontSize(8);
+   const lines=doc.splitTextToSize(meta,pageW-60);
+   doc.text(lines,30,62);
+   return 62+lines.length*11+14;
+ };
  let y=drawHeader();
- for(let i=0;i<data.tables.length;i++){
-  const t=data.tables[i];
-  if(i>0){doc.addPage();y=drawHeader();}
-  doc.setFont('NotoEthiopic','normal');doc.setFontSize(10);doc.text(String(t.heading||''),35,y);y+=10;
-  const colN=(t.head||[]).length;
-  const colStyles={};
-  if(colN===8){colStyles[0]={cellWidth:58};colStyles[1]={cellWidth:145};colStyles[2]={cellWidth:100};for(let j=3;j<7;j++)colStyles[j]={cellWidth:42};colStyles[7]={cellWidth:90};}
-  doc.autoTable({head:[t.head||[]],body:t.body||[],startY:y+5,margin:{left:30,right:30,bottom:30},styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},columnStyles:colStyles,showHead:'everyPage',rowPageBreak:'avoid',tableWidth:'auto'});
+ for(let i=0;i<tables.length;i++){
+   const t=tables[i];
+   if(i>0){doc.addPage();y=drawHeader();}
+   doc.setFont('NotoEthiopic','normal');doc.setFontSize(10);
+   doc.text(String(t.heading||''),30,y);y+=8;
+   const colStyles={};
+   // Give the monthly/yearly 8-column table enough room for all status counts.
+   if(t.head.length===8){
+     colStyles[0]={cellWidth:58};colStyles[1]={cellWidth:145};colStyles[2]={cellWidth:100};
+     for(let j=3;j<7;j++)colStyles[j]={cellWidth:48};colStyles[7]={cellWidth:100};
+   }
+   doc.autoTable({head:[t.head],body:t.body,startY:y+5,margin:{left:30,right:30,bottom:30},
+     styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},
+     headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},
+     bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},columnStyles:colStyles,
+     showHead:'everyPage',rowPageBreak:'avoid',tableWidth:'auto'});
+   y=(doc.lastAutoTable?.finalY||y+30)+18;
  }
  const base64=doc.output('datauristring').split(',')[1];
  if(window.Android&&typeof Android.saveBase64File==='function')Android.saveBase64File(filename,base64,'application/pdf');
