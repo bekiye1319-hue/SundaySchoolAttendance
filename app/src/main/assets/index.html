@@ -857,7 +857,7 @@ body.app-dark-theme #ssModernNotice .ss-notice-icon{background:#234333;color:#8e
 body.app-dark-theme .attendance-unlock-btn{background:#422006;color:#fed7aa;border-color:#92400e}
 </style>
 \n<style id="modern-notification-system">
-#modernToastRegion{position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;height:100%;padding:20px;box-sizing:border-box;pointer-events:none;background:transparent}
+#modernToastRegion{position:fixed;top:var(--toast-top,76px);left:0;right:0;z-index:2147483600;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;width:100%;max-height:45vh;overflow:visible;padding:8px 16px;box-sizing:border-box;pointer-events:none;background:transparent}
 .modern-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:11px;width:min(440px,calc(100vw - 40px));max-width:100%;box-sizing:border-box;padding:17px 19px;border:1px solid var(--toast-border);border-left:5px solid var(--toast-accent);border-radius:16px;background:var(--toast-bg);color:var(--toast-text);box-shadow:0 18px 55px rgba(15,23,42,.28);font:500 15px/1.55 inherit;animation:toastIn .24s ease-out;backdrop-filter:blur(12px)}
 .modern-toast.success{--toast-accent:#16a34a;--toast-border:#bbf7d0;--toast-bg:#f0fdf4;--toast-text:#166534}.modern-toast.error{--toast-accent:#dc2626;--toast-border:#fecaca;--toast-bg:#fef2f2;--toast-text:#991b1b}.modern-toast.warning{--toast-accent:#d97706;--toast-border:#fed7aa;--toast-bg:#fff7ed;--toast-text:#9a3412}.modern-toast.info{--toast-accent:#2563eb;--toast-border:#bfdbfe;--toast-bg:#eff6ff;--toast-text:#1e40af}
 body.app-dark-theme .modern-toast{--toast-bg:#172033;--toast-text:#e5e7eb;--toast-border:#334155}
@@ -866,7 +866,7 @@ body.app-dark-theme .modern-toast{--toast-bg:#172033;--toast-text:#e5e7eb;--toas
 #modernConfirmBox{width:min(420px,100%);padding:22px;border-radius:18px;background:var(--card-bg,#fff);color:var(--text-color,inherit);box-shadow:0 24px 70px rgba(0,0,0,.28);animation:toastIn .18s ease-out}#modernConfirmBox p{margin:0 0 20px;line-height:1.65;white-space:pre-wrap}#modernConfirmBox .confirm-actions{display:flex;justify-content:flex-end;gap:10px}#modernConfirmBox button{min-width:90px;padding:10px 16px;border-radius:10px;border:1px solid #cbd5e1;cursor:pointer;font:inherit}#modernConfirmYes{background:#2563eb;color:white;border-color:#2563eb}
 button,input[type=button],input[type=submit],[role=button]{transition:transform .13s ease,filter .13s ease,box-shadow .13s ease}button:active,input[type=button]:active,input[type=submit]:active,[role=button]:active{transform:scale(.97);filter:brightness(.96)}
 @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(max-width:600px){#modernToastRegion{padding:16px} .modern-toast{width:min(440px,calc(100vw - 32px));padding:16px;font-size:14px}}
+@media(max-width:600px){#modernToastRegion{padding:8px 12px} .modern-toast{width:min(440px,calc(100vw - 24px));padding:14px;font-size:14px}}
 </style>
 
 <style id="modern-button-feedback">
@@ -1628,7 +1628,7 @@ $('saveAtt').onclick=async()=>{
  if(!ok)return; // Never show success after Firestore rejects the write.
  unlockedAttendanceRecords.clear();saveLocal();drawAttendance();renderStats();updateDashboard();await logActivity('Attendance saved',`ቀን ${dateET(iso)} • ${isClassScoped()?assignedClass:$('attClass').value}`);showModernNotification('Attendanceው በFirebase በትክክል ተቀምጧል።');
 };
-$('addStudent').onclick=async()=>{if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');let name=$('studentName').value.trim();if(!name)return showModernNotification('ስም ያስገቡ።');let phone=$('studentPhone').value.trim(),gender=$('studentGender').value;if(!gender)return showModernNotification('የተማሪውን ፆታ ይምረጡ።');const normName=name.toLocaleLowerCase().replace(/\s+/g,' ');if(students.some(s=>String(s.name||'').trim().toLocaleLowerCase().replace(/\s+/g,' ')===normName))return showModernNotification('ይህ ስም ቀድሞ ተመዝግቧል። ተመሳሳይ ተማሪ ደግሞ መመዝገብ አይቻልም።');if(phone&&students.some(s=>String(s.phone||'').trim().replace(/\s+/g,'')===phone.replace(/\s+/g,'')))return showModernNotification('ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል።');const className=$('studentClass').value;let newId;try{newId=nextStudentId(className)}catch(e){return showModernNotification(e.message)}const st={id:newId,name,className,phone,gender};students.push(st);const ok=await cloudSave();if(!ok){students=students.filter(s=>String(s.id)!==String(st.id));return;}saveLocal();$('studentName').value='';$('studentPhone').value='';$('studentGender').value='';renderAll();await logActivity('Student added',`${st.name} • ${st.id} • ${st.className}`);showModernNotification('ምዝገባ በተሳካ ሁኔታ ተጠናቋል። ID: '+st.id)};
+$('addStudent').onclick=async()=>{if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');let name=$('studentName').value.trim();if(!name)return showModernNotification('ስም ያስገቡ።');let phone=$('studentPhone').value.trim(),gender=$('studentGender').value;if(!gender)return showModernNotification('የተማሪውን ፆታ ይምረጡ።');const normName=name.toLocaleLowerCase().replace(/\s+/g,' ');if(students.some(s=>String(s.name||'').trim().toLocaleLowerCase().replace(/\s+/g,' ')===normName))return showModernNotification('ይህ ስም ቀድሞ ተመዝግቧል። ተመሳሳይ ተማሪ ደግሞ መመዝገብ አይቻልም።');if(phone&&students.some(s=>String(s.phone||'').trim().replace(/\s+/g,'')===phone.replace(/\s+/g,'')))return showModernNotification('ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል።');const className=$('studentClass').value;let newId;try{newId=nextStudentId(className)}catch(e){return showModernNotification(e.message)}const st={id:newId,name,className,phone,gender};students.push(st);const ok=await cloudSave();if(!ok){students=students.filter(s=>String(s.id)!==String(st.id));return;}saveLocal();$('studentName').value='';$('studentPhone').value='';$('studentGender').value='';renderAll();await logActivity('Student added',`${st.name} • ${st.id} • ${st.className}`);closeStudentRegistration();showModernNotification('ምዝገባ በተሳካ ሁኔታ ተጠናቋል። ID: '+st.id)};
 $('className').addEventListener('input',()=>{const c=$('className').value.trim();$('classPrefix').value=classPrefixes[c]||defaultPrefixForClass(c)});$('addClass').onclick=async()=>{if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');let c=$('className').value.trim(),prefix=$('classPrefix').value.trim().toUpperCase();if(!c||classes.includes(c))return showModernNotification('የክፍል ስም ያስገቡ፤ እንደገና ያለ ክፍል አይጨምሩ።');if(!/^[A-Z]{2,8}$/.test(prefix))return showModernNotification('Prefix ከ2 እስከ 8 የእንግሊዝኛ ፊደላት ብቻ መሆን አለበት።');if(Object.entries(classPrefixes).some(([name,p])=>name!==c&&String(p).toUpperCase()===prefix))return showModernNotification('ይህ Prefix ለሌላ ክፍል ተመድቧል። ሌላ ይምረጡ።');classes.push(c);classPrefixes[c]=prefix;const ok=await cloudSave();if(!ok){classes=classes.filter(x=>x!==c);delete classPrefixes[c];return}saveLocal();$('className').value='';$('classPrefix').value='';renderAll();await logActivity('Class added',c)};
 function openStudentEdit(id){
  if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');
@@ -1710,7 +1710,7 @@ async function exportTablePdf(filename,title,meta,table){
  doc.addFileToVFS('NotoSansEthiopic-Regular.ttf',NOTO_ETHIOPIC_TTF_BASE64);
  doc.addFont('NotoSansEthiopic-Regular.ttf','NotoEthiopic','normal');
  doc.setFont('NotoEthiopic','normal');doc.setFontSize(16);doc.text(String(title||'Attendance Report'),40,38);
- doc.setFontSize(9);if(meta)doc.text(String(meta).replace(/\s+/g,' ').slice(0,180),40,56);
+ doc.setFontSize(9);let metaLines=[];if(meta){const metaText=String(meta).replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();metaLines=doc.splitTextToSize(metaText,doc.internal.pageSize.getWidth()-80);doc.text(metaLines,40,56);}
  // IMPORTANT: export exactly the selected report content passed by the caller.
  // Do not search #reportResult globally: daily attendance and all-class reports
  // are assembled separately and otherwise the PDF may contain the wrong table.
@@ -1719,16 +1719,17 @@ async function exportTablePdf(filename,title,meta,table){
  else if(table&&table.querySelectorAll){tables=Array.from(table.querySelectorAll('table'));}
  else if(typeof table==='string'){const tmp=document.createElement('div');tmp.innerHTML=table;tables=Array.from(tmp.querySelectorAll('table'));}
  if(!tables.length){showModernNotification('Report table is empty.');return;}
- let cursorY=72;
+ let cursorY=62+Math.max(1,metaLines.length)*12;
  for(let index=0;index<tables.length;index++){
   const current=tables[index];
   const heading=current.previousElementSibling&&/^H[1-4]$/.test(current.previousElementSibling.tagName)?current.previousElementSibling.innerText.trim():'';
   if(heading){if(cursorY>doc.internal.pageSize.getHeight()-70){doc.addPage();cursorY=42;}doc.setFont('NotoEthiopic','normal');doc.setFontSize(11);doc.text(heading.slice(0,150),40,cursorY);cursorY+=16;}
-  const head=Array.from(current.querySelectorAll('thead tr:first-child th, thead tr:first-child td')).map(x=>x.innerText.trim());
-  const body=Array.from(current.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>td.innerText.trim()));
+  const headerRow=current.querySelector('thead tr:first-child')||current.querySelector('tr');
+  const head=headerRow?Array.from(headerRow.querySelectorAll('th,td')).map(x=>(x.innerText||x.textContent||'').trim()):[];
+  const body=Array.from(current.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>(td.innerText||td.textContent||'').trim()));
   if(!head.length)continue;
   if(index>0&&cursorY>doc.internal.pageSize.getHeight()-100){doc.addPage();cursorY=42;}
-  doc.autoTable({head:[head],body,startY:cursorY,styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},margin:{left:35,right:35,bottom:35},rowPageBreak:'avoid',showHead:'everyPage',horizontalPageBreak:true,horizontalPageBreakRepeat:0});
+  doc.autoTable({head:[head],body,startY:cursorY,styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},margin:{left:35,right:35,bottom:35},rowPageBreak:'avoid',showHead:'everyPage',horizontalPageBreak:false,tableWidth:'auto'});
   cursorY=(doc.lastAutoTable&&doc.lastAutoTable.finalY?doc.lastAutoTable.finalY:cursorY)+18;
  }
  const uri=doc.output('datauristring');const pdfBase64=uri.substring(uri.indexOf(',')+1);
@@ -1740,7 +1741,7 @@ $('printReport').onclick=()=>{
  if($('reportResultCard').classList.contains('hidden')){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
  const reportTables=Array.from($('reportResult').querySelectorAll('table'));if(!reportTables.length){showModernNotification('የሚታተም ሪፖርት አልተገኘም።');return;}
  const meta=$('reportResult').querySelector('.report-range-note')?.textContent||'';
- const reportHtml=Array.from($('reportResult').children).filter(el=>el.matches('h1,h2,h3,h4,table')).map(el=>el.outerHTML).join('');
+ const reportHtml=$('reportResult').innerHTML;
  makeCleanPrintSheet('የAttendance ሪፖርት',meta,reportHtml);
  // Hide drawer layers inline as well as through print CSS; restore after the print dialog closes.
  window.__printHiddenElements=[];
@@ -1748,7 +1749,7 @@ $('printReport').onclick=()=>{
    window.__printHiddenElements.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);
    el.style.setProperty('display','none','important');
  });
- document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;const pdfArea=document.getElementById('printCleanArea');exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,pdfArea).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
+ document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;const pdfArea=document.getElementById('printCleanArea');exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,$('reportResult')).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
 };
 window.addEventListener('afterprint',()=>{
  document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
@@ -3093,6 +3094,46 @@ body>nav.no-print{z-index:2147482500!important}
  // Ensure dialogs created later are lifted above the sidebar stack.
  const observer=new MutationObserver(()=>document.querySelectorAll('.modern-confirm-overlay,.modern-dialog-overlay,[role="dialog"],[aria-modal="true"]').forEach(el=>{el.style.zIndex='2147483600';}));
  observer.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<style id="registration-modal-and-toast-position-fix">
+#studentRegistrationBackdrop{position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.58);display:none;align-items:center;justify-content:center;padding:18px;overflow:auto}
+#studentRegistrationBackdrop.open{display:flex}
+#studentRegistrationBackdrop>.students-ref-card{width:min(680px,100%);max-height:calc(100dvh - 36px);overflow:auto;margin:0!important;box-shadow:0 24px 70px rgba(0,0,0,.3)}
+#studentRegistrationBackdrop .registration-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+#studentRegistrationBackdrop .registration-modal-head button{background:#64748b;padding:7px 12px}
+#openStudentRegistration{margin:8px 0 14px}
+</style>
+<script id="registration-modal-and-toast-runtime-fix">
+(()=>{
+ const positionToast=()=>{
+   const region=document.getElementById('modernToastRegion');if(!region)return;
+   const nav=document.querySelector('nav:not(.hidden), nav[aria-label="ዋና ምናሌ"]');
+   let bottom=12;
+   if(nav){const r=nav.getBoundingClientRect();bottom=Math.max(12,Math.min(window.innerHeight-70,r.bottom+8));}
+   else {const header=document.querySelector('header');if(header){const r=header.getBoundingClientRect();bottom=Math.max(12,r.bottom+8);}}
+   region.style.setProperty('--toast-top',bottom+'px');
+ };
+ window.addEventListener('scroll',positionToast,{passive:true});window.addEventListener('resize',positionToast);
+ const init=()=>{
+   const section=document.getElementById('students');if(!section||document.getElementById('studentRegistrationBackdrop'))return;
+   const card=section.querySelector('.students-ref-card');const title=section.querySelector('.students-ref-title');if(!card||!title)return;
+   const open=document.createElement('button');open.id='openStudentRegistration';open.type='button';open.className='students-ref-btn students-ref-btn-green';open.innerHTML='<i class="fa-solid fa-user-plus"></i> አዲስ ተማሪ መመዝገብ';title.insertAdjacentElement('afterend',open);
+   const backdrop=document.createElement('div');backdrop.id='studentRegistrationBackdrop';backdrop.setAttribute('role','presentation');
+   const head=document.createElement('div');head.className='registration-modal-head';
+   const heading=card.querySelector('.students-ref-card-title');if(heading)head.appendChild(heading);
+   const close=document.createElement('button');close.type='button';close.textContent='ዝጋ ✕';close.setAttribute('aria-label','Close registration form');head.appendChild(close);
+   card.insertBefore(head,card.firstChild);backdrop.appendChild(card);document.body.appendChild(backdrop);
+   const show=()=>{backdrop.classList.add('open');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById('studentName')?.focus(),50);positionToast();};
+   window.closeStudentRegistration=()=>{backdrop.classList.remove('open');document.body.style.overflow='';};
+   open.addEventListener('click',show);close.addEventListener('click',window.closeStudentRegistration);
+   backdrop.addEventListener('click',e=>{if(e.target===backdrop)window.closeStudentRegistration();});
+   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&backdrop.classList.contains('open'))window.closeStudentRegistration();});
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+ const observer=new MutationObserver(positionToast);observer.observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 
