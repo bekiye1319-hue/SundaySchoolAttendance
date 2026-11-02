@@ -1360,6 +1360,19 @@ function report(){
   }
   html+='</tbody></table>';
   if(selected){html+=`<h2 style="margin-top:22px">የ${esc(selected.student.name)} የዕለት በዕለት ሪፖርት</h2><p>የተመዘገቡ ቀናት፦ ${selected.marked} | የመገኘት መጠን፦ <strong>${selected.percent}%</strong></p><table class="report-table"><thead><tr><th>ቀን</th><th>የAttendance ሁኔታ</th></tr></thead><tbody>`;if(!selected.dates.length)html+='<tr><td colspan="2">በዚህ የቀን ክልል ውስጥ የተመዘገበ Attendance የለም።</td></tr>';else selected.dates.forEach(item=>{html+=`<tr><td>${dateET(item.date)}</td><td class="${item.status}"><strong>${item.status} - ${genderedStatusLabel(item.status,selected.student.gender)}</strong></td></tr>`;});html+='</tbody></table>';}
+  // Build a PDF data model directly from the same report rows and filters.
+  // This avoids scraping a stale/partial DOM table in Android WebView.
+  const pdfMeta=`ቀን፦ ${dateET(from)}${dailyMode?'':' – '+dateET(to)} | ክፍል፦ ${classCaption} | ምክንያት፦ ${reasonCaption} | ተማሪዎች፦ ${list.length}`;
+  const pdfTables=[];
+  if(dailyMode){
+    pdfTables.push({heading:'የዕለቱ የAttendance ሪፖርት',head:['ተ.ቁ','ID','ተማሪ','ክፍል','ምክንያት','Status'],body:rows.map(({st},i)=>{const status=(attendance[dailyIso]||{})[String(st.id)]||'—';return [String(i+1),String(st.id??''),String(st.name??''),String(st.className??''),dailyReasonByClass(st.className),status];})});
+  }else{
+    pdfTables.push({heading:reportMode==='yearly'?'ዓመታዊ ሪፖርት':'ወርሃዊ / የቀን ክልል ሪፖርት',head:['ተ.ቁ (ID)','ተማሪ','ክፍል','P','A','L','E','የመገኘት መጠን'],body:rows.map(({st,c,percent},i)=>[String(st.id??''),String(st.name??''),String(st.className??''),String(c.P),String(c.A),String(c.L),String(c.E),`${percent}%`])});
+  }
+  if(selected){
+    pdfTables.push({heading:`የ${selected.student.name} የዕለት በዕለት ሪፖርት`,head:['ቀን','የAttendance ሁኔታ'],body:selected.dates.length?selected.dates.map(item=>[dateET(item.date),`${item.status} - ${genderedStatusLabel(item.status,selected.student.gender)}`]):[['—','በዚህ የቀን ክልል ውስጥ የተመዘገበ Attendance የለም።']]});
+  }
+  window.__lastReportPdfData={title:'የAttendance ሪፖርት',meta:pdfMeta,tables:pdfTables};
   $('reportResult').innerHTML=html;
   $('reportResult').classList.toggle('individual-report-result',sid!=='__ALL__');
   $('statistics').classList.remove('hidden');$('reportVisualSection').classList.remove('hidden');$('comparativeAnalysisCard').classList.toggle('hidden',!$('showComparativeAnalysis').checked);$('reportResultCard').classList.remove('hidden');
@@ -1736,6 +1749,28 @@ async function exportTablePdf(filename,title,meta,table){
  if(window.Android&&typeof Android.saveBase64File==='function')Android.saveBase64File(filename,pdfBase64,'application/pdf');
  else{const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
 }
+async function exportGeneratedReportPdf(filename){
+ const data=window.__lastReportPdfData;
+ if(!data||!Array.isArray(data.tables)||!data.tables.length){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
+ if(!window.jspdf||!window.jspdf.jsPDF){showModernNotification('PDF library did not load. Connect to the internet and try again.');return;}
+ const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
+ doc.addFileToVFS('NotoSansEthiopic-Regular.ttf',NOTO_ETHIOPIC_TTF_BASE64);doc.addFont('NotoSansEthiopic-Regular.ttf','NotoEthiopic','normal');
+ const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight();
+ const drawHeader=()=>{doc.setFont('NotoEthiopic','normal');doc.setFontSize(15);doc.text('ሰንበት ትምህርት ቤት',35,30);doc.setFontSize(12);doc.text(data.title||'የAttendance ሪፖርት',35,49);doc.setFontSize(8);const lines=doc.splitTextToSize(String(data.meta||''),pageW-70);doc.text(lines,35,65);return 65+lines.length*11+12;};
+ let y=drawHeader();
+ for(let i=0;i<data.tables.length;i++){
+  const t=data.tables[i];
+  if(i>0){doc.addPage();y=drawHeader();}
+  doc.setFont('NotoEthiopic','normal');doc.setFontSize(10);doc.text(String(t.heading||''),35,y);y+=10;
+  const colN=(t.head||[]).length;
+  const colStyles={};
+  if(colN===8){colStyles[0]={cellWidth:58};colStyles[1]={cellWidth:145};colStyles[2]={cellWidth:100};for(let j=3;j<7;j++)colStyles[j]={cellWidth:42};colStyles[7]={cellWidth:90};}
+  doc.autoTable({head:[t.head||[]],body:t.body||[],startY:y+5,margin:{left:30,right:30,bottom:30},styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},columnStyles:colStyles,showHead:'everyPage',rowPageBreak:'avoid',tableWidth:'auto'});
+ }
+ const base64=doc.output('datauristring').split(',')[1];
+ if(window.Android&&typeof Android.saveBase64File==='function')Android.saveBase64File(filename,base64,'application/pdf');
+ else{const blob=doc.output('blob'),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+}
 $('makeReport').onclick=()=>{report();logActivity('Report generated','የAttendance ሪፖርት ተፈጠረ')};
 $('printReport').onclick=()=>{
  if($('reportResultCard').classList.contains('hidden')){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
@@ -1749,7 +1784,7 @@ $('printReport').onclick=()=>{
    window.__printHiddenElements.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);
    el.style.setProperty('display','none','important');
  });
- document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;const pdfArea=document.getElementById('printCleanArea');exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,$('reportResult')).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
+ document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;const pdfArea=document.getElementById('printCleanArea');exportGeneratedReportPdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
 };
 window.addEventListener('afterprint',()=>{
  document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
@@ -3134,6 +3169,57 @@ body>nav.no-print{z-index:2147482500!important}
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
  const observer=new MutationObserver(positionToast);observer.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<script id="final-single-owner-mobile-drawer-fix">
+(()=>{
+ const boot=()=>{
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  const backdrop=document.getElementById('sidebarBackdrop');
+  const bottom=document.getElementById('mobileBottomNav');
+  const menu=document.getElementById('menuToggle');
+  if(!sidebar||!menu||!backdrop||document.documentElement.dataset.finalDrawerFix==='1')return;
+  document.documentElement.dataset.finalDrawerFix='1';
+  const mobile=()=>window.matchMedia('(max-width:800px)').matches;
+  const open=()=>{
+   if(!mobile())return;
+   sidebar.classList.add('sidebar-open');document.body.classList.add('sidebar-drawer-open');
+   backdrop.classList.add('show');
+   sidebar.style.setProperty('visibility','visible','important');sidebar.style.setProperty('pointer-events','auto','important');sidebar.style.setProperty('transform','translate3d(0,0,0)','important');sidebar.style.setProperty('z-index','2147483001','important');
+   backdrop.style.setProperty('display','block','important');backdrop.style.setProperty('visibility','visible','important');backdrop.style.setProperty('pointer-events','auto','important');backdrop.style.setProperty('opacity','1','important');backdrop.style.setProperty('z-index','2147483000','important');
+   menu.setAttribute('aria-expanded','true');
+   if(bottom){bottom.style.setProperty('display','none','important');bottom.style.setProperty('pointer-events','none','important');}
+  };
+  const close=()=>{
+   sidebar.classList.remove('sidebar-open');document.body.classList.remove('sidebar-drawer-open');backdrop.classList.remove('show');
+   if(mobile()){
+    sidebar.style.setProperty('transform','translate3d(-105%,0,0)','important');sidebar.style.setProperty('visibility','hidden','important');sidebar.style.setProperty('pointer-events','none','important');
+    backdrop.style.setProperty('visibility','hidden','important');backdrop.style.setProperty('pointer-events','none','important');backdrop.style.setProperty('opacity','0','important');
+   }else{
+    ['transform','visibility','pointer-events','z-index'].forEach(k=>sidebar.style.removeProperty(k));
+    ['display','visibility','pointer-events','opacity','z-index'].forEach(k=>backdrop.style.removeProperty(k));
+   }
+   menu.setAttribute('aria-expanded','false');
+   if(bottom&&mobile()){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('visibility','visible','important');bottom.style.setProperty('pointer-events','auto','important');}
+  };
+  const toggle=()=>sidebar.classList.contains('sidebar-open')?close():open();
+  // Capture before old duplicated handlers; stop them so the drawer toggles exactly once.
+  document.addEventListener('click',ev=>{
+   const target=ev.target instanceof Element?ev.target:null;if(!target)return;
+   const trigger=target.closest('#menuToggle,[data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
+   if(trigger){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();toggle();return;}
+   if(target.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();close();return;}
+   const page=target.closest('nav[aria-label="ዋና ምናሌ"] button[data-page]');
+   if(page&&mobile())setTimeout(close,0);
+  },true);
+  document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&sidebar.classList.contains('sidebar-open'))close();},true);
+  window.addEventListener('resize',()=>{if(!mobile())close();});
+  window.openAppSidebar=open;window.closeAppSidebar=close;
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+ setTimeout(boot,250);setTimeout(boot,900);
 })();
 </script>
 
