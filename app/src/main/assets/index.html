@@ -1030,6 +1030,7 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 (function(){
@@ -1799,38 +1800,49 @@ async function exportGeneratedReportPdf(filename){
  if(!window.pdfMake||typeof window.pdfMake.createPdf!=='function'){
    showModernNotification('PDF ላይብረሪ አልተጫነም። ኢንተርኔት አረጋግጠው ይሞክሩ።');return;
  }
- const content=[
-  {text:'የሰንበት ትምህርት ቤት',style:'schoolTitle',alignment:'center'},
-  {text:data.title||'የAttendance ሪፖርት',style:'reportTitle',alignment:'center'},
-  {text:data.meta||'',style:'meta',margin:[0,0,0,12]}
- ];
- data.tables.forEach((t,idx)=>{
-  content.push({text:t.heading||'',style:'sectionTitle',margin:[0,idx?12:0,0,5]});
-  const body=[(t.head||[]).map(v=>({text:String(v??''),style:'tableHeader'}))];
-  (t.body||[]).forEach(row=>body.push((t.head||[]).map((_,i)=>({text:String(row[i]??''),style:'tableCell'}))));
-  if(body.length===1)body.push([{text:'—',colSpan:Math.max(1,(t.head||[]).length),style:'tableCell'},...Array(Math.max(0,(t.head||[]).length-1)).map(()=>({text:''}))]);
-  content.push({
-   table:{headerRows:1,keepWithHeaderRows:1,widths:(t.head||[]).map(()=>'*'),body},
-   layout:{fillColor:(row)=>row===0?'#174ea6':null,
-    hLineWidth:()=>0.5,vLineWidth:()=>0.35,hLineColor:()=> '#cbd5e1',vLineColor:()=> '#cbd5e1',
-    paddingLeft:()=>4,paddingRight:()=>4,paddingTop:()=>4,paddingBottom:()=>4},
-   margin:[0,0,0,8]
-  });
- });
- const fontData=NOTO_ETHIOPIC_TTF_BASE64;
- if(typeof fontData!=='string'||fontData.length<10000){
+ const ethFont=NOTO_ETHIOPIC_TTF_BASE64;
+ if(typeof ethFont!=='string'||ethFont.length<10000){
    showModernNotification('የአማርኛ PDF ፊደል ፋይል ትክክል አይደለም።');return;
  }
+ // pdfmake's bundled Roboto handles Latin letters, IDs, P/A/L/E, punctuation and numerals.
+ // The embedded Noto Ethiopic subset is used only for Ethiopic Unicode characters.
  window.pdfMake.vfs=window.pdfMake.vfs||{};
- window.pdfMake.vfs['NotoSansEthiopic-Regular.ttf']=fontData;
+ window.pdfMake.vfs['NotoSansEthiopic-Regular.ttf']=ethFont;
  window.pdfMake.fonts={
-  ...(window.pdfMake.fonts||{}),
-  NotoEthiopic:{normal:'NotoSansEthiopic-Regular.ttf',bold:'NotoSansEthiopic-Regular.ttf',
-   italics:'NotoSansEthiopic-Regular.ttf',bolditalics:'NotoSansEthiopic-Regular.ttf'}
+   ...(window.pdfMake.fonts||{}),
+   Roboto:{normal:'Roboto-Regular.ttf',bold:'Roboto-Medium.ttf',italics:'Roboto-Italic.ttf',bolditalics:'Roboto-MediumItalic.ttf'},
+   NotoEthiopic:{normal:'NotoSansEthiopic-Regular.ttf',bold:'NotoSansEthiopic-Regular.ttf',italics:'NotoSansEthiopic-Regular.ttf',bolditalics:'NotoSansEthiopic-Regular.ttf'}
  };
+ const mixedText=(value,baseStyle={})=>{
+   const str=String(value??'');
+   const parts=str.match(/[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF]+|[^\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF]+/g)||[''];
+   return parts.map(part=>({text:part,font:/[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF]/.test(part)?'NotoEthiopic':'Roboto',...baseStyle}));
+ };
+ const content=[
+  {text:mixedText('የሰንበት ትምህርት ቤት',{bold:true}),style:'schoolTitle',alignment:'center'},
+  {text:mixedText(data.title||'የAttendance ሪፖርት',{bold:true}),style:'reportTitle',alignment:'center'},
+  {text:mixedText(data.meta||''),style:'meta',margin:[0,0,0,12]}
+ ];
+ data.tables.forEach((t,idx)=>{
+  content.push({text:mixedText(t.heading||'',{bold:true}),style:'sectionTitle',margin:[0,idx?12:0,0,5]});
+  const headers=t.head||[];
+  const body=[headers.map(v=>({text:mixedText(v,{bold:true}),style:'tableHeader'}))];
+  (t.body||[]).forEach(row=>body.push(headers.map((_,i)=>({text:mixedText(row[i]??''),style:'tableCell'}))));
+  if(body.length===1){
+   const n=Math.max(1,headers.length);
+   body.push([{text:mixedText('—'),colSpan:n,style:'tableCell'},...Array(n-1).fill({text:''})]);
+  }
+  content.push({
+   table:{headerRows:1,keepWithHeaderRows:1,widths:headers.map(()=>'*'),body},
+   layout:{fillColor:(row)=>row===0?'#174ea6':null,
+    hLineWidth:()=>0.5,vLineWidth:()=>0.35,hLineColor:()=> '#cbd5e1',vLineColor:()=> '#cbd5e1',
+    paddingLeft:()=>5,paddingRight:()=>5,paddingTop:()=>5,paddingBottom:()=>5},
+   margin:[0,0,0,9]
+  });
+ });
  const docDefinition={
-  pageSize:'A4',pageOrientation:'landscape',pageMargins:[24,30,24,30],
-  defaultStyle:{font:'NotoEthiopic',fontSize:9,color:'#172033'},
+  pageSize:'A4',pageOrientation:'landscape',pageMargins:[25,30,25,30],
+  defaultStyle:{font:'Roboto',fontSize:9,color:'#172033'},
   styles:{
    schoolTitle:{fontSize:16,bold:true,color:'#174ea6',margin:[0,0,0,4]},
    reportTitle:{fontSize:13,bold:true,color:'#174ea6',margin:[0,0,0,8]},
@@ -1840,22 +1852,19 @@ async function exportGeneratedReportPdf(filename){
    tableCell:{fontSize:8.5}
   },
   content,
-  footer:(page,pages)=>({text:`${page} / ${pages}`,alignment:'center',fontSize:8,margin:[0,10,0,0]})
+  footer:(page,pages)=>({text:String(page)+' / '+String(pages),font:'Roboto',alignment:'center',fontSize:8,margin:[0,10,0,0]})
  };
  try{
-  await new Promise((resolve,reject)=>{
-   window.pdfMake.createPdf(docDefinition).getBase64(base64=>{
-    try{
-     if(window.Android&&typeof Android.saveBase64File==='function')Android.saveBase64File(filename,base64,'application/pdf');
-     else{
-      const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));
-      const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
-      const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),2000);
-     }
-     resolve();
-    }catch(e){reject(e);}
-   });
+  window.pdfMake.createPdf(docDefinition).getBase64(base64=>{
+   try{
+    if(window.Android&&typeof Android.saveBase64File==='function')Android.saveBase64File(filename,base64,'application/pdf');
+    else{
+     const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));
+     const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+     const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+     setTimeout(()=>URL.revokeObjectURL(url),2000);
+    }
+   }catch(error){console.error('PDF save error',error);showModernNotification('PDF ማስቀመጥ አልተሳካም።');}
   });
  }catch(error){console.error('PDF export error',error);showModernNotification('PDF ማውጣት አልተሳካም፦ '+(error.message||error));}
 }
@@ -3313,37 +3322,46 @@ body>nav.no-print{z-index:2147482500!important}
 </script>
 
 
-<script id="final-sidebar-toggle-reliability">
+
+
+<script id="final-sidebar-control-fix">
 (function(){
- function setDrawer(open){
-  const side=document.querySelector('nav[aria-label="ዋና ምናሌ"]')||document.querySelector('body>nav.no-print:not(#mobileBottomNav)');
-  const backdrop=document.getElementById('sidebarBackdrop');
+ const getParts=()=>({
+  nav:document.querySelector('body>nav[aria-label="ዋና ምናሌ"]'),
+  backdrop:document.getElementById('sidebarBackdrop'),
+  toggle:document.getElementById('menuToggle'),
+  bottom:document.getElementById('mobileBottomNav')
+ });
+ function setOpen(open){
+  const {nav,backdrop,toggle,bottom}=getParts();
+  if(!nav||!window.matchMedia('(max-width:800px)').matches)return;
+  nav.classList.toggle('sidebar-open',open);
   document.body.classList.toggle('sidebar-drawer-open',open);
-  if(side){
-   side.classList.toggle('sidebar-open',open);
-   side.style.setProperty('transform',open?'translateX(0)':'','important');
-   side.style.setProperty('visibility',open?'visible':'','important');
-   side.style.setProperty('pointer-events',open?'auto':'','important');
-  }
   if(backdrop){backdrop.classList.toggle('show',open);backdrop.setAttribute('aria-hidden',String(!open));}
-  const menu=document.getElementById('menuToggle');
-  if(menu)menu.setAttribute('aria-expanded',String(open));
+  if(toggle)toggle.setAttribute('aria-expanded',String(open));
+  if(bottom){
+   if(open){bottom.style.setProperty('display','none','important');bottom.style.setProperty('visibility','hidden','important');bottom.style.setProperty('pointer-events','none','important');}
+   else {bottom.style.removeProperty('display');bottom.style.removeProperty('visibility');bottom.style.removeProperty('pointer-events');}
+  }
  }
- document.addEventListener('click',function(e){
+ function toggleDrawer(){const {nav}=getParts();setOpen(!nav?.classList.contains('sidebar-open'));}
+ // Window capture runs before document/element handlers that previously fought over the drawer.
+ window.addEventListener('click',function(e){
+  const more=e.target.closest('#mobileBottomNav [data-mobile-more]');
   const menu=e.target.closest('#menuToggle');
-  const more=e.target.closest('[data-mobile-more]');
-  if(menu||more){
-   e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
-   const currentlyOpen=document.body.classList.contains('sidebar-drawer-open');
-   setDrawer(!currentlyOpen);
+  if(more||menu){
+   e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();
+   toggleDrawer();
   }
  },true);
  document.addEventListener('click',function(e){
-  if(e.target.closest('#sidebarBackdrop'))setDrawer(false);
-  if(e.target.closest('nav[aria-label="ዋና ምናሌ"] button[data-page]'))setDrawer(false);
+  if(e.target.closest('#sidebarBackdrop'))setOpen(false);
+  if(e.target.closest('body>nav[aria-label="ዋና ምናሌ"] button[data-page]'))setOpen(false);
  },true);
- window.openAppSidebar=()=>setDrawer(true);
- window.closeAppSidebar=()=>setDrawer(false);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false);});
+ window.addEventListener('resize',()=>{if(!window.matchMedia('(max-width:800px)').matches)setOpen(false);});
+ window.openAppSidebar=()=>setOpen(true);
+ window.closeAppSidebar=()=>setOpen(false);
 })();
 </script>
 </body></html>
