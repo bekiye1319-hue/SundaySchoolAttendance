@@ -914,7 +914,7 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
  <div class="panel attendance-filter-panel attendance-reference-form-card"><div class="section-caption">የAttendance መረጃ</div><div class="attendance-filters"><div><label for="attDate">ቀን (DD/MM/YYYY የኢትዮጵያ ዘመን)</label><input id="attDate" placeholder="01/02/2019"></div><div><label for="attClass">ክፍል</label><select id="attClass"></select></div></div><div class="grid" style="margin-top:12px"><div><label for="attendanceReason">የAttendance መዝገቡ ምክንያት</label><select id="attendanceReason"><option value="መዝሙር">መዝሙር</option><option value="ወረብ">ወረብ</option><option value="ትምህርት">ትምህርት</option><option value="ሌላ">ሌላ</option></select></div><div id="attendanceReasonOtherWrap" class="hidden"><label for="attendanceReasonOther">ሌላ ምክንያት ይጻፉ</label><input id="attendanceReasonOther" placeholder="ምክንያቱን እዚህ ይጻፉ"></div></div><p class="small">የተመረጠው ምክንያት ለዚህ ቀንና ክፍል ይመዘገባል።</div>
  <div class="attendance-reference-legend" aria-label="የAttendance ሁኔታ መመሪያ"><span><b class="ref-pill p">P</b><span>P = ተገኝቷል</span></span><span><b class="ref-pill a">A</b><span>A = ቀርቷል</span></span><span><b class="ref-pill l">L</b><span>L = ዘግይቷል</span></span><span><b class="ref-pill e">E</b><span>E = ፈቃድ</span></span></div>
  <div class="panel attendance-list-panel"><div class="attendance-toolbar"><div><h3>የተማሪዎች Attendance</h3><p>ለእያንዳንዱ ተማሪ አንድ ሁኔታ ይምረጡ።</p></div></div>
- <div class="row attendance-actions no-print"><button id="saveAtt" class="att-btn-green"><i class="fa-solid fa-floppy-disk"></i> Attendance አስቀምጥ</button><button id="allPresent" class="att-btn-blue"><i class="fa-solid fa-user-check"></i> ሁሉንም P አድርግ</button><button id="printAttendance" class="att-btn-gray"><i class="fa-solid fa-print"></i> ይህን ክፍል Print</button><button id="printAllAttendance" class="att-btn-gray"><i class="fa-solid fa-print"></i> ሁሉንም ክፍሎች Print</button></div>
+ <div class="row attendance-actions no-print"><button id="saveAtt" class="att-btn-green"><i class="fa-solid fa-floppy-disk"></i> Attendance አስቀምጥ</button><button id="allPresent" class="att-btn-blue"><i class="fa-solid fa-user-check"></i> ሁሉንም P አድርግ</button></div>
  <div class="attendance-search-wrap" role="search" aria-label="የAttendance ተማሪ ፍለጋና ማጣሪያ">
  <div class="attendance-search-field"><span aria-hidden="true">⌕</span><input id="attendanceSearch" type="search" placeholder="በተማሪ ስም፣ ID ወይም ክፍል ፈልግ…" aria-label="Attendance ተማሪ ፈልግ"></div>
  <select id="attendanceStatusFilter" aria-label="በAttendance ሁኔታ አጣራ"><option value="ALL">ሁሉም ተማሪዎች</option><option value="P">P - ተገኝቷል</option><option value="A">A - ቀርቷል</option><option value="L">L - ዘግይቷል</option><option value="E">E - ፈቃድ</option><option value="NONE">ያልተመዘገበ</option></select>
@@ -2023,35 +2023,7 @@ renderAll();
 @media(max-width:600px){#attendance .attendance-reference-table{min-width:650px!important}#attendance .attendance-choice-group{gap:16px}}
 @media(prefers-reduced-motion:reduce){nav.no-print,.sidebar-backdrop{transition:none!important}}
 </style>
-<script id="mobile-sidebar-drawer-reliable-handler">
-(()=>{
- const nav=document.querySelector('body > nav.no-print');
- const toggle=document.getElementById('menuToggle');
- const backdrop=document.getElementById('sidebarBackdrop');
- if(!nav||!toggle||!backdrop||toggle.dataset.drawerBound==='1')return;
- toggle.dataset.drawerBound='1';
- const isMobile=()=>window.matchMedia('(max-width: 800px)').matches;
- const close=()=>{
-   nav.classList.remove('sidebar-open');
-   backdrop.classList.remove('show');
-   document.body.classList.remove('sidebar-drawer-open');
-   toggle.setAttribute('aria-expanded','false');
- };
- const open=()=>{
-   if(!isMobile())return;
-   nav.classList.add('sidebar-open');
-   backdrop.classList.add('show');
-   document.body.classList.add('sidebar-drawer-open');
-   toggle.setAttribute('aria-expanded','true');
- };
- const toggleDrawer=(e)=>{e.preventDefault();e.stopPropagation();if(nav.classList.contains('sidebar-open'))close();else open();};
- toggle.addEventListener('click',toggleDrawer);
- backdrop.addEventListener('click',close);
- nav.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',close));
- document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
- window.addEventListener('resize',()=>{if(!isMobile())close();});
-})();
-</script>
+<script id="mobile-sidebar-drawer-reliable-handler-disabled"></script>
 
 <style id="attendance-four-column-radio-reference">
 /* Match the user's latest reference: four separate status columns and compact checked circles. */
@@ -3199,36 +3171,7 @@ body.auth-locked #quickRefreshToggle,body.auth-loading #quickRefreshToggle{displ
 body>nav.no-print{z-index:2147482500!important}
 @media(max-width:800px){#menuToggle{z-index:2147483001!important;pointer-events:auto!important}}
 </style>
-<script id="final-navigation-and-scroll-fixes">
-(function(){
- const sidebar=document.querySelector('body>nav.no-print');
- const backdrop=document.getElementById('sidebarBackdrop');
- const menu=document.getElementById('menuToggle');
- function setDrawer(open){
-   if(!sidebar)return;
-   sidebar.classList.toggle('sidebar-open',!!open);
-   if(backdrop)backdrop.classList.toggle('show',!!open);
-   if(menu){menu.setAttribute('aria-expanded',String(!!open));menu.setAttribute('aria-label',open?'ምናሌ ዝጋ':'ምናሌ ክፈት');}
-   document.body.classList.toggle('sidebar-is-open',!!open);
- }
- if(menu){menu.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();setDrawer(!sidebar?.classList.contains('sidebar-open'));},true);}
- if(backdrop)backdrop.addEventListener('click',()=>setDrawer(false));
- // Close the drawer after choosing any navigation page, then start the new page at top.
- document.querySelectorAll('nav button[data-page]').forEach(btn=>btn.addEventListener('click',()=>{
-   setDrawer(false);
-   requestAnimationFrame(()=>{window.scrollTo({top:0,left:0,behavior:'instant'});document.documentElement.scrollTop=0;document.body.scrollTop=0;});
- }));
- // Some mobile layouts expose a secondary More/Menu trigger; delegate it without
- // hijacking unrelated buttons or the page's normal actions.
- document.addEventListener('click',function(ev){
-   const trigger=ev.target.closest('[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
-   if(trigger&&trigger!==menu){ev.preventDefault();setDrawer(!sidebar?.classList.contains('sidebar-open'));}
- });
- // Ensure dialogs created later are lifted above the sidebar stack.
- const observer=new MutationObserver(()=>document.querySelectorAll('.modern-confirm-overlay,.modern-dialog-overlay,[role="dialog"],[aria-modal="true"]').forEach(el=>{el.style.zIndex='2147483600';}));
- observer.observe(document.body,{childList:true,subtree:true});
-})();
-</script>
+<script id="final-navigation-and-scroll-fixes-disabled"></script>
 
 
 <style id="registration-modal-and-toast-position-fix">
@@ -3271,97 +3214,88 @@ body>nav.no-print{z-index:2147482500!important}
 </script>
 
 
-<script id="final-single-owner-mobile-drawer-fix">
+<script id="final-single-owner-mobile-drawer-fix-disabled"></script>
+
+
+
+
+<script id="final-sidebar-control-fix-disabled"></script>
+
+<script id="single-stable-sidebar-controller-v2">
 (()=>{
- const boot=()=>{
-  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+ const init=()=>{
+  const sidebar=document.querySelector('body > nav[aria-label="ዋና ምናሌ"]');
   const backdrop=document.getElementById('sidebarBackdrop');
-  const bottom=document.getElementById('mobileBottomNav');
   const menu=document.getElementById('menuToggle');
-  if(!sidebar||!menu||!backdrop||document.documentElement.dataset.finalDrawerFix==='1')return;
-  document.documentElement.dataset.finalDrawerFix='1';
+  const bottom=document.getElementById('mobileBottomNav');
+  if(!sidebar||!backdrop||!menu||document.documentElement.dataset.sidebarV2==='1')return;
+  document.documentElement.dataset.sidebarV2='1';
   const mobile=()=>window.matchMedia('(max-width:800px)').matches;
-  const open=()=>{
-   if(!mobile())return;
-   sidebar.classList.add('sidebar-open');document.body.classList.add('sidebar-drawer-open');
-   backdrop.classList.add('show');
-   sidebar.style.setProperty('visibility','visible','important');sidebar.style.setProperty('pointer-events','auto','important');sidebar.style.setProperty('transform','translate3d(0,0,0)','important');sidebar.style.setProperty('z-index','2147483001','important');
-   backdrop.style.setProperty('display','block','important');backdrop.style.setProperty('visibility','visible','important');backdrop.style.setProperty('pointer-events','auto','important');backdrop.style.setProperty('opacity','1','important');backdrop.style.setProperty('z-index','2147483000','important');
-   menu.setAttribute('aria-expanded','true');
-   if(bottom){bottom.style.setProperty('display','none','important');bottom.style.setProperty('pointer-events','none','important');}
-  };
-  const close=()=>{
-   sidebar.classList.remove('sidebar-open');document.body.classList.remove('sidebar-drawer-open');backdrop.classList.remove('show');
-   if(mobile()){
-    sidebar.style.setProperty('transform','translate3d(-105%,0,0)','important');sidebar.style.setProperty('visibility','hidden','important');sidebar.style.setProperty('pointer-events','none','important');
-    backdrop.style.setProperty('visibility','hidden','important');backdrop.style.setProperty('pointer-events','none','important');backdrop.style.setProperty('opacity','0','important');
+  const setDrawer=(open)=>{
+   const active=!!open&&mobile();
+   sidebar.classList.toggle('sidebar-open',active);
+   document.body.classList.toggle('sidebar-drawer-open',active);
+   document.body.classList.toggle('sidebar-is-open',active);
+   backdrop.classList.toggle('show',active);
+   backdrop.setAttribute('aria-hidden',String(!active));
+   menu.setAttribute('aria-expanded',String(active));
+   menu.setAttribute('aria-label',active?'ምናሌ ዝጋ':'ምናሌ ክፈት');
+   if(active){
+    sidebar.style.setProperty('visibility','visible','important');
+    sidebar.style.setProperty('pointer-events','auto','important');
+    sidebar.style.setProperty('transform','translate3d(0,0,0)','important');
+    sidebar.style.setProperty('z-index','2147483001','important');
+    backdrop.style.setProperty('display','block','important');
+    backdrop.style.setProperty('visibility','visible','important');
+    backdrop.style.setProperty('pointer-events','auto','important');
+    backdrop.style.setProperty('opacity','1','important');
+    backdrop.style.setProperty('z-index','2147483000','important');
+    if(bottom){bottom.style.setProperty('display','none','important');bottom.style.setProperty('visibility','hidden','important');bottom.style.setProperty('pointer-events','none','important');}
    }else{
-    ['transform','visibility','pointer-events','z-index'].forEach(k=>sidebar.style.removeProperty(k));
-    ['display','visibility','pointer-events','opacity','z-index'].forEach(k=>backdrop.style.removeProperty(k));
+    if(mobile()){
+     sidebar.style.setProperty('transform','translate3d(-105%,0,0)','important');
+     sidebar.style.setProperty('visibility','hidden','important');
+     sidebar.style.setProperty('pointer-events','none','important');
+    }else{
+     ['transform','visibility','pointer-events','z-index'].forEach(k=>sidebar.style.removeProperty(k));
+    }
+    backdrop.style.setProperty('visibility','hidden','important');
+    backdrop.style.setProperty('pointer-events','none','important');
+    backdrop.style.setProperty('opacity','0','important');
+    if(bottom&&mobile()){
+     bottom.style.removeProperty('display');bottom.style.removeProperty('visibility');bottom.style.removeProperty('pointer-events');
+    }
    }
-   menu.setAttribute('aria-expanded','false');
-   if(bottom&&mobile()){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('visibility','visible','important');bottom.style.setProperty('pointer-events','auto','important');}
   };
-  const toggle=()=>sidebar.classList.contains('sidebar-open')?close():open();
-  // Capture before old duplicated handlers; stop them so the drawer toggles exactly once.
-  document.addEventListener('click',ev=>{
+  const toggle=()=>setDrawer(!sidebar.classList.contains('sidebar-open'));
+  window.addEventListener('click',ev=>{
    const target=ev.target instanceof Element?ev.target:null;if(!target)return;
-   const trigger=target.closest('#menuToggle,[data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
+   const trigger=target.closest('#menuToggle,#mobileBottomNav [data-mobile-more],[data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
    if(trigger){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();toggle();return;}
-   if(target.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();close();return;}
-   const page=target.closest('nav[aria-label="ዋና ምናሌ"] button[data-page]');
-   if(page&&mobile())setTimeout(close,0);
+   if(target.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(false);return;}
+   if(target.closest('nav[aria-label="ዋና ምናሌ"] button[data-page]'))setDrawer(false);
   },true);
-  document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&sidebar.classList.contains('sidebar-open'))close();},true);
-  window.addEventListener('resize',()=>{if(!mobile())close();});
-  window.openAppSidebar=open;window.closeAppSidebar=close;
+  document.addEventListener('keydown',ev=>{if(ev.key==='Escape')setDrawer(false);});
+  window.addEventListener('resize',()=>{if(!mobile())setDrawer(false);});
+  window.openAppSidebar=()=>setDrawer(true);
+  window.closeAppSidebar=()=>setDrawer(false);
+  setDrawer(false);
  };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
- setTimeout(boot,250);setTimeout(boot,900);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+ setTimeout(init,300);
 })();
 </script>
-
-
-
-
-<script id="final-sidebar-control-fix">
-(function(){
- const getParts=()=>({
-  nav:document.querySelector('body>nav[aria-label="ዋና ምናሌ"]'),
-  backdrop:document.getElementById('sidebarBackdrop'),
-  toggle:document.getElementById('menuToggle'),
-  bottom:document.getElementById('mobileBottomNav')
- });
- function setOpen(open){
-  const {nav,backdrop,toggle,bottom}=getParts();
-  if(!nav||!window.matchMedia('(max-width:800px)').matches)return;
-  nav.classList.toggle('sidebar-open',open);
-  document.body.classList.toggle('sidebar-drawer-open',open);
-  if(backdrop){backdrop.classList.toggle('show',open);backdrop.setAttribute('aria-hidden',String(!open));}
-  if(toggle)toggle.setAttribute('aria-expanded',String(open));
-  if(bottom){
-   if(open){bottom.style.setProperty('display','none','important');bottom.style.setProperty('visibility','hidden','important');bottom.style.setProperty('pointer-events','none','important');}
-   else {bottom.style.removeProperty('display');bottom.style.removeProperty('visibility');bottom.style.removeProperty('pointer-events');}
+<script id="attendance-remaining-button-toast-v2">
+(()=>{
+ const init=()=>{
+  const all=document.getElementById('allPresent');
+  if(all&&!all.dataset.toastBound){
+   all.dataset.toastBound='1';
+   all.addEventListener('click',()=>setTimeout(()=>window.showModernNotification?.('ሁሉም ተማሪዎች P ሁኔታ እንዲመረጥ ተተግብሯል።','success'),0));
   }
- }
- function toggleDrawer(){const {nav}=getParts();setOpen(!nav?.classList.contains('sidebar-open'));}
- // Window capture runs before document/element handlers that previously fought over the drawer.
- window.addEventListener('click',function(e){
-  const more=e.target.closest('#mobileBottomNav [data-mobile-more]');
-  const menu=e.target.closest('#menuToggle');
-  if(more||menu){
-   e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();
-   toggleDrawer();
-  }
- },true);
- document.addEventListener('click',function(e){
-  if(e.target.closest('#sidebarBackdrop'))setOpen(false);
-  if(e.target.closest('body>nav[aria-label="ዋና ምናሌ"] button[data-page]'))setOpen(false);
- },true);
- document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false);});
- window.addEventListener('resize',()=>{if(!window.matchMedia('(max-width:800px)').matches)setOpen(false);});
- window.openAppSidebar=()=>setOpen(true);
- window.closeAppSidebar=()=>setOpen(false);
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+ setTimeout(init,350);
 })();
 </script>
 </body></html>
