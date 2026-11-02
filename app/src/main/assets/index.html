@@ -1347,15 +1347,16 @@ function report(){
   const dailyMode=reportMode==='daily';
   const dailyIso=from;
   const dailyReasonByClass=(cls)=>{const rr=getAttendanceReason(dailyIso,cls);return rr?(rr.type==='ሌላ'&&rr.other?`ሌላ: ${rr.other}`:rr.type):'—'};
-  let html=`<p class="report-range-note">ቀን፦ ${dateET(from)}${dailyMode?'':' – '+dateET(to)} &nbsp; • &nbsp; የተመረጡ ተማሪዎች፦ ${list.length} &nbsp; • &nbsp; ምክንያት፦ ${esc(reasonCaption)}</p>`;
+  const classCaption=classFilter==='__ALL__'?'ሁሉም ክፍሎች':classFilter;
+  let html=`<p class="report-range-note">ቀን፦ ${dateET(from)}${dailyMode?'':' – '+dateET(to)} &nbsp; • &nbsp; ክፍል፦ ${esc(classCaption)} &nbsp; • &nbsp; የተመረጡ ተማሪዎች፦ ${list.length} &nbsp; • &nbsp; ምክንያት፦ ${esc(reasonCaption)}</p>`;
   if(dailyMode){
     html+='<table class="report-table"><thead><tr><th>ተ.ቁ</th><th>ID</th><th>ተማሪ</th><th>ክፍል</th><th>ምክንያት</th><th>Status</th></tr></thead><tbody>';
     rows.forEach(({st})=>{const status=(attendance[dailyIso]||{})[String(st.id)]||'—';html+=`<tr><td>${rows.indexOf(rows.find(r=>r.st===st))+1}</td><td>${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${esc(st.className||'')}</td><td>${esc(dailyReasonByClass(st.className))}</td><td><strong class="${['P','A','L','E'].includes(status)?status:''}">${status}</strong></td></tr>`;});
     if(!rows.length)html+='<tr><td colspan="6">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   }else{
-    html+='<table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>';
-    rows.forEach(({st,c,percent},i)=>{const pc=percent>=100?'high':percent>=75?'mid':'low';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
-    if(!rows.length)html+='<tr><td colspan="7">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
+    html+='<table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>';
+    rows.forEach(({st,c,percent},i)=>{const pc=percent>=100?'high':percent>=75?'mid':'low';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${esc(st.className||'')}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
+    if(!rows.length)html+='<tr><td colspan="8">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   }
   html+='</tbody></table>';
   if(selected){html+=`<h2 style="margin-top:22px">የ${esc(selected.student.name)} የዕለት በዕለት ሪፖርት</h2><p>የተመዘገቡ ቀናት፦ ${selected.marked} | የመገኘት መጠን፦ <strong>${selected.percent}%</strong></p><table class="report-table"><thead><tr><th>ቀን</th><th>የAttendance ሁኔታ</th></tr></thead><tbody>`;if(!selected.dates.length)html+='<tr><td colspan="2">በዚህ የቀን ክልል ውስጥ የተመዘገበ Attendance የለም።</td></tr>';else selected.dates.forEach(item=>{html+=`<tr><td>${dateET(item.date)}</td><td class="${item.status}"><strong>${item.status} - ${genderedStatusLabel(item.status,selected.student.gender)}</strong></td></tr>`;});html+='</tbody></table>';}
@@ -1721,11 +1722,10 @@ async function exportTablePdf(filename,title,meta,table){
  let cursorY=72;
  for(let index=0;index<tables.length;index++){
   const current=tables[index];
-  const heading=current.previousElementSibling&&/^H[1-4]$/.test(current.previousElementSibling.tagName)?(current.previousElementSibling.innerText||current.previousElementSibling.textContent||'').trim():'';
+  const heading=current.previousElementSibling&&/^H[1-4]$/.test(current.previousElementSibling.tagName)?current.previousElementSibling.innerText.trim():'';
   if(heading){if(cursorY>doc.internal.pageSize.getHeight()-70){doc.addPage();cursorY=42;}doc.setFont('NotoEthiopic','normal');doc.setFontSize(11);doc.text(heading.slice(0,150),40,cursorY);cursorY+=16;}
-  const cellText=(cell)=>{const visible=(cell.innerText||'').trim();if(visible)return visible;return (cell.textContent||'').replace(/\s+/g,' ').trim();};
-  const head=Array.from(current.querySelectorAll('thead tr:first-child th, thead tr:first-child td')).map(cellText);
-  const body=Array.from(current.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll(':scope > th, :scope > td')).map(cellText));
+  const head=Array.from(current.querySelectorAll('thead tr:first-child th, thead tr:first-child td')).map(x=>x.innerText.trim());
+  const body=Array.from(current.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(td=>td.innerText.trim()));
   if(!head.length)continue;
   if(index>0&&cursorY>doc.internal.pageSize.getHeight()-100){doc.addPage();cursorY=42;}
   doc.autoTable({head:[head],body,startY:cursorY,styles:{font:'NotoEthiopic',fontStyle:'normal',fontSize:8,cellPadding:4,overflow:'linebreak',valign:'middle'},headStyles:{font:'NotoEthiopic',fontStyle:'normal',fillColor:[23,78,166],textColor:255},bodyStyles:{font:'NotoEthiopic',fontStyle:'normal'},margin:{left:35,right:35,bottom:35},rowPageBreak:'avoid',showHead:'everyPage',horizontalPageBreak:true,horizontalPageBreakRepeat:0});
@@ -1738,16 +1738,17 @@ async function exportTablePdf(filename,title,meta,table){
 $('makeReport').onclick=()=>{report();logActivity('Report generated','የAttendance ሪፖርት ተፈጠረ')};
 $('printReport').onclick=()=>{
  if($('reportResultCard').classList.contains('hidden')){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
- const reportContainer=$('reportResult');const tables=Array.from(reportContainer.querySelectorAll('table'));if(!tables.length){showModernNotification('የሚታተም ሪፖርት አልተገኘም።');return;}
+ const reportTables=Array.from($('reportResult').querySelectorAll('table'));if(!reportTables.length){showModernNotification('የሚታተም ሪፖርት አልተገኘም።');return;}
  const meta=$('reportResult').querySelector('.report-range-note')?.textContent||'';
- makeCleanPrintSheet('የAttendance ሪፖርት',meta,tables.map(t=>t.outerHTML).join(''));
+ const reportHtml=Array.from($('reportResult').children).filter(el=>el.matches('h1,h2,h3,h4,table')).map(el=>el.outerHTML).join('');
+ makeCleanPrintSheet('የAttendance ሪፖርት',meta,reportHtml);
  // Hide drawer layers inline as well as through print CSS; restore after the print dialog closes.
  window.__printHiddenElements=[];
  document.querySelectorAll('nav[aria-label="ዋና ምናሌ"],#sidebarBackdrop,#mobileBottomNav,#supervisorDesktopNavbar,#globalProfileNavbar,.sidebar-backdrop').forEach(el=>{
    window.__printHiddenElements.push([el,el.style.getPropertyValue('display'),el.style.getPropertyPriority('display')]);
    el.style.setProperty('display','none','important');
  });
- document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,reportContainer).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
+ document.body.classList.remove('print-attendance','print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const from=dateISO($('fromDate').value)||'date',to=dateISO($('toDate').value)||from;const pdfArea=document.getElementById('printCleanArea');exportTablePdf(`Attendance_${dateETFile(from)}_to_${dateETFile(to)}_Report.pdf`,'Attendance Report',meta,pdfArea).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
 };
 window.addEventListener('afterprint',()=>{
  document.body.classList.remove('print-attendance','print-report','print-all-attendance','print-clean-sheet');
