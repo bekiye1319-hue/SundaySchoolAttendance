@@ -883,6 +883,15 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
 @keyframes modernButtonTap{0%{transform:scale(1)}45%{transform:scale(.965)}100%{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){button,.btn,[role="button"],.modern-click-feedback{transition:none!important;animation:none!important}}
 </style>
+
+<style id="student-edit-modal-header-visibility-final">
+@media(max-width:800px){
+ #editStudentModal{align-items:flex-start!important;padding:calc(78px + env(safe-area-inset-top)) 12px calc(90px + env(safe-area-inset-bottom))!important;overflow-y:auto!important}
+ #editStudentModal>.panel{width:100%!important;max-height:calc(100dvh - 180px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;margin:0 auto!important;overflow-y:auto!important}
+ #editStudentModal>.panel h2{position:relative!important;top:auto!important;display:block!important;white-space:normal!important;overflow:visible!important;line-height:1.45!important;padding:12px 8px!important;margin:0 0 12px!important;background:inherit!important}
+}
+</style>
+
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickRefreshToggle" class="header-badge refresh-quick-toggle no-print" aria-label="Refresh data" title="Refresh data"><span class="refresh-glyph" aria-hidden="true">↻</span></button><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -1331,16 +1340,15 @@ function report(){
   const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);
   const reportMode=$('reportPeriod').value;
   if(!from||!to||from>to){
-    showModernNotification('ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።');
-    $('statistics').innerHTML='';$('reportPieLegend').innerHTML='';$('reportPieChart').style.background='#e5e7eb';
-    $('reportComparison').innerHTML='<p class="small">ትክክለኛ የቀን ክልል ይምረጡ።</p>';return;
+    showModernNotification('ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።');return;
   }
-  const fromDateObj=new Date(from+'T00:00:00'),toDateObj=new Date(to+'T00:00:00');
-  if(reportMode==='monthly'&&(from.slice(0,7)!==to.slice(0,7)||fromDateObj.getDate()!==1||toDateObj.getDate()!==new Date(toDateObj.getFullYear(),toDateObj.getMonth()+1,0).getDate())){
-    showModernNotification('ወርሃዊ ሪፖርት ለማውጣት የወሩን መጀመሪያና መጨረሻ ቀን ሙሉ በሙሉ ያስገቡ።');return;
+  const startUTC=Date.parse(from+'T00:00:00Z'),endUTC=Date.parse(to+'T00:00:00Z');
+  const inclusiveDays=Math.floor((endUTC-startUTC)/86400000)+1;
+  if(reportMode==='monthly'&&inclusiveDays!==30){
+    showModernNotification('ወርሃዊ ሪፖርት ለማውጣት ትክክለኛ 30 ቀናት ብቻ ያስገቡ።');return;
   }
-  if(reportMode==='yearly'&&(from.slice(0,4)!==to.slice(0,4)||from.slice(5)!=='01-01'||to.slice(5)!=='12-31')){
-    showModernNotification('ዓመታዊ ሪፖርት ለማውጣት የዓመቱን ጥር 1 እስከ ታህሳስ 30/31 ቀን ያስገቡ።');return;
+  if(reportMode==='yearly'&&inclusiveDays!==366){
+    showModernNotification('ዓመታዊ ሪፖርት ለማውጣት ትክክለኛ 366 ቀናት ብቻ ያስገቡ።');return;
   }
   const dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort();
   const sid=$('reportStudent').value,classFilter=$('reportClass').value,reasonFilter=$('reportReason')?.value||'__ALL__';
@@ -1404,12 +1412,12 @@ function report(){
  settingsRoot.addEventListener('click',event=>{
    const button=event.target.closest('button');if(!button||!settingsRoot.contains(button))return;
    const label=(button.innerText||button.getAttribute('aria-label')||'Setting').replace(/\s+/g,' ').trim();
-   if(typeof showModernNotification==='function')showModernNotification(`${label} — ተጫኗል።`);
+   if(typeof showModernNotification==='function')showModernNotification(`⚙️ ${label} ተጫኗል።`);
  },true);
  settingsRoot.addEventListener('change',event=>{
    const control=event.target.closest('select');if(!control||!settingsRoot.contains(control))return;
    const label=control.selectedOptions?.[0]?.textContent?.trim()||control.value;
-   if(typeof showModernNotification==='function')showModernNotification(`ቅንብር ተቀይሯል፦ ${label}`);
+   if(typeof showModernNotification==='function')showModernNotification(`⚙️ ቅንብር ተቀይሯል፦ ${label}`);
  },true);
 })();
 
@@ -1784,81 +1792,72 @@ async function exportTablePdf(filename,title,meta,table){
  else{const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
 }
 async function exportGeneratedReportPdf(filename){
- const reportRoot=document.getElementById('reportResult');
- if(!reportRoot){showModernNotification('የሪፖርት ውጤት አልተገኘም።');return;}
- const domTables=Array.from(reportRoot.querySelectorAll('table'));
- if(!domTables.length){showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;}
+ const data=window.__lastReportPdfData;
+ if(!data||!Array.isArray(data.tables)||!data.tables.length){
+   showModernNotification('መጀመሪያ ሪፖርት አውጣ።');return;
+ }
  if(!window.pdfMake||typeof window.pdfMake.createPdf!=='function'){
-   showModernNotification('PDF ላይብረሪ አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።');return;
+   showModernNotification('PDF ላይብረሪ አልተጫነም። ኢንተርኔት አረጋግጠው ይሞክሩ።');return;
  }
- const meta=reportRoot.querySelector('.report-range-note')?.innerText?.trim()||'';
- const clean=x=>(x?.innerText||x?.textContent||'').replace(/\s+/g,' ').trim();
  const content=[
-   {text:'የሰንበት ትምህርት ቤት',style:'schoolTitle',alignment:'center'},
-   {text:'የAttendance ሪፖርት',style:'reportTitle',alignment:'center'},
-   {text:meta,style:'meta',margin:[0,0,0,14]}
+  {text:'የሰንበት ትምህርት ቤት',style:'schoolTitle',alignment:'center'},
+  {text:data.title||'የAttendance ሪፖርት',style:'reportTitle',alignment:'center'},
+  {text:data.meta||'',style:'meta',margin:[0,0,0,12]}
  ];
- domTables.forEach((table,index)=>{
-   let heading=table.previousElementSibling;
-   while(heading&&!/^H[1-6]$/.test(heading.tagName))heading=heading.previousElementSibling;
-   if(heading)content.push({text:clean(heading),style:'sectionTitle',margin:[0,index?14:0,0,6]});
-   const headerRow=table.querySelector('thead tr:last-child');
-   const headers=headerRow?Array.from(headerRow.querySelectorAll('th,td')).map(clean):[];
-   const bodyRows=Array.from(table.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('th,td')).map(clean));
-   if(!headers.length)return;
-   const normalized=bodyRows.map(row=>{
-     const out=row.slice(0,headers.length);
-     while(out.length<headers.length)out.push('');
-     return out.map(v=>({text:v,style:'tableCell'}));
-   });
-   content.push({table:{headerRows:1, widths:Array(headers.length).fill('*'),
-     body:[headers.map(v=>({text:v,style:'tableHeader'})),...normalized]},
-     layout:{hLineWidth:()=>0.6,vLineWidth:()=>0.4,hLineColor:()=>'#cbd5e1',vLineColor:()=>'#cbd5e1',
-       paddingLeft:()=>5,paddingRight:()=>5,paddingTop:()=>4,paddingBottom:()=>4},
-     margin:[0,0,0,10]});
+ data.tables.forEach((t,idx)=>{
+  content.push({text:t.heading||'',style:'sectionTitle',margin:[0,idx?12:0,0,5]});
+  const body=[(t.head||[]).map(v=>({text:String(v??''),style:'tableHeader'}))];
+  (t.body||[]).forEach(row=>body.push((t.head||[]).map((_,i)=>({text:String(row[i]??''),style:'tableCell'}))));
+  if(body.length===1)body.push([{text:'—',colSpan:Math.max(1,(t.head||[]).length),style:'tableCell'},...Array(Math.max(0,(t.head||[]).length-1)).map(()=>({text:''}))]);
+  content.push({
+   table:{headerRows:1,keepWithHeaderRows:1,widths:(t.head||[]).map(()=>'*'),body},
+   layout:{fillColor:(row)=>row===0?'#174ea6':null,
+    hLineWidth:()=>0.5,vLineWidth:()=>0.35,hLineColor:()=> '#cbd5e1',vLineColor:()=> '#cbd5e1',
+    paddingLeft:()=>4,paddingRight:()=>4,paddingTop:()=>4,paddingBottom:()=>4},
+   margin:[0,0,0,8]
+  });
  });
- const docDefinition={
-   pageSize:'A4',pageOrientation:'landscape',pageMargins:[28,32,28,32],
-   defaultStyle:{font:'NotoEthiopic',fontSize:8,color:'#172033'},
-   styles:{
-     schoolTitle:{fontSize:15,bold:true,color:'#174ea6',margin:[0,0,0,4]},
-     reportTitle:{fontSize:12,bold:true,color:'#174ea6',margin:[0,0,0,8]},
-     meta:{fontSize:8,color:'#334155'},
-     sectionTitle:{fontSize:10,bold:true,color:'#174ea6'},
-     tableHeader:{bold:true,color:'#ffffff',fillColor:'#174ea6',fontSize:8,alignment:'center'},
-     tableCell:{fontSize:7.5}
-   },
-   content,
-   footer:(currentPage,pageCount)=>({text:`${currentPage} / ${pageCount}`,alignment:'center',fontSize:8,margin:[0,10,0,0]})
- };
- // Register the embedded Ethiopic font already bundled in this HTML.
- window.pdfMake.vfs=window.pdfMake.vfs||{};
- if(window.pdfMake.vfs){
-   window.pdfMake.vfs['NotoSansEthiopic-Regular.ttf']=NOTO_ETHIOPIC_TTF_BASE64;
-   window.pdfMake.fonts={...(window.pdfMake.fonts||{}),NotoEthiopic:{
-     normal:'NotoSansEthiopic-Regular.ttf',bold:'NotoSansEthiopic-Regular.ttf',
-     italics:'NotoSansEthiopic-Regular.ttf',bolditalics:'NotoSansEthiopic-Regular.ttf'
-   }};
- }else{
-   showModernNotification('የPDF ፊደል ፋይል አልተገኘም።');return;
+ const fontData=NOTO_ETHIOPIC_TTF_BASE64;
+ if(typeof fontData!=='string'||fontData.length<10000){
+   showModernNotification('የአማርኛ PDF ፊደል ፋይል ትክክል አይደለም።');return;
  }
- await new Promise((resolve,reject)=>{
-   try{
-     window.pdfMake.createPdf(docDefinition).getBase64(base64=>{
-       try{
-         if(window.Android&&typeof Android.saveBase64File==='function'){
-           Android.saveBase64File(filename,base64,'application/pdf');
-         }else{
-           const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));
-           const blob=new Blob([bytes],{type:'application/pdf'}),url=URL.createObjectURL(blob);
-           const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
-           setTimeout(()=>URL.revokeObjectURL(url),1500);
-         }
-         resolve();
-       }catch(e){reject(e);}
-     });
-   }catch(e){reject(e);}
- });
+ window.pdfMake.vfs=window.pdfMake.vfs||{};
+ window.pdfMake.vfs['NotoSansEthiopic-Regular.ttf']=fontData;
+ window.pdfMake.fonts={
+  ...(window.pdfMake.fonts||{}),
+  NotoEthiopic:{normal:'NotoSansEthiopic-Regular.ttf',bold:'NotoSansEthiopic-Regular.ttf',
+   italics:'NotoSansEthiopic-Regular.ttf',bolditalics:'NotoSansEthiopic-Regular.ttf'}
+ };
+ const docDefinition={
+  pageSize:'A4',pageOrientation:'landscape',pageMargins:[24,30,24,30],
+  defaultStyle:{font:'NotoEthiopic',fontSize:9,color:'#172033'},
+  styles:{
+   schoolTitle:{fontSize:16,bold:true,color:'#174ea6',margin:[0,0,0,4]},
+   reportTitle:{fontSize:13,bold:true,color:'#174ea6',margin:[0,0,0,8]},
+   meta:{fontSize:9,color:'#334155'},
+   sectionTitle:{fontSize:11,bold:true,color:'#174ea6'},
+   tableHeader:{bold:true,color:'#ffffff',fontSize:9,alignment:'center'},
+   tableCell:{fontSize:8.5}
+  },
+  content,
+  footer:(page,pages)=>({text:`${page} / ${pages}`,alignment:'center',fontSize:8,margin:[0,10,0,0]})
+ };
+ try{
+  await new Promise((resolve,reject)=>{
+   window.pdfMake.createPdf(docDefinition).getBase64(base64=>{
+    try{
+     if(window.Android&&typeof Android.saveBase64File==='function')Android.saveBase64File(filename,base64,'application/pdf');
+     else{
+      const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));
+      const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+      const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),2000);
+     }
+     resolve();
+    }catch(e){reject(e);}
+   });
+  });
+ }catch(error){console.error('PDF export error',error);showModernNotification('PDF ማውጣት አልተሳካም፦ '+(error.message||error));}
 }
 
 $('makeReport').onclick=()=>{report();logActivity('Report generated','የAttendance ሪፖርት ተፈጠረ')};
@@ -3313,6 +3312,40 @@ body>nav.no-print{z-index:2147482500!important}
 })();
 </script>
 
+
+<script id="final-sidebar-toggle-reliability">
+(function(){
+ function setDrawer(open){
+  const side=document.querySelector('nav[aria-label="ዋና ምናሌ"]')||document.querySelector('body>nav.no-print:not(#mobileBottomNav)');
+  const backdrop=document.getElementById('sidebarBackdrop');
+  document.body.classList.toggle('sidebar-drawer-open',open);
+  if(side){
+   side.classList.toggle('sidebar-open',open);
+   side.style.setProperty('transform',open?'translateX(0)':'','important');
+   side.style.setProperty('visibility',open?'visible':'','important');
+   side.style.setProperty('pointer-events',open?'auto':'','important');
+  }
+  if(backdrop){backdrop.classList.toggle('show',open);backdrop.setAttribute('aria-hidden',String(!open));}
+  const menu=document.getElementById('menuToggle');
+  if(menu)menu.setAttribute('aria-expanded',String(open));
+ }
+ document.addEventListener('click',function(e){
+  const menu=e.target.closest('#menuToggle');
+  const more=e.target.closest('[data-mobile-more]');
+  if(menu||more){
+   e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+   const currentlyOpen=document.body.classList.contains('sidebar-drawer-open');
+   setDrawer(!currentlyOpen);
+  }
+ },true);
+ document.addEventListener('click',function(e){
+  if(e.target.closest('#sidebarBackdrop'))setDrawer(false);
+  if(e.target.closest('nav[aria-label="ዋና ምናሌ"] button[data-page]'))setDrawer(false);
+ },true);
+ window.openAppSidebar=()=>setDrawer(true);
+ window.closeAppSidebar=()=>setDrawer(false);
+})();
+</script>
 </body></html>
 
 <style id="v8-clean-attendance-print">
