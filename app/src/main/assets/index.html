@@ -1438,21 +1438,8 @@ function report(){
   if(window.matchMedia('(max-width:800px)').matches){requestAnimationFrame(()=>setTimeout(()=>$('reportResultCard').scrollIntoView({behavior:'smooth',block:'start'}),80));}
 }
 
-// Settings feedback: show compact toast messages for every settings button and dropdown.
-// Existing validation/save handlers remain responsible for success or failure.
-(function(){
- const settingsRoot=document.getElementById('settings');if(!settingsRoot)return;
- settingsRoot.addEventListener('click',event=>{
-   const button=event.target.closest('button');if(!button||!settingsRoot.contains(button))return;
-   const label=(button.innerText||button.getAttribute('aria-label')||'Setting').replace(/\s+/g,' ').trim();
-   if(typeof showModernNotification==='function')showModernNotification(`⚙️ ${label} ተጫኗል።`);
- },true);
- settingsRoot.addEventListener('change',event=>{
-   const control=event.target.closest('select');if(!control||!settingsRoot.contains(control))return;
-   const label=control.selectedOptions?.[0]?.textContent?.trim()||control.value;
-   if(typeof showModernNotification==='function')showModernNotification(`⚙️ ቅንብር ተቀይሯል፦ ${label}`);
- },true);
-})();
+// Notifications are emitted by the actual operation handlers after success or failure;
+// never report a save merely because a button was clicked or a dropdown was changed.
 
 function renderAll(){fillSelects();renderStudents();renderClasses();drawAttendance();renderStats();updateDashboard();if(typeof window.renderQualifiedStudents==='function')window.renderQualifiedStudents();renderRecentActivityStream()}
 function renderSupervisorClassStatus(){
@@ -1560,7 +1547,22 @@ $('changeOwnPassword').addEventListener('click',changeOwnPassword);$('archiveCla
 // production enforcement must also be mirrored in Firestore Security Rules.
 let extendedSettings={language:'am',lateWindowByClass:{},lateCutoffByClass:{},attendanceCloseByClass:{},attendanceCloseEnabledByClass:{},attendanceEditHours:24,rolePermissions:{teacher:{view:true,attendance:true,edit:true},class_teacher:{view:true,attendance:true,edit:true},class_assistant:{view:true,attendance:true,edit:false}},classAssignments:{}};
 async function loadExtendedSettings(){let cloudData=null;try{const snap=await db.collection('appSettings').doc('extended').get();if(snap.exists)cloudData=snap.data()||{};}catch(e){console.warn('Extended settings read failed',e.message)}try{const local=JSON.parse(localStorage.getItem('ss_extended_settings')||'{}');/* Local storage is a fallback only. Shared Supervisor settings from Firestore MUST win, otherwise stale device cache can revert Qualified ON/date/percentage after reopening. */extendedSettings={...extendedSettings,...local,...(cloudData||{}),lateCutoffByClass:{...(local.lateCutoffByClass||{}),...(cloudData?.lateCutoffByClass||{})},attendanceCloseByClass:{...(local.attendanceCloseByClass||{}),...(cloudData?.attendanceCloseByClass||{})},lateWindowByClass:{...(local.lateWindowByClass||{}),...(cloudData?.lateWindowByClass||{})},attendanceCloseEnabledByClass:{...(local.attendanceCloseEnabledByClass||{}),...(cloudData?.attendanceCloseEnabledByClass||{})}};if(cloudData?.qualifiedStudents)extendedSettings.qualifiedStudents=cloudData.qualifiedStudents;if(cloudData?.qualifiedStudentsPublic)extendedSettings.qualifiedStudentsPublic=cloudData.qualifiedStudentsPublic;/* Refresh local cache from the authoritative shared settings. */localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings));}catch(e){console.warn('Extended settings cache read/write failed',e.message)}applyLanguage(extendedSettings.language||'am');watchLanguageChanges();fillExtendedSettingsForm();if(typeof window.syncQualifiedForm==='function')window.syncQualifiedForm();if(typeof window.renderQualifiedStudents==='function')window.renderQualifiedStudents()}
-async function saveExtendedSettings(changes,activity){if(role!=='supervisor')throw new Error('ይህን ቅንብር Supervisor ብቻ ማስተካከል ይችላል።');const next={...extendedSettings,...changes};await db.collection('appSettings').doc('extended').set({...changes,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});extendedSettings=next;try{localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings))}catch(e){}if(activity)await logActivity('Settings updated',activity)}
+async function saveExtendedSettings(changes,activity){
+ if(role!=='supervisor')throw new Error('ይህን ቅንብር Supervisor ብቻ ማስተካከል ይችላል።');
+ const next={...extendedSettings,...changes};
+ try{
+  await db.collection('appSettings').doc('extended').set({...changes,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
+  extendedSettings=next;
+  try{localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings))}catch(e){}
+  if(activity)await logActivity('Settings updated',activity);
+  if(typeof window.showModernNotification==='function')window.showModernNotification('ቅንብሩ በFirebase በተሳካ ሁኔታ ተቀምጧል።','success');
+  return true;
+ }catch(e){
+  console.error('Settings save failed:',e);
+  if(typeof window.showModernNotification==='function')window.showModernNotification('ቅንብሩ ማስቀመጥ አልተሳካም። '+(e.code||e.message||''),'error');
+  throw e;
+ }
+}
 const LANG_TEXT_ORIGINAL=new WeakMap();
 const LANG_EN={
 'ዋና ምናሌ':'Main Menu','የሰንበት ትምህርት ቤት የተማሪ እና የAttendance አጠቃላይ መረጃ':'Sunday School Student and Attendance Overview',
@@ -3350,15 +3352,20 @@ body>nav.no-print{z-index:2147482500!important}
    const rows=enabled?calculateQualifiedRows():[];
    const publicData={enabled,startDate,endDate,threshold,rows};
    await docRef().set({qualifiedStudents:cfg,qualifiedStudentsPublic:publicData,qualifiedStudentsPublishedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
+   const verifySnap=await docRef().get();
+   const savedCfg=verifySnap.exists?(verifySnap.data()||{}).qualifiedStudents:null;
+   if(!savedCfg||Boolean(savedCfg.enabled)!==enabled||String(savedCfg.startDate||'')!==startDate||String(savedCfg.endDate||'')!==endDate||Number(savedCfg.threshold)!==threshold){throw new Error('Firebase ላይ የተቀመጠውን ቅንብር ማረጋገጥ አልተቻለም።');}
    extendedSettings={...extendedSettings,qualifiedStudents:cfg,qualifiedStudentsPublic:publicData};
    try{localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings));}catch(cacheError){console.warn('Qualified settings local cache unavailable',cacheError);}
    lastPublished=JSON.stringify(publicData);
    if(typeof logActivity==='function')await logActivity('Settings updated','Qualified students setting updated');
    renderQualifiedStudents();syncQualifiedForm();
    message.textContent='✅ Qualified Students ቅንብር እና Dashboard ውጤት Firebase ላይ ተቀምጠዋል።';
+   if(typeof window.showModernNotification==='function')window.showModernNotification('Qualified Students ቅንብር በFirebase ተቀምጦ ተረጋግጧል።','success');
   }catch(e){
    console.error('Qualified Students save failed:',e);
    message.textContent='❌ አልተቀመጠም። '+(e.code?e.code+' — ':'')+(e.message||'Firebase ግንኙነትን ያረጋግጡ።');
+   if(typeof window.showModernNotification==='function')window.showModernNotification('Qualified Students ማስቀመጥ አልተሳካም። '+(e.code||e.message||''),'error');
   }finally{btn.disabled=role!=='supervisor';}
  }
  // Bind after DOM is ready and use a single guarded listener.
