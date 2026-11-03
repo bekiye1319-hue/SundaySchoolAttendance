@@ -2075,6 +2075,41 @@ if(quickRefreshButton&&!quickRefreshButton.dataset.boundInsideApp){
   finally{quickRefreshButton.classList.remove('is-refreshing');quickRefreshButton.removeAttribute('aria-busy');}
  });
 }
+// Share the core app state with the separately-loaded Qualified Students feature script.
+// Without these bridges, that script runs outside this IIFE and throws
+// "extendedSettings is not defined" while dashboard refreshes are triggered.
+const appStateBridge={
+  appSettings:()=>appSettings,
+  currentUser:()=>currentUser,
+  role:()=>role,
+  assignedClass:()=>assignedClass,
+  students:()=>students,
+  classes:()=>classes,
+  attendance:()=>attendance,
+  attendanceReasons:()=>attendanceReasons,
+  extendedSettings:()=>extendedSettings,
+  db:()=>db,
+  firebase:()=>firebase,
+  dateISO:()=>dateISO,
+  dateET:()=>dateET,
+  esc:()=>esc,
+  logActivity:()=>logActivity,
+  saveExtendedSettings:()=>saveExtendedSettings,
+  triggerDownload:()=>triggerDownload,
+  showModernNotification:()=>showModernNotification
+};
+Object.entries(appStateBridge).forEach(([key,getValue])=>{
+  try{Object.defineProperty(window,key,{configurable:true,get:getValue,set:value=>{
+    // Keep mutable app state synchronized with the original IIFE bindings.
+    if(key==='extendedSettings')extendedSettings=value;
+    else if(key==='appSettings')appSettings=value;
+    else if(key==='currentUser')currentUser=value;
+    else if(key==='role')role=value;
+    else if(key==='students')students=value;
+    else if(key==='attendance')attendance=value;
+    else if(key==='classes')classes=value;
+  }});}catch(e){console.warn('App state bridge setup failed for '+key,e);}
+});
 // All legacy showModernNotification() calls are routed to the centered modern notification runtime loaded below.
 renderAll();
 })();
