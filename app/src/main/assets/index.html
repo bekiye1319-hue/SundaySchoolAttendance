@@ -890,6 +890,8 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
  #editStudentModal>.panel{width:100%!important;max-height:calc(100dvh - 180px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;margin:0 auto!important;overflow-y:auto!important}
  #editStudentModal>.panel h2{position:relative!important;top:auto!important;display:block!important;white-space:normal!important;overflow:visible!important;line-height:1.45!important;padding:12px 8px!important;margin:0 0 12px!important;background:inherit!important}
 }
+/* Requested: remove the two Attendance print buttons without touching allPresent. */
+#attendance #printAttendance,#attendance #printAllAttendance{display:none!important}
 </style>
 
 </head><body class="auth-loading">
@@ -914,7 +916,7 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
  <div class="panel attendance-filter-panel attendance-reference-form-card"><div class="section-caption">የAttendance መረጃ</div><div class="attendance-filters"><div><label for="attDate">ቀን (DD/MM/YYYY የኢትዮጵያ ዘመን)</label><input id="attDate" placeholder="01/02/2019"></div><div><label for="attClass">ክፍል</label><select id="attClass"></select></div></div><div class="grid" style="margin-top:12px"><div><label for="attendanceReason">የAttendance መዝገቡ ምክንያት</label><select id="attendanceReason"><option value="መዝሙር">መዝሙር</option><option value="ወረብ">ወረብ</option><option value="ትምህርት">ትምህርት</option><option value="ሌላ">ሌላ</option></select></div><div id="attendanceReasonOtherWrap" class="hidden"><label for="attendanceReasonOther">ሌላ ምክንያት ይጻፉ</label><input id="attendanceReasonOther" placeholder="ምክንያቱን እዚህ ይጻፉ"></div></div><p class="small">የተመረጠው ምክንያት ለዚህ ቀንና ክፍል ይመዘገባል።</div>
  <div class="attendance-reference-legend" aria-label="የAttendance ሁኔታ መመሪያ"><span><b class="ref-pill p">P</b><span>P = ተገኝቷል</span></span><span><b class="ref-pill a">A</b><span>A = ቀርቷል</span></span><span><b class="ref-pill l">L</b><span>L = ዘግይቷል</span></span><span><b class="ref-pill e">E</b><span>E = ፈቃድ</span></span></div>
  <div class="panel attendance-list-panel"><div class="attendance-toolbar"><div><h3>የተማሪዎች Attendance</h3><p>ለእያንዳንዱ ተማሪ አንድ ሁኔታ ይምረጡ።</p></div></div>
- <div class="row attendance-actions no-print"><button id="saveAtt" class="att-btn-green"><i class="fa-solid fa-floppy-disk"></i> Attendance አስቀምጥ</button><button id="allPresent" class="att-btn-blue"><i class="fa-solid fa-user-check"></i> ሁሉንም P አድርግ</button></div>
+ <div class="row attendance-actions no-print"><button id="saveAtt" class="att-btn-green"><i class="fa-solid fa-floppy-disk"></i> Attendance አስቀምጥ</button><button id="allPresent" class="att-btn-blue"><i class="fa-solid fa-user-check"></i> ሁሉንም P አድርግ</button><button id="printAttendance" class="att-btn-gray"><i class="fa-solid fa-print"></i> ይህን ክፍል Print</button><button id="printAllAttendance" class="att-btn-gray"><i class="fa-solid fa-print"></i> ሁሉንም ክፍሎች Print</button></div>
  <div class="attendance-search-wrap" role="search" aria-label="የAttendance ተማሪ ፍለጋና ማጣሪያ">
  <div class="attendance-search-field"><span aria-hidden="true">⌕</span><input id="attendanceSearch" type="search" placeholder="በተማሪ ስም፣ ID ወይም ክፍል ፈልግ…" aria-label="Attendance ተማሪ ፈልግ"></div>
  <select id="attendanceStatusFilter" aria-label="በAttendance ሁኔታ አጣራ"><option value="ALL">ሁሉም ተማሪዎች</option><option value="P">P - ተገኝቷል</option><option value="A">A - ቀርቷል</option><option value="L">L - ዘግይቷል</option><option value="E">E - ፈቃድ</option><option value="NONE">ያልተመዘገበ</option></select>
@@ -1027,6 +1029,30 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
   </div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script id="ss-webview-boot-watchdog">
+(function(){
+  var finished=false;
+  function reveal(message){
+    if(finished)return; finished=true;
+    document.body.classList.remove('auth-loading');
+    var login=document.getElementById('cloudLogin');
+    var note=document.getElementById('cloudLoginMessage');
+    if(login)login.style.display='flex';
+    if(note && message)note.textContent=message;
+  }
+  // If startup never reaches Firebase auth, do not leave the user on an endless spinner.
+  window.setTimeout(function(){
+    if(document.body.classList.contains('auth-loading'))
+      reveal('መተግበሪያው ከFirebase ጋር መገናኘት አልቻለም። Internet ያረጋግጡና እንደገና ይክፈቱ። / Could not finish startup. Check your internet connection and retry.');
+  },20000);
+  window.addEventListener('error',function(e){
+    if(document.body.classList.contains('auth-loading')){
+      console.error('Startup error:',e.message,e.filename,e.lineno);
+      reveal('የመተግበሪያ መነሻ ስህተት ተፈጥሯል። Internet ያረጋግጡና እንደገና ይክፈቱ። / App startup error. Please retry.');
+    }
+  });
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
