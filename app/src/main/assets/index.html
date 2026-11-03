@@ -3408,9 +3408,11 @@ body>nav.no-print{z-index:2147482500!important}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindQualifiedSave,{once:true});else bindQualifiedSave();
  $q('downloadQualifiedStudents')?.addEventListener('click',()=>{const cfg=qualifiedConfig(),rows=getVisibleRows();if(!cfg.enabled)return;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const lines=[['ID','Student','Class','P','A','L','E','Attendance %'],...rows.map(x=>[x.id,x.name,x.className,x.P,x.A,x.L,x.E,x.percent])];const csv='\ufeff'+lines.map(r=>r.map(q).join(',')).join('\r\n');triggerDownload('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));});
  document.addEventListener('DOMContentLoaded',()=>{syncQualifiedForm();renderQualifiedStudents()});
- const oldUpdate=window.updateDashboard;if(typeof oldUpdate==='function'){window.updateDashboard=function(){oldUpdate();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows()}}
- const oldFill=window.fillExtendedSettingsForm;if(typeof oldFill==='function'){window.fillExtendedSettingsForm=function(){oldFill();syncQualifiedForm();renderQualifiedStudents()}}
- window.refreshQualifiedStudentsFromSettings=()=>{syncQualifiedForm();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows()};
+ // Do not wrap updateDashboard or fillExtendedSettingsForm here. The main app
+ // already calls renderQualifiedStudents() from updateDashboard and refreshes
+ // settings after load. Wrapping global functions caused recursive call chains
+ // in some WebView builds (Maximum call stack size exceeded).
+ window.refreshQualifiedStudentsFromSettings=()=>{syncQualifiedForm();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows().catch(e=>console.error('Qualified dashboard refresh failed:',e))};
 })();
 </script>
 </body></html>
