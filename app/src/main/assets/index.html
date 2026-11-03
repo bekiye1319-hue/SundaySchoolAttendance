@@ -3044,9 +3044,9 @@ body.auth-locked #quickRefreshToggle,body.auth-loading #quickRefreshToggle{displ
 </script>
 <script id="modern-notification-runtime">
 (()=>{
- const icons={success:'✓',error:'✕',warning:'!',info:'i'};
+ const icons={success:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.8"/></svg>',error:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>',warning:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg>',info:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v5m0-8h.01"/></svg>'};
  function kindOf(message){const t=String(message||'').toLowerCase();if(/አልተሳካ|ስህተት|error|failed|denied|cannot|unable|አይቻልም|አልተገኘ/.test(t))return'error';if(/ይፈልጋሉ|ማስጠንቀቂያ|warning|ጥንቃቄ|ትኩረት/.test(t))return'warning';if(/ተሳክቷል|በተሳካ|ተመዝግቧል|ተዘምኗል|ተሰርዟል|success|saved|updated|completed/.test(t))return'success';return'info'}
- function toast(message,type){let region=document.getElementById('modernToastRegion');if(!region){region=document.createElement('div');region.id='modernToastRegion';region.setAttribute('aria-live','polite');region.setAttribute('aria-atomic','false');document.body.appendChild(region)}const k=type||kindOf(message),el=document.createElement('div');el.className='modern-toast '+k;el.setAttribute('role',k==='error'?'alert':'status');const icon=document.createElement('span');icon.className='modern-toast-icon';icon.textContent=icons[k]||icons.info;const body=document.createElement('div');body.className='modern-toast-message';body.textContent=String(message??'');const close=document.createElement('button');close.className='modern-toast-close';close.type='button';close.setAttribute('aria-label','Close notification');close.textContent='×';close.onclick=()=>el.remove();el.append(icon,body,close);region.appendChild(el);const timer=setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-6px)';setTimeout(()=>el.remove(),180)},4200);close.addEventListener('click',()=>clearTimeout(timer));return el}
+ function toast(message,type){let region=document.getElementById('modernToastRegion');if(!region){region=document.createElement('div');region.id='modernToastRegion';region.setAttribute('aria-live','polite');region.setAttribute('aria-atomic','false');document.body.appendChild(region)}const k=type||kindOf(message),el=document.createElement('div');el.className='modern-toast '+k;el.setAttribute('role',k==='error'?'alert':'status');const icon=document.createElement('span');icon.className='modern-toast-icon';icon.innerHTML=icons[k]||icons.info;const body=document.createElement('div');body.className='modern-toast-message';body.textContent=String(message??'');const close=document.createElement('button');close.className='modern-toast-close';close.type='button';close.setAttribute('aria-label','Close notification');close.textContent='×';close.onclick=()=>el.remove();el.append(icon,body,close);region.appendChild(el);const timer=setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-6px)';setTimeout(()=>el.remove(),180)},4200);close.addEventListener('click',()=>clearTimeout(timer));return el}
  window.showModernNotification=toast;
  // Consistent visual feedback for buttons without changing their existing actions.
  document.addEventListener('click',event=>{
@@ -3199,7 +3199,7 @@ body>nav.no-print{z-index:2147482500!important}
  setTimeout(boot,300);setTimeout(boot,1000);
 })();
 (()=>{
- const icons={success:'✓',error:'×',warning:'!',info:'i'};
+ const icons={success:'✓',error:'×',warning:'⚠',info:'💡'};
  let active=null;
  function classify(msg){const t=String(msg??'').toLowerCase();if(/አልተሳካ|ስህተት|error|failed|denied|cannot|unable|አይቻልም|አልተገኘ/.test(t))return'error';if(/warning|ጥንቃቄ|ማስጠንቀቂያ|ይፈልጋሉ/.test(t))return'warning';if(/ተሳክቷል|በተሳካ|ተመዝግቧል|ተዘምኗል|ተሰርዟል|saved|updated|completed/.test(t))return'success';return'info'}
  function notice(message,type='info',title){
@@ -3207,7 +3207,7 @@ body>nav.no-print{z-index:2147482500!important}
   const labels={success:'ተሳክቷል',error:'ስህተት',warning:'ማስጠንቀቂያ',info:'መረጃ'};
   const back=document.createElement('div');back.id='appModalNoticeBackdrop';back.setAttribute('role','presentation');
   const box=document.createElement('section');box.id='appModalNotice';box.className=kind;box.setAttribute('role',kind==='error'?'alertdialog':'dialog');box.setAttribute('aria-modal','true');
-  const icon=document.createElement('div');icon.className='notice-icon';icon.textContent=icons[kind]||icons.info;
+  const icon=document.createElement('div');icon.className='notice-icon';icon.innerHTML=icons[kind]||icons.info;
   const heading=document.createElement('h3');heading.textContent=title||labels[kind]||labels.info;
   const text=document.createElement('p');text.textContent=String(message??'');
   const ok=document.createElement('button');ok.type='button';ok.className='notice-ok';ok.textContent='እሺ';
@@ -3318,4 +3318,87 @@ body>nav.no-print{z-index:2147482500!important}
   #printCleanArea table, #printAllAttendanceArea table { width:100%!important; border-collapse:collapse!important; table-layout:auto!important; }
   #printCleanArea th, #printCleanArea td, #printAllAttendanceArea th, #printAllAttendanceArea td { color:#111!important; background:#fff!important; border:1px solid #444!important; padding:4px 5px!important; }
 }
+</style>
+
+
+<style id="final-hide-bottom-nav-on-auth">
+/* Bottom navigation is only for signed-in app pages. */
+html body.auth-loading #mobileBottomNav,
+html body.auth-locked #mobileBottomNav,
+html body.login-visible #mobileBottomNav {
+  display:none!important; visibility:hidden!important; pointer-events:none!important;
+}
+#appModalNotice .notice-icon{font-size:25px!important;line-height:1!important}
+#appModalNotice.info .notice-icon{
+  width:54px!important;height:54px!important;border-radius:16px!important;
+  background:#e8f2fc!important;color:#1769aa!important;
+  font-size:27px!important;box-shadow:inset 0 0 0 1px #c9def3;
+}
+body.app-dark-theme #appModalNotice.info .notice-icon{
+  background:#203a55!important;color:#9ccfff!important;box-shadow:inset 0 0 0 1px #365878;
+}
+</style>
+<script id="final-auth-aware-bottom-nav-and-notice-icon">
+(()=>{
+ const sync=()=>{
+   const nav=document.getElementById('mobileBottomNav');
+   if(!nav)return;
+   const body=document.body;
+   const login=document.getElementById('cloudLogin');
+   const loginVisible=!!login && getComputedStyle(login).display!=='none' &&
+     login.getBoundingClientRect().width>0 && login.getBoundingClientRect().height>0;
+   const hide=body.classList.contains('auth-loading') ||
+     body.classList.contains('auth-locked') || loginVisible;
+   body.classList.toggle('login-visible',hide);
+   if(hide){
+     nav.style.setProperty('display','none','important');
+     nav.style.setProperty('visibility','hidden','important');
+     nav.style.setProperty('pointer-events','none','important');
+   }else{
+     nav.style.removeProperty('display');
+     nav.style.removeProperty('visibility');
+     nav.style.removeProperty('pointer-events');
+   }
+ };
+ const start=()=>{
+   sync();
+   const observer=new MutationObserver(sync);
+   observer.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true,childList:true});
+   const login=document.getElementById('cloudLogin');
+   if(login)observer.observe(login,{attributes:true,attributeFilter:['style','class','hidden']});
+   window.addEventListener('pageshow',sync);
+   window.addEventListener('resize',sync);
+   setInterval(sync,700);
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+ // Keep notice symbols consistent: use clean SVG icons, never emoji/text glyphs.
+ const polishSettingIcons=()=>{
+   const svg=(name)=> name==='gear'
+     ? '<svg class="setting-inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z"/><path d="m19.4 13.5 1.1.9-1.1 1.9-1.4-.5a7.8 7.8 0 0 1-1.4.8l-.2 1.5h-2.2l-.3-1.5a7.8 7.8 0 0 1-1.5-.1l-1 1.1-1.9-1.1.5-1.4a7.8 7.8 0 0 1-.8-1.4l-1.5-.2v-2.2l1.5-.3a7.8 7.8 0 0 1 .1-1.5l-1.1-1 1.1-1.9 1.4.5a7.8 7.8 0 0 1 1.4-.8l.2-1.5h2.2l.3 1.5a7.8 7.8 0 0 1 1.5.1l1-1.1 1.9 1.1-.5 1.4a7.8 7.8 0 0 1 .8 1.4l1.5.2v2.2l-1.5.3a7.8 7.8 0 0 1-.1 1.5Z"/></svg>'
+     : '<svg class="setting-inline-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4M8 20v-7h8v7"/></svg>';
+   const settings=document.getElementById('settings');
+   if(settings){
+     settings.querySelectorAll('h2,h3,button').forEach(el=>{
+       if(el.dataset.iconPolished==='1')return;
+       const t=el.textContent||'';
+       if(/^[\s⚙️]+/.test(t)){el.innerHTML=el.innerHTML.replace(/^[\s⚙️]+/,'');el.insertAdjacentHTML('afterbegin',svg('gear')+' ');el.dataset.iconPolished='1';}
+       else if(el.tagName==='BUTTON' && /^[\s💾]+/.test(t)){el.innerHTML=el.innerHTML.replace(/^[\s💾]+/,'');el.insertAdjacentHTML('afterbegin',svg('save')+' ');el.dataset.iconPolished='1';}
+     });
+   }
+   const modal=document.querySelector('#appModalNotice .notice-icon');
+   if(modal && !modal.querySelector('svg')){const kind=['success','error','warning','info'].find(k=>modal.closest('#appModalNotice')?.classList.contains(k))||'info';modal.innerHTML=icons[kind]||icons.info;}
+ };
+ const polishObserver=new MutationObserver(polishSettingIcons);
+ if(document.body){polishObserver.observe(document.body,{childList:true,subtree:true});polishSettingIcons();}
+
+})();
+</script>
+
+<style id="polished-svg-notice-and-settings-icons">
+#appModalNotice .notice-icon svg,.modern-toast-icon svg{width:27px;height:27px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#appModalNotice .notice-icon{font-size:0!important}
+.setting-inline-icon{width:19px;height:19px;vertical-align:-3px;display:inline-block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#settings h2 .setting-inline-icon,#settings h3 .setting-inline-icon{color:var(--primary,#087a50)}
+#settings button .setting-inline-icon{width:17px;height:17px}
+body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08)}
 </style>
