@@ -1043,8 +1043,8 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
   // If startup never reaches Firebase auth, do not leave the user on an endless spinner.
   window.setTimeout(function(){
     if(document.body.classList.contains('auth-loading'))
-      reveal('መተግበሪያው ከFirebase ጋር መገናኘት አልቻለም። Internet ያረጋግጡና እንደገና ይክፈቱ። / Could not finish startup. Check your internet connection and retry.');
-  },20000);
+      reveal('መተግበሪያው ከFirebase ጋር መገናኘት አልቻለም። Internet ያረጋግጡና እንደገና ይክፈቱ። / Firebase sign-in is taking too long. Check your internet connection, then tap Sign in again.');
+  },45000);
   window.addEventListener('error',function(e){
     if(document.body.classList.contains('auth-loading')){
       console.error('Startup error:',e.message,e.filename,e.lineno);
@@ -1223,7 +1223,7 @@ async function cloudSave(scope='records'){
  }
 }
 async function login(){let email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password){msg('Email እና Password ያስገቡ።');return}$('cloudLoginBtn').disabled=true;msg('በመግባት ላይ...');try{// Firebase Web Auth defaults to LOCAL persistence; do not reset persistence on each login.
-let cred=await auth.signInWithEmailAndPassword(email,password);startAuthSession();currentUser=cred.user;let ud=await db.collection('users').doc(currentUser.uid).get();if(!ud.exists||!['supervisor','teacher','class_teacher','class_assistant'].includes(ud.data().role)){await auth.signOut();currentUser=null;role=null;msg('users/'+cred.user.uid+' ውስጥ role=supervisor፣ teacher፣ class_teacher ወይም class_assistant መሆኑን ይፈትሹ።');return}role=ud.data().role;assignedClass=String(ud.data().className||ud.data().assignedClass||'');if($('backupUserEmail'))$('backupUserEmail').textContent=currentUser.email||'';if($('backupUserRole'))$('backupUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('globalUserEmail'))$('globalUserEmail').textContent=currentUser.email||'';if($('globalUserRole'))$('globalUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarEmail'))$('sidebarEmail').textContent=currentUser.email||'';if($('sidebarRole'))$('sidebarRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarAvatar'))$('sidebarAvatar').textContent=(currentUser.email||'S').charAt(0).toUpperCase();if(isClassScoped()&&!assignedClass){await auth.signOut();currentUser=null;role=null;msg('class_teacher/class_assistant ለሆነ መለያ users ሰነዱ ውስጥ className ወይም assignedClass መሙላት አለበት።');return}await loadCloud();await loadAppSettings();setLogin(false);applyRoleUI();runAutoBackupIfDue();$('cloudPassword').value='';msg('ገብተዋል።');logActivity('Sign in','ተጠቃሚ ወደ ስርዓቱ ገባ');if(role==='supervisor')renderActivityLogs()}catch(e){console.error(e);msg(friendlyFirebaseError(e,'login'))}finally{$('cloudLoginBtn').disabled=false}}
+let cred=await auth.signInWithEmailAndPassword(email,password);startAuthSession();currentUser=cred.user;let ud=await db.collection('users').doc(currentUser.uid).get();if(!ud.exists||!['supervisor','teacher','class_teacher','class_assistant'].includes(ud.data().role)){await auth.signOut();currentUser=null;role=null;msg('users/'+cred.user.uid+' ውስጥ role=supervisor፣ teacher፣ class_teacher ወይም class_assistant መሆኑን ይፈትሹ።');return}role=ud.data().role;assignedClass=String(ud.data().className||ud.data().assignedClass||'');if($('backupUserEmail'))$('backupUserEmail').textContent=currentUser.email||'';if($('backupUserRole'))$('backupUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('globalUserEmail'))$('globalUserEmail').textContent=currentUser.email||'';if($('globalUserRole'))$('globalUserRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarEmail'))$('sidebarEmail').textContent=currentUser.email||'';if($('sidebarRole'))$('sidebarRole').textContent=role==='supervisor'?'Supervisor':role==='teacher'?'Teacher':role==='class_teacher'?'Class Teacher':'Class Assistant';if($('sidebarAvatar'))$('sidebarAvatar').textContent=(currentUser.email||'S').charAt(0).toUpperCase();if(isClassScoped()&&!assignedClass){await auth.signOut();currentUser=null;role=null;msg('class_teacher/class_assistant ለሆነ መለያ users ሰነዱ ውስጥ className ወይም assignedClass መሙላት አለበት።');return}setLogin(false);applyRoleUI();msg('መረጃ በመጫን ላይ...');$('cloudPassword').value='';try{await loadCloud();await loadAppSettings();syncSettingsForm();msg('ገብተዋል።');}catch(dataError){console.error('Login succeeded, but cloud data loading is delayed:',dataError);msg('Login ተሳክቷል፤ ግን መረጃ መጫን አልተሳካም። Internet ያረጋግጡና Refresh ይጫኑ።');}runAutoBackupIfDue();logActivity('Sign in','ተጠቃሚ ወደ ስርዓቱ ገባ');if(role==='supervisor')renderActivityLogs()}catch(e){console.error(e);msg(friendlyFirebaseError(e,'login'))}finally{$('cloudLoginBtn').disabled=false}}
 async function loadCloud(){
  let ss,cc,attendanceDocs=[];
  if(isClassScoped()){
@@ -1988,8 +1988,17 @@ auth.onAuthStateChanged(async user=>{
   ['backupUserEmail','globalUserEmail','sidebarEmail'].forEach(id=>{if($(id))$(id).textContent=user.email||'';});
   ['backupUserRole','globalUserRole','sidebarRole'].forEach(id=>{if($(id))$(id).textContent=roleName;});
   if($('sidebarAvatar'))$('sidebarAvatar').textContent=(user.email||'S').charAt(0).toUpperCase();
-  await loadCloud();setLogin(false);applyRoleUI();runAutoBackupIfDue();msg('');
-  await loadAppSettings();syncSettingsForm();if(role==='supervisor'){renderActivityLogs();renderRecentActivityStream();}
+  // Reveal the authenticated app as soon as the account profile is verified.
+  // Firestore data reads can be slow on mobile networks; they must not leave
+  // the user trapped behind the login screen or trigger the startup watchdog.
+  setLogin(false);applyRoleUI();msg('መረጃ በመጫን ላይ...');
+  try{
+   await loadCloud();await loadAppSettings();syncSettingsForm();msg('');
+  }catch(dataError){
+   console.error('Session restored, but cloud data loading is delayed:',dataError);
+   msg('Login ተመልሷል፤ ግን መረጃ መጫን አልተሳካም። Internet ያረጋግጡና Refresh ይጫኑ።');
+  }
+  runAutoBackupIfDue();if(role==='supervisor'){renderActivityLogs();renderRecentActivityStream();}
  }catch(e){console.error('Session restore failed:',e);setLogin(true);msg(friendlyFirebaseError(e,'login'));}
  finally{restoringAuthSession=false;}
 });
