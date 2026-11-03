@@ -900,6 +900,134 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
 input[aria-invalid="true"]{border-color:#dc2626!important;box-shadow:0 0 0 2px rgba(220,38,38,.10)!important}
 body.app-dark-theme .password-field-error{color:#fca5a5}
 </style>
+
+<style id="modern-design-preview-v1">
+/* Modern visual layer — deliberately CSS-only to preserve existing Firebase and app logic. */
+:root{
+  --modern-primary:#167a52;--modern-primary-2:#20a36b;--modern-accent:#2876c7;
+  --modern-bg:#f3f6fa;--modern-surface:#ffffff;--modern-surface-2:#f8fafc;
+  --modern-text:#172536;--modern-muted:#64748b;--modern-line:#e2e8f0;
+  --modern-shadow:0 8px 26px rgba(20,39,65,.07);--modern-radius:18px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--modern-bg)!important;color:var(--modern-text)!important;font-family:"Noto Sans Ethiopic",Arial,sans-serif!important}
+body>header:first-of-type{
+  position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  min-height:82px!important;padding:15px 64px!important;
+  background:linear-gradient(115deg,#105d43 0%,#16865a 55%,#20a36b 100%)!important;
+  box-shadow:0 5px 20px rgba(10,75,50,.18)!important
+}
+body>header:first-of-type h1{font-size:clamp(19px,2.5vw,27px)!important;font-weight:800!important;letter-spacing:.1px}
+body>header:first-of-type p{margin:5px 0 0!important;opacity:.88;font-size:13px}
+main{max-width:1500px!important;width:100%!important;margin:0 auto!important;padding:24px clamp(12px,2vw,30px) 90px!important}
+.page{animation:modernFadeIn .22s ease-out}
+@keyframes modernFadeIn{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
+.panel,.dashboard-stat,.report-visual-card,.report-card,.attendance-filter-panel{
+  background:var(--modern-surface)!important;border:1px solid var(--modern-line)!important;
+  border-radius:var(--modern-radius)!important;box-shadow:var(--modern-shadow)!important
+}
+.panel{padding:clamp(15px,2vw,24px)!important;margin-bottom:18px!important}
+.panel h2,.page h2{color:var(--modern-text)!important;font-weight:800!important;letter-spacing:-.2px}
+.page-title,.dashboard-title{margin-bottom:18px!important}
+.dashboard-stats{gap:14px!important}
+.dashboard-stat{
+  position:relative;overflow:hidden;padding:20px!important;min-height:132px;
+  display:flex;flex-direction:column;justify-content:center;gap:7px;
+  transition:transform .18s ease,box-shadow .18s ease!important
+}
+.dashboard-stat:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,39,65,.11)!important}
+.dashboard-stat strong{font-size:clamp(25px,3vw,34px)!important;font-weight:800!important;color:var(--modern-primary)!important}
+.dashboard-stat span{color:var(--modern-muted)!important;font-size:13px!important}
+.kpi-icon{width:38px;height:38px;border-radius:12px;background:#e8f5ee;color:var(--modern-primary);display:grid;place-items:center;font-size:20px}
+button,.btn{
+  border-radius:11px!important;font-weight:700!important;letter-spacing:.05px;
+  transition:transform .16s ease,filter .16s ease,box-shadow .16s ease!important
+}
+button:hover,.btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{
+  outline:3px solid rgba(40,118,199,.24)!important;outline-offset:2px!important
+}
+input,select,textarea{
+  border:1px solid #d5dee9!important;border-radius:11px!important;background:var(--modern-surface-2)!important;
+  color:var(--modern-text)!important;min-height:43px;padding:10px 12px!important
+}
+input:focus,select:focus,textarea:focus{border-color:#4d9bce!important;box-shadow:0 0 0 3px rgba(40,118,199,.11)!important}
+label{color:var(--modern-text)!important;font-weight:700!important}
+.table-wrap{border:1px solid var(--modern-line);border-radius:13px;background:var(--modern-surface);overflow:auto}
+table{border-collapse:separate!important;border-spacing:0!important;margin:0!important}
+th{background:#eef4f8!important;color:#334155!important;font-weight:800!important}
+th,td{padding:11px 12px!important;border-right:0!important;border-left:0!important;border-top:0!important;border-bottom:1px solid var(--modern-line)!important}
+tbody tr:last-child td{border-bottom:0!important}
+tbody tr:hover{background:#f5f9fc!important}
+.small,.muted{color:var(--modern-muted)!important;line-height:1.65}
+.notice{border-radius:12px!important;border:1px solid #f3dfaa!important}
+nav[aria-label="ዋና ምናሌ"]{
+  background:var(--modern-surface)!important;border-right:1px solid var(--modern-line)!important;
+  box-shadow:12px 0 35px rgba(20,39,65,.08)!important
+}
+nav[aria-label="ዋና ምናሌ"] button{
+  border-radius:11px!important;margin:3px 10px!important;padding:12px 14px!important;
+  text-align:left!important;transition:background .16s ease,color .16s ease,transform .16s ease!important
+}
+nav[aria-label="ዋና ምናሌ"] button.active{box-shadow:inset 3px 0 0 #20a36b!important}
+#mobileBottomNav{
+  background:rgba(255,255,255,.94)!important;backdrop-filter:blur(16px)!important;
+  border-top:1px solid var(--modern-line)!important;box-shadow:0 -8px 28px rgba(20,39,65,.08)!important
+}
+#mobileBottomNav button{border-radius:12px!important}
+#settings>.panel:not(:first-child){background:var(--modern-surface)!important}
+#settings>.panel:first-child{background:linear-gradient(120deg,#105d43,#16865a 58%,#20a36b)!important}
+#reports .report-container{border-radius:var(--modern-radius)!important}
+#appModalNotice{border-radius:20px!important;box-shadow:0 24px 70px rgba(8,20,35,.24)!important}
+#sidebarBackdrop{backdrop-filter:blur(3px)}
+/* Dark theme — keep all pages, controls, tables and overlays readable. */
+body.app-dark-theme{
+  --modern-bg:#0d1724;--modern-surface:#142235;--modern-surface-2:#101d2d;
+  --modern-text:#e6edf6;--modern-muted:#a6b4c6;--modern-line:#2a3b50;
+  --modern-shadow:0 9px 28px rgba(0,0,0,.22);
+  background:var(--modern-bg)!important;color:var(--modern-text)!important
+}
+body.app-dark-theme .panel,body.app-dark-theme .dashboard-stat,
+body.app-dark-theme .report-visual-card,body.app-dark-theme .report-card,
+body.app-dark-theme .attendance-filter-panel,body.app-dark-theme .table-wrap,
+body.app-dark-theme nav[aria-label="ዋና ምናሌ"]{
+  background:var(--modern-surface)!important;border-color:var(--modern-line)!important;color:var(--modern-text)!important
+}
+body.app-dark-theme .panel h2,body.app-dark-theme .page h2,
+body.app-dark-theme label,body.app-dark-theme td,body.app-dark-theme th,
+body.app-dark-theme .dashboard-title,body.app-dark-theme .dashboard-stat span{color:var(--modern-text)!important}
+body.app-dark-theme th{background:#203249!important}
+body.app-dark-theme tbody tr:hover{background:#1b2c41!important}
+body.app-dark-theme input,body.app-dark-theme select,body.app-dark-theme textarea{
+  background:#101d2d!important;color:#e6edf6!important;border-color:#354a62!important
+}
+body.app-dark-theme .small,body.app-dark-theme .muted{color:var(--modern-muted)!important}
+body.app-dark-theme nav[aria-label="ዋና ምናሌ"] button{color:#dce7f4!important}
+body.app-dark-theme #mobileBottomNav{background:rgba(20,34,53,.94)!important;border-color:var(--modern-line)!important}
+body.app-dark-theme #settings>.panel:not(:first-child){background:var(--modern-surface)!important}
+body.app-dark-theme #settings>.panel:not(:first-child) h2{color:#b8e8ce!important}
+body.app-dark-theme .recent-activity-item{background:#101d2d!important;border-color:var(--modern-line)!important}
+body.app-dark-theme .recent-activity-item strong{color:#e6edf6!important}
+body.app-dark-theme .recent-activity-item small{color:#a6b4c6!important}
+body.app-dark-theme .report-visual-card{background:var(--modern-surface)!important}
+body.app-dark-theme #appModalNotice{background:#142235!important;color:#e6edf6!important}
+@media(max-width:800px){
+  main{padding:14px 12px 100px!important}
+  body>header:first-of-type{min-height:70px!important;padding:12px 58px!important}
+  .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .dashboard-stat{padding:14px!important;min-height:112px}
+  .panel{padding:15px!important;border-radius:15px!important}
+  th,td{padding:9px 10px!important}
+}
+@media(max-width:420px){
+  .dashboard-stats{grid-template-columns:1fr 1fr!important}
+  .dashboard-stat strong{font-size:24px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickRefreshToggle" class="header-badge refresh-quick-toggle no-print" aria-label="Refresh data" title="Refresh data"><span class="refresh-glyph" aria-hidden="true">↻</span></button><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
