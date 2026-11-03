@@ -2058,35 +2058,7 @@ renderAll();
 @media(max-width:600px){#attendance .attendance-reference-table{min-width:650px!important}#attendance .attendance-choice-group{gap:16px}}
 @media(prefers-reduced-motion:reduce){nav.no-print,.sidebar-backdrop{transition:none!important}}
 </style>
-<script id="mobile-sidebar-drawer-reliable-handler">
-(()=>{
- const nav=document.querySelector('body > nav.no-print');
- const toggle=document.getElementById('menuToggle');
- const backdrop=document.getElementById('sidebarBackdrop');
- if(!nav||!toggle||!backdrop||toggle.dataset.drawerBound==='1')return;
- toggle.dataset.drawerBound='1';
- const isMobile=()=>window.matchMedia('(max-width: 800px)').matches;
- const close=()=>{
-   nav.classList.remove('sidebar-open');
-   backdrop.classList.remove('show');
-   document.body.classList.remove('sidebar-drawer-open');
-   toggle.setAttribute('aria-expanded','false');
- };
- const open=()=>{
-   if(!isMobile())return;
-   nav.classList.add('sidebar-open');
-   backdrop.classList.add('show');
-   document.body.classList.add('sidebar-drawer-open');
-   toggle.setAttribute('aria-expanded','true');
- };
- const toggleDrawer=(e)=>{e.preventDefault();e.stopPropagation();if(nav.classList.contains('sidebar-open'))close();else open();};
- toggle.addEventListener('click',toggleDrawer);
- backdrop.addEventListener('click',close);
- nav.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',close));
- document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
- window.addEventListener('resize',()=>{if(!isMobile())close();});
-})();
-</script>
+<!-- Replaced by unified navigation controller: mobile-sidebar-drawer-reliable-handler -->
 
 <style id="attendance-four-column-radio-reference">
 /* Match the user's latest reference: four separate status columns and compact checked circles. */
@@ -2443,39 +2415,7 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
  <button type="button" data-mobile-page="reports"><i class="fa-solid fa-chart-column mobile-nav-icon" aria-hidden="true"></i><span>ሪፖርት</span></button>
  <button type="button" data-mobile-more="true"><i class="fa-solid fa-ellipsis mobile-nav-icon" aria-hidden="true"></i><span>More</span></button>
 </nav>
-<script id="v20-mobile-navigation-and-fast-refresh">
-(()=>{
- const init=()=>{
-  const bottom=document.getElementById('mobileBottomNav');
-  const sidebar=document.querySelector('nav[aria-label="ዋና ምናሌ"]')||document.querySelector('body>nav.no-print:not(#mobileBottomNav)');
-  if(!bottom)return;
-  // Make sure the fixed navigation is a direct child of body, outside transformed page panels.
-  if(bottom.parentElement!==document.body)document.body.appendChild(bottom);
-  const showNav=()=>{if(window.matchMedia('(max-width: 800px)').matches){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('position','fixed','important');bottom.style.setProperty('top','auto','important');bottom.style.setProperty('bottom','0','important');bottom.style.setProperty('left','0','important');bottom.style.setProperty('right','0','important');bottom.style.setProperty('width','100%','important');bottom.style.setProperty('z-index','2147483000','important');bottom.style.setProperty('transform','translate3d(0,0,0)','important');bottom.style.setProperty('visibility','visible','important');bottom.style.setProperty('opacity','1','important');bottom.style.setProperty('pointer-events','auto','important');}};
-  const setActive=page=>bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===page));
-  const sync=()=>{
-   if(!sidebar){showNav();return;}
-   ['students','reports'].forEach(page=>{const source=sidebar.querySelector('[data-page="'+page+'"]');const target=bottom.querySelector('[data-mobile-page="'+page+'"]');if(target)target.classList.toggle('hidden',!source||source.classList.contains('hidden'));});
-   const active=sidebar.querySelector('button[data-page].active');if(active)setActive(active.dataset.page);
-   showNav();
-  };
-  bottom.addEventListener('click',e=>{
-   const btn=e.target.closest('[data-mobile-page]');
-   if(btn&&sidebar){const target=sidebar.querySelector('button[data-page="'+btn.dataset.mobilePage+'"]');if(target&&!target.classList.contains('hidden'))target.click();return;}
-   if(e.target.closest('[data-mobile-more]')){const toggle=document.getElementById('menuToggle');if(toggle)toggle.click();}
-  });
-  if(sidebar){
-   sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>{setActive(b.dataset.page);setTimeout(sync,0);}));
-   new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
-  }
-  sync();window.syncMobileBottomNavigation=sync;
-  window.addEventListener('resize',showNav,{passive:true});
-  // Pull-to-refresh gesture intentionally removed; use the header refresh button.
-
- };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-})();
-</script>
+<!-- Replaced by unified navigation controller: v20-mobile-navigation-and-fast-refresh -->
 
 
 <style id="final-sidebar-and-bottom-navigation-theme">
@@ -3009,38 +2949,7 @@ body.app-dark-theme #attendance .attendance-table-wrap tbody tr:focus-within>td{
 body.app-dark-theme #attendance .attendance-table-wrap tbody tr:active>td{background:#315342!important;}
 @media(prefers-reduced-motion:reduce){#students .students-ref-table-wrap tbody tr,#students .students-ref-table-wrap tbody tr>td,#attendance .attendance-table-wrap tbody tr{transition:none!important}}
 </style>
-<script id="final-v5-bottom-navigation-behavior">
-(()=>{
- const init=()=>{
-  const bottom=document.getElementById('mobileBottomNav');
-  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
-  const toggle=document.getElementById('menuToggle');
-  if(!bottom||!sidebar)return;
-  const pageButtons=[...bottom.querySelectorAll('[data-mobile-page]')];
-  const sync=()=>{
-   pageButtons.forEach(b=>{const source=sidebar.querySelector('[data-page="'+b.dataset.mobilePage+'"]');b.classList.toggle('hidden',!source||source.classList.contains('hidden'));});
-   const active=sidebar.querySelector('button[data-page].active');
-   if(active)pageButtons.forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===active.dataset.page));
-  };
-  if(!bottom.dataset.v5Bound){
-   bottom.dataset.v5Bound='1';
-   bottom.addEventListener('click',e=>{
-    const page=e.target.closest('[data-mobile-page]');
-    if(page){const source=sidebar.querySelector('button[data-page="'+page.dataset.mobilePage+'"]');if(source&&!source.classList.contains('hidden'))source.click();return;}
-    if(e.target.closest('[data-mobile-more]')){if(toggle)toggle.click();}
-   });
-   sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(sync,0)));
-   new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
-   if(toggle){toggle.addEventListener('click',()=>setTimeout(()=>{document.body.classList.toggle('sidebar-drawer-open',sidebar.classList.contains('sidebar-open'));},0));}
-   const backdrop=document.getElementById('sidebarBackdrop');if(backdrop)backdrop.addEventListener('click',()=>document.body.classList.remove('sidebar-drawer-open'));
-   sidebar.querySelectorAll('button[data-page],#topLogout').forEach(b=>b.addEventListener('click',()=>document.body.classList.remove('sidebar-drawer-open')));
-  }
-  sync();window.syncMobileBottomNavigation=sync;
- };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
- setTimeout(init,400);setTimeout(init,1200);
-})();
-</script>
+<!-- Replaced by unified navigation controller: final-v5-bottom-navigation-behavior -->
 
 <style id="v6-final-mobile-navigation-login-fixes">
 /* Login overlay must always suppress all app navigation, even before auth-locked is toggled. */
@@ -3061,80 +2970,7 @@ body.auth-locked #mobileBottomNav{display:none!important;visibility:hidden!impor
  body.sidebar-drawer-open #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important}
 }
 </style>
-<script id="v6-final-navigation-auth-sync">
-(()=>{
- const boot=()=>{
-  const bottom=document.getElementById('mobileBottomNav');
-  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
-  const login=document.getElementById('cloudLogin');
-  const toggle=document.getElementById('menuToggle');
-  const backdrop=document.getElementById('sidebarBackdrop');
-  if(!bottom||!sidebar)return;
-  if(bottom.parentElement!==document.body)document.body.appendChild(bottom);
-  const loginVisible=()=>{
-   if(!login)return false;
-   const cs=getComputedStyle(login);
-   return cs.display!=='none' && cs.visibility!=='hidden' && login.getAttribute('aria-hidden')!=='true';
-  };
-  const syncVisibility=()=>{
-   const locked=document.body.classList.contains('auth-locked')||document.body.classList.contains('auth-loading')||loginVisible();
-   const drawer=sidebar.classList.contains('sidebar-open')||document.body.classList.contains('sidebar-drawer-open');
-   if(locked||drawer||!matchMedia('(max-width:800px)').matches){
-    bottom.style.setProperty('display','none','important');
-    bottom.style.setProperty('visibility','hidden','important');
-    bottom.style.setProperty('pointer-events','none','important');
-   }else{
-    bottom.style.setProperty('display','grid','important');
-    bottom.style.setProperty('position','fixed','important');
-    bottom.style.setProperty('inset','auto 0 0 0','important');
-    bottom.style.setProperty('width','100%','important');
-    bottom.style.setProperty('z-index','2147482000','important');
-    bottom.style.setProperty('visibility','visible','important');
-    bottom.style.setProperty('opacity','1','important');
-    bottom.style.setProperty('pointer-events','auto','important');
-   }
-  };
-  const syncActive=()=>{
-   const active=sidebar.querySelector('button[data-page].active');
-   bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',!!active&&b.dataset.mobilePage===active.dataset.page));
-  };
-  // Capture and stop older duplicate click handlers (which previously toggled More twice).
-  if(!bottom.dataset.v6Capture){
-   bottom.dataset.v6Capture='1';
-   bottom.addEventListener('click',e=>{
-    const page=e.target.closest('[data-mobile-page]');
-    const more=e.target.closest('[data-mobile-more]');
-    if(!page&&!more)return;
-    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
-    if(page){
-     const id=page.dataset.mobilePage;
-     const source=sidebar.querySelector('button[data-page="'+id+'"]');
-     if(source){source.click();setTimeout(()=>{syncActive();syncVisibility();},60);}
-     return;
-    }
-    if(more&&toggle){
-     if(sidebar.classList.contains('sidebar-open')){
-      sidebar.classList.remove('sidebar-open');document.body.classList.remove('sidebar-drawer-open');
-      if(backdrop)backdrop.classList.remove('show');toggle.setAttribute('aria-expanded','false');
-     }else{
-      toggle.click();
-     }
-     setTimeout(syncVisibility,30);
-    }
-   },true);
-  }
-  const observer=new MutationObserver(()=>{syncActive();syncVisibility();});
-  observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
-  sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{syncActive();syncVisibility();},30)));
-  if(backdrop)backdrop.addEventListener('click',()=>setTimeout(syncVisibility,30));
-  window.addEventListener('resize',syncVisibility);
-  syncActive();syncVisibility();
-  window.syncMobileBottomNavigation=()=>{syncActive();syncVisibility();};
- };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
- setTimeout(boot,500);setTimeout(boot,1400);
-})();
-</script>
+<!-- Replaced by unified navigation controller: v6-final-navigation-auth-sync -->
 
 
 <style id="v7-sidebar-header-clear-and-print-export-fix">
@@ -3234,36 +3070,7 @@ body.auth-locked #quickRefreshToggle,body.auth-loading #quickRefreshToggle{displ
 body>nav.no-print{z-index:2147482500!important}
 @media(max-width:800px){#menuToggle{z-index:2147483001!important;pointer-events:auto!important}}
 </style>
-<script id="final-navigation-and-scroll-fixes">
-(function(){
- const sidebar=document.querySelector('body>nav.no-print');
- const backdrop=document.getElementById('sidebarBackdrop');
- const menu=document.getElementById('menuToggle');
- function setDrawer(open){
-   if(!sidebar)return;
-   sidebar.classList.toggle('sidebar-open',!!open);
-   if(backdrop)backdrop.classList.toggle('show',!!open);
-   if(menu){menu.setAttribute('aria-expanded',String(!!open));menu.setAttribute('aria-label',open?'ምናሌ ዝጋ':'ምናሌ ክፈት');}
-   document.body.classList.toggle('sidebar-is-open',!!open);
- }
- if(menu){menu.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();setDrawer(!sidebar?.classList.contains('sidebar-open'));},true);}
- if(backdrop)backdrop.addEventListener('click',()=>setDrawer(false));
- // Close the drawer after choosing any navigation page, then start the new page at top.
- document.querySelectorAll('nav button[data-page]').forEach(btn=>btn.addEventListener('click',()=>{
-   setDrawer(false);
-   requestAnimationFrame(()=>{window.scrollTo({top:0,left:0,behavior:'instant'});document.documentElement.scrollTop=0;document.body.scrollTop=0;});
- }));
- // Some mobile layouts expose a secondary More/Menu trigger; delegate it without
- // hijacking unrelated buttons or the page's normal actions.
- document.addEventListener('click',function(ev){
-   const trigger=ev.target.closest('[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
-   if(trigger&&trigger!==menu){ev.preventDefault();setDrawer(!sidebar?.classList.contains('sidebar-open'));}
- });
- // Ensure dialogs created later are lifted above the sidebar stack.
- const observer=new MutationObserver(()=>document.querySelectorAll('.modern-confirm-overlay,.modern-dialog-overlay,[role="dialog"],[aria-modal="true"]').forEach(el=>{el.style.zIndex='2147483600';}));
- observer.observe(document.body,{childList:true,subtree:true});
-})();
-</script>
+<!-- Replaced by unified navigation controller: final-navigation-and-scroll-fixes -->
 
 
 <style id="registration-modal-and-toast-position-fix">
@@ -3306,99 +3113,114 @@ body>nav.no-print{z-index:2147482500!important}
 </script>
 
 
-<script id="final-single-owner-mobile-drawer-fix">
+<!-- Replaced by unified navigation controller: final-single-owner-mobile-drawer-fix -->
+
+
+
+
+<!-- Replaced by unified navigation controller: final-sidebar-control-fix -->
+
+<style id="unified-modal-notification-and-drawer-styles">
+@media(max-width:800px){
+ body>nav[aria-label="ዋና ምናሌ"]{z-index:2147483001!important;transition:transform .25s ease,visibility .25s ease!important}
+ body>nav[aria-label="ዋና ምናሌ"].sidebar-open{transform:translate3d(0,0,0)!important;visibility:visible!important;pointer-events:auto!important}
+ #sidebarBackdrop{z-index:2147483000!important}
+ #mobileBottomNav{z-index:2147482000!important}
+}
+#appModalNoticeBackdrop{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(8,22,16,.48);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:appNoticeFade .16s ease-out}
+#appModalNotice{width:min(420px,100%);box-sizing:border-box;border:1px solid rgba(255,255,255,.65);border-radius:24px;padding:26px 23px 20px;background:var(--card-bg,#fff);color:var(--text-color,#263238);box-shadow:0 24px 80px rgba(0,0,0,.28);text-align:center;animation:appNoticePop .2s ease-out}
+#appModalNotice .notice-icon{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;font-size:27px;font-weight:800;background:var(--notice-soft,#e8f5ec);color:var(--notice-color,#137545)}
+#appModalNotice.success{--notice-color:#12804a;--notice-soft:#e6f6ec}#appModalNotice.error{--notice-color:#c62828;--notice-soft:#ffebee}#appModalNotice.warning{--notice-color:#a66300;--notice-soft:#fff4df}#appModalNotice.info{--notice-color:#1769aa;--notice-soft:#e8f2fc}
+#appModalNotice h3{font-size:20px;line-height:1.35;margin:0 0 10px;color:var(--notice-color)}
+#appModalNotice p{font-size:15px;line-height:1.65;margin:0 0 22px;overflow-wrap:anywhere;white-space:pre-wrap}
+#appModalNotice .notice-ok{width:100%;min-height:48px;border:0;border-radius:13px;background:linear-gradient(135deg,#087344,#15965c);color:#fff;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 7px 18px rgba(8,115,68,.2)}
+#appModalNotice.error .notice-ok{background:linear-gradient(135deg,#b42318,#dc4545)}#appModalNotice.warning .notice-ok{background:linear-gradient(135deg,#a66300,#d18a16)}#appModalNotice.info .notice-ok{background:linear-gradient(135deg,#1769aa,#318bd0)}
+@keyframes appNoticeFade{from{opacity:0}to{opacity:1}}@keyframes appNoticePop{from{opacity:0;transform:translateY(9px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-color-scheme:dark){#appModalNotice{background:#17251e;color:#e8f2ec;border-color:#34483c}}
+</style>
+
+
+<script id="unified-navigation-and-modal-notifications">
 (()=>{
  const boot=()=>{
-  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]')||document.querySelector('body>nav.no-print:not(#mobileBottomNav)');
   const backdrop=document.getElementById('sidebarBackdrop');
   const bottom=document.getElementById('mobileBottomNav');
   const menu=document.getElementById('menuToggle');
-  if(!sidebar||!menu||!backdrop||document.documentElement.dataset.finalDrawerFix==='1')return;
-  document.documentElement.dataset.finalDrawerFix='1';
-  const mobile=()=>window.matchMedia('(max-width:800px)').matches;
-  const open=()=>{
-   if(!mobile())return;
-   sidebar.classList.add('sidebar-open');document.body.classList.add('sidebar-drawer-open');
-   backdrop.classList.add('show');
-   sidebar.style.setProperty('visibility','visible','important');sidebar.style.setProperty('pointer-events','auto','important');sidebar.style.setProperty('transform','translate3d(0,0,0)','important');sidebar.style.setProperty('z-index','2147483001','important');
-   backdrop.style.setProperty('display','block','important');backdrop.style.setProperty('visibility','visible','important');backdrop.style.setProperty('pointer-events','auto','important');backdrop.style.setProperty('opacity','1','important');backdrop.style.setProperty('z-index','2147483000','important');
-   menu.setAttribute('aria-expanded','true');
-   if(bottom){bottom.style.setProperty('display','none','important');bottom.style.setProperty('pointer-events','none','important');}
-  };
-  const close=()=>{
-   sidebar.classList.remove('sidebar-open');document.body.classList.remove('sidebar-drawer-open');backdrop.classList.remove('show');
-   if(mobile()){
-    sidebar.style.setProperty('transform','translate3d(-105%,0,0)','important');sidebar.style.setProperty('visibility','hidden','important');sidebar.style.setProperty('pointer-events','none','important');
-    backdrop.style.setProperty('visibility','hidden','important');backdrop.style.setProperty('pointer-events','none','important');backdrop.style.setProperty('opacity','0','important');
+  if(!sidebar||!menu||!backdrop||document.documentElement.dataset.unifiedNavReady==='1')return;
+  document.documentElement.dataset.unifiedNavReady='1';
+  const mobile=()=>matchMedia('(max-width:800px)').matches;
+  if(bottom&&bottom.parentElement!==document.body)document.body.appendChild(bottom);
+  const setDrawer=(open)=>{
+   const value=!!open&&mobile();
+   sidebar.classList.toggle('sidebar-open',value);
+   document.body.classList.toggle('sidebar-drawer-open',value);
+   document.body.classList.toggle('sidebar-is-open',value);
+   backdrop.classList.toggle('show',value);
+   backdrop.setAttribute('aria-hidden',String(!value));
+   menu.setAttribute('aria-expanded',String(value));
+   menu.setAttribute('aria-label',value?'ምናሌ ዝጋ':'ምናሌ ክፈት');
+   if(value){
+    sidebar.style.setProperty('visibility','visible','important');sidebar.style.setProperty('pointer-events','auto','important');sidebar.style.setProperty('transform','translate3d(0,0,0)','important');
+    backdrop.style.setProperty('display','block','important');backdrop.style.setProperty('visibility','visible','important');backdrop.style.setProperty('opacity','1','important');backdrop.style.setProperty('pointer-events','auto','important');
+    if(bottom){bottom.style.setProperty('display','none','important');bottom.style.setProperty('pointer-events','none','important');}
    }else{
-    ['transform','visibility','pointer-events','z-index'].forEach(k=>sidebar.style.removeProperty(k));
-    ['display','visibility','pointer-events','opacity','z-index'].forEach(k=>backdrop.style.removeProperty(k));
+    sidebar.style.removeProperty('visibility');sidebar.style.removeProperty('pointer-events');sidebar.style.removeProperty('transform');
+    backdrop.style.removeProperty('display');backdrop.style.removeProperty('visibility');backdrop.style.removeProperty('opacity');backdrop.style.removeProperty('pointer-events');
+    if(bottom&&mobile()){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('visibility','visible','important');bottom.style.setProperty('pointer-events','auto','important');}
    }
-   menu.setAttribute('aria-expanded','false');
-   if(bottom&&mobile()){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('visibility','visible','important');bottom.style.setProperty('pointer-events','auto','important');}
   };
-  const toggle=()=>sidebar.classList.contains('sidebar-open')?close():open();
-  // Capture before old duplicated handlers; stop them so the drawer toggles exactly once.
-  document.addEventListener('click',ev=>{
-   const target=ev.target instanceof Element?ev.target:null;if(!target)return;
-   const trigger=target.closest('#menuToggle,[data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
-   if(trigger){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();toggle();return;}
-   if(target.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();close();return;}
-   const page=target.closest('nav[aria-label="ዋና ምናሌ"] button[data-page]');
-   if(page&&mobile())setTimeout(close,0);
+  const syncBottom=()=>{
+   if(!bottom)return;
+   sidebar.querySelectorAll('button[data-page]').forEach(src=>{const dst=bottom.querySelector('[data-mobile-page="'+src.dataset.page+'"]');if(dst)dst.classList.toggle('hidden',src.classList.contains('hidden'));});
+   const active=sidebar.querySelector('button[data-page].active');
+   bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',!!active&&b.dataset.mobilePage===active.dataset.page));
+  };
+  // One delegated capture handler owns every drawer trigger, avoiding competing toggles.
+  window.addEventListener('click',ev=>{
+   const t=ev.target instanceof Element?ev.target:null;if(!t)return;
+   const trigger=t.closest('#menuToggle,#mobileBottomNav [data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
+   if(trigger){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(true);return;}
+   if(t.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(false);return;}
+   const page=t.closest('body>nav[aria-label="ዋና ምናሌ"] button[data-page]');
+   if(page){setTimeout(()=>{setDrawer(false);syncBottom();window.scrollTo({top:0,left:0,behavior:'instant'});},0);return;}
+   const mobilePage=t.closest('#mobileBottomNav [data-mobile-page]');
+   if(mobilePage&&bottom){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();const source=sidebar.querySelector('button[data-page="'+mobilePage.dataset.mobilePage+'"]');if(source&&!source.classList.contains('hidden'))source.click();setTimeout(syncBottom,80);return;}
+   const mobileLogout=t.closest('#mobileBottomNav [data-mobile-logout]');
+   if(mobileLogout){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();const logout=sidebar.querySelector('#topLogout');if(logout)logout.click();}
   },true);
-  document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&sidebar.classList.contains('sidebar-open'))close();},true);
-  window.addEventListener('resize',()=>{if(!mobile())close();});
-  window.openAppSidebar=open;window.closeAppSidebar=close;
+  document.addEventListener('keydown',ev=>{if(ev.key==='Escape')setDrawer(false);});
+  window.addEventListener('resize',()=>{if(!mobile())setDrawer(false);syncBottom();});
+  const observer=new MutationObserver(syncBottom);observer.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+  window.openAppSidebar=()=>setDrawer(true);window.closeAppSidebar=()=>setDrawer(false);window.syncMobileBottomNavigation=syncBottom;
+  syncBottom();setDrawer(false);
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
- setTimeout(boot,250);setTimeout(boot,900);
+ setTimeout(boot,300);setTimeout(boot,1000);
 })();
-</script>
-
-
-
-
-<script id="final-sidebar-control-fix">
-(function(){
- const getParts=()=>({
-  nav:document.querySelector('body>nav[aria-label="ዋና ምናሌ"]'),
-  backdrop:document.getElementById('sidebarBackdrop'),
-  toggle:document.getElementById('menuToggle'),
-  bottom:document.getElementById('mobileBottomNav')
- });
- function setOpen(open){
-  const {nav,backdrop,toggle,bottom}=getParts();
-  if(!nav||!window.matchMedia('(max-width:800px)').matches)return;
-  nav.classList.toggle('sidebar-open',open);
-  document.body.classList.toggle('sidebar-drawer-open',open);
-  if(backdrop){backdrop.classList.toggle('show',open);backdrop.setAttribute('aria-hidden',String(!open));}
-  if(toggle)toggle.setAttribute('aria-expanded',String(open));
-  if(bottom){
-   if(open){bottom.style.setProperty('display','none','important');bottom.style.setProperty('visibility','hidden','important');bottom.style.setProperty('pointer-events','none','important');}
-   else {bottom.style.removeProperty('display');bottom.style.removeProperty('visibility');bottom.style.removeProperty('pointer-events');}
-  }
+(()=>{
+ const icons={success:'✓',error:'×',warning:'!',info:'i'};
+ let active=null;
+ function classify(msg){const t=String(msg??'').toLowerCase();if(/አልተሳካ|ስህተት|error|failed|denied|cannot|unable|አይቻልም|አልተገኘ/.test(t))return'error';if(/warning|ጥንቃቄ|ማስጠንቀቂያ|ይፈልጋሉ/.test(t))return'warning';if(/ተሳክቷል|በተሳካ|ተመዝግቧል|ተዘምኗል|ተሰርዟል|saved|updated|completed/.test(t))return'success';return'info'}
+ function notice(message,type='info',title){
+  if(active)active.remove();const kind=type||classify(message);
+  const labels={success:'ተሳክቷል',error:'ስህተት',warning:'ማስጠንቀቂያ',info:'መረጃ'};
+  const back=document.createElement('div');back.id='appModalNoticeBackdrop';back.setAttribute('role','presentation');
+  const box=document.createElement('section');box.id='appModalNotice';box.className=kind;box.setAttribute('role',kind==='error'?'alertdialog':'dialog');box.setAttribute('aria-modal','true');
+  const icon=document.createElement('div');icon.className='notice-icon';icon.textContent=icons[kind]||icons.info;
+  const heading=document.createElement('h3');heading.textContent=title||labels[kind]||labels.info;
+  const text=document.createElement('p');text.textContent=String(message??'');
+  const ok=document.createElement('button');ok.type='button';ok.className='notice-ok';ok.textContent='እሺ';
+  box.append(icon,heading,text,ok);back.appendChild(box);document.body.appendChild(back);active=back;
+  const close=()=>{if(active===back)active=null;back.remove();};ok.addEventListener('click',close);back.addEventListener('click',e=>{if(e.target===back)close();});
+  const key=e=>{if(e.key==='Escape'||e.key==='Enter'){document.removeEventListener('keydown',key);close();}};document.addEventListener('keydown',key);ok.focus();return back;
  }
- function toggleDrawer(){const {nav}=getParts();setOpen(!nav?.classList.contains('sidebar-open'));}
- // Window capture runs before document/element handlers that previously fought over the drawer.
- window.addEventListener('click',function(e){
-  const more=e.target.closest('#mobileBottomNav [data-mobile-more]');
-  const menu=e.target.closest('#menuToggle');
-  if(more||menu){
-   e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();
-   toggleDrawer();
-  }
- },true);
- document.addEventListener('click',function(e){
-  if(e.target.closest('#sidebarBackdrop'))setOpen(false);
-  if(e.target.closest('body>nav[aria-label="ዋና ምናሌ"] button[data-page]'))setOpen(false);
- },true);
- document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false);});
- window.addEventListener('resize',()=>{if(!window.matchMedia('(max-width:800px)').matches)setOpen(false);});
- window.openAppSidebar=()=>setOpen(true);
- window.closeAppSidebar=()=>setOpen(false);
+ window.showModernNotification=(message,type)=>notice(message,type||classify(message));
+ window.showAppModalNotice=notice;
+ window.alert=(message)=>notice(message,classify(message));
 })();
 </script>
+
 </body></html>
 
 <style id="v8-clean-attendance-print">
