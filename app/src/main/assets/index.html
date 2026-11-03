@@ -900,134 +900,6 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
 input[aria-invalid="true"]{border-color:#dc2626!important;box-shadow:0 0 0 2px rgba(220,38,38,.10)!important}
 body.app-dark-theme .password-field-error{color:#fca5a5}
 </style>
-
-<style id="modern-design-preview-v1">
-/* Modern visual layer — deliberately CSS-only to preserve existing Firebase and app logic. */
-:root{
-  --modern-primary:#167a52;--modern-primary-2:#20a36b;--modern-accent:#2876c7;
-  --modern-bg:#f3f6fa;--modern-surface:#ffffff;--modern-surface-2:#f8fafc;
-  --modern-text:#172536;--modern-muted:#64748b;--modern-line:#e2e8f0;
-  --modern-shadow:0 8px 26px rgba(20,39,65,.07);--modern-radius:18px;
-}
-html{scroll-behavior:smooth}
-body{background:var(--modern-bg)!important;color:var(--modern-text)!important;font-family:"Noto Sans Ethiopic",Arial,sans-serif!important}
-body>header:first-of-type{
-  position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;
-  min-height:82px!important;padding:15px 64px!important;
-  background:linear-gradient(115deg,#105d43 0%,#16865a 55%,#20a36b 100%)!important;
-  box-shadow:0 5px 20px rgba(10,75,50,.18)!important
-}
-body>header:first-of-type h1{font-size:clamp(19px,2.5vw,27px)!important;font-weight:800!important;letter-spacing:.1px}
-body>header:first-of-type p{margin:5px 0 0!important;opacity:.88;font-size:13px}
-main{max-width:1500px!important;width:100%!important;margin:0 auto!important;padding:24px clamp(12px,2vw,30px) 90px!important}
-.page{animation:modernFadeIn .22s ease-out}
-@keyframes modernFadeIn{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
-.panel,.dashboard-stat,.report-visual-card,.report-card,.attendance-filter-panel{
-  background:var(--modern-surface)!important;border:1px solid var(--modern-line)!important;
-  border-radius:var(--modern-radius)!important;box-shadow:var(--modern-shadow)!important
-}
-.panel{padding:clamp(15px,2vw,24px)!important;margin-bottom:18px!important}
-.panel h2,.page h2{color:var(--modern-text)!important;font-weight:800!important;letter-spacing:-.2px}
-.page-title,.dashboard-title{margin-bottom:18px!important}
-.dashboard-stats{gap:14px!important}
-.dashboard-stat{
-  position:relative;overflow:hidden;padding:20px!important;min-height:132px;
-  display:flex;flex-direction:column;justify-content:center;gap:7px;
-  transition:transform .18s ease,box-shadow .18s ease!important
-}
-.dashboard-stat:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,39,65,.11)!important}
-.dashboard-stat strong{font-size:clamp(25px,3vw,34px)!important;font-weight:800!important;color:var(--modern-primary)!important}
-.dashboard-stat span{color:var(--modern-muted)!important;font-size:13px!important}
-.kpi-icon{width:38px;height:38px;border-radius:12px;background:#e8f5ee;color:var(--modern-primary);display:grid;place-items:center;font-size:20px}
-button,.btn{
-  border-radius:11px!important;font-weight:700!important;letter-spacing:.05px;
-  transition:transform .16s ease,filter .16s ease,box-shadow .16s ease!important
-}
-button:hover,.btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
-button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{
-  outline:3px solid rgba(40,118,199,.24)!important;outline-offset:2px!important
-}
-input,select,textarea{
-  border:1px solid #d5dee9!important;border-radius:11px!important;background:var(--modern-surface-2)!important;
-  color:var(--modern-text)!important;min-height:43px;padding:10px 12px!important
-}
-input:focus,select:focus,textarea:focus{border-color:#4d9bce!important;box-shadow:0 0 0 3px rgba(40,118,199,.11)!important}
-label{color:var(--modern-text)!important;font-weight:700!important}
-.table-wrap{border:1px solid var(--modern-line);border-radius:13px;background:var(--modern-surface);overflow:auto}
-table{border-collapse:separate!important;border-spacing:0!important;margin:0!important}
-th{background:#eef4f8!important;color:#334155!important;font-weight:800!important}
-th,td{padding:11px 12px!important;border-right:0!important;border-left:0!important;border-top:0!important;border-bottom:1px solid var(--modern-line)!important}
-tbody tr:last-child td{border-bottom:0!important}
-tbody tr:hover{background:#f5f9fc!important}
-.small,.muted{color:var(--modern-muted)!important;line-height:1.65}
-.notice{border-radius:12px!important;border:1px solid #f3dfaa!important}
-nav[aria-label="ዋና ምናሌ"]{
-  background:var(--modern-surface)!important;border-right:1px solid var(--modern-line)!important;
-  box-shadow:12px 0 35px rgba(20,39,65,.08)!important
-}
-nav[aria-label="ዋና ምናሌ"] button{
-  border-radius:11px!important;margin:3px 10px!important;padding:12px 14px!important;
-  text-align:left!important;transition:background .16s ease,color .16s ease,transform .16s ease!important
-}
-nav[aria-label="ዋና ምናሌ"] button.active{box-shadow:inset 3px 0 0 #20a36b!important}
-#mobileBottomNav{
-  background:rgba(255,255,255,.94)!important;backdrop-filter:blur(16px)!important;
-  border-top:1px solid var(--modern-line)!important;box-shadow:0 -8px 28px rgba(20,39,65,.08)!important
-}
-#mobileBottomNav button{border-radius:12px!important}
-#settings>.panel:not(:first-child){background:var(--modern-surface)!important}
-#settings>.panel:first-child{background:linear-gradient(120deg,#105d43,#16865a 58%,#20a36b)!important}
-#reports .report-container{border-radius:var(--modern-radius)!important}
-#appModalNotice{border-radius:20px!important;box-shadow:0 24px 70px rgba(8,20,35,.24)!important}
-#sidebarBackdrop{backdrop-filter:blur(3px)}
-/* Dark theme — keep all pages, controls, tables and overlays readable. */
-body.app-dark-theme{
-  --modern-bg:#0d1724;--modern-surface:#142235;--modern-surface-2:#101d2d;
-  --modern-text:#e6edf6;--modern-muted:#a6b4c6;--modern-line:#2a3b50;
-  --modern-shadow:0 9px 28px rgba(0,0,0,.22);
-  background:var(--modern-bg)!important;color:var(--modern-text)!important
-}
-body.app-dark-theme .panel,body.app-dark-theme .dashboard-stat,
-body.app-dark-theme .report-visual-card,body.app-dark-theme .report-card,
-body.app-dark-theme .attendance-filter-panel,body.app-dark-theme .table-wrap,
-body.app-dark-theme nav[aria-label="ዋና ምናሌ"]{
-  background:var(--modern-surface)!important;border-color:var(--modern-line)!important;color:var(--modern-text)!important
-}
-body.app-dark-theme .panel h2,body.app-dark-theme .page h2,
-body.app-dark-theme label,body.app-dark-theme td,body.app-dark-theme th,
-body.app-dark-theme .dashboard-title,body.app-dark-theme .dashboard-stat span{color:var(--modern-text)!important}
-body.app-dark-theme th{background:#203249!important}
-body.app-dark-theme tbody tr:hover{background:#1b2c41!important}
-body.app-dark-theme input,body.app-dark-theme select,body.app-dark-theme textarea{
-  background:#101d2d!important;color:#e6edf6!important;border-color:#354a62!important
-}
-body.app-dark-theme .small,body.app-dark-theme .muted{color:var(--modern-muted)!important}
-body.app-dark-theme nav[aria-label="ዋና ምናሌ"] button{color:#dce7f4!important}
-body.app-dark-theme #mobileBottomNav{background:rgba(20,34,53,.94)!important;border-color:var(--modern-line)!important}
-body.app-dark-theme #settings>.panel:not(:first-child){background:var(--modern-surface)!important}
-body.app-dark-theme #settings>.panel:not(:first-child) h2{color:#b8e8ce!important}
-body.app-dark-theme .recent-activity-item{background:#101d2d!important;border-color:var(--modern-line)!important}
-body.app-dark-theme .recent-activity-item strong{color:#e6edf6!important}
-body.app-dark-theme .recent-activity-item small{color:#a6b4c6!important}
-body.app-dark-theme .report-visual-card{background:var(--modern-surface)!important}
-body.app-dark-theme #appModalNotice{background:#142235!important;color:#e6edf6!important}
-@media(max-width:800px){
-  main{padding:14px 12px 100px!important}
-  body>header:first-of-type{min-height:70px!important;padding:12px 58px!important}
-  .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-  .dashboard-stat{padding:14px!important;min-height:112px}
-  .panel{padding:15px!important;border-radius:15px!important}
-  th,td{padding:9px 10px!important}
-}
-@media(max-width:420px){
-  .dashboard-stats{grid-template-columns:1fr 1fr!important}
-  .dashboard-stat strong{font-size:24px!important}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
-}
-</style>
-
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickRefreshToggle" class="header-badge refresh-quick-toggle no-print" aria-label="Refresh data" title="Refresh data"><span class="refresh-glyph" aria-hidden="true">↻</span></button><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -1043,7 +915,7 @@ body.app-dark-theme #appModalNotice{background:#142235!important;color:#e6edf6!i
 <div class="global-profile-navbar no-print" id="globalProfileNavbar"><div class="global-profile-user"><div class="global-profile-avatar"><i class="fa-solid fa-user"></i></div><div class="global-profile-details"><h4><span id="globalUserRole">Supervisor</span> <i class="fa-solid fa-chevron-down" style="font-size:.72rem"></i></h4><p id="globalUserEmail">admin@example.com</p></div></div><button id="globalNavbarLogout" class="global-profile-logout" type="button"><i class="fa-solid fa-right-from-bracket"></i> ውጣ / Logout</button></div>
 <div id="sidebarBackdrop" class="sidebar-backdrop no-print"></div><nav class="no-print" aria-label="ዋና ምናሌ"><div class="sidebar-user"><div class="sidebar-avatar" id="sidebarAvatar">S</div><div><strong id="sidebarRole">Supervisor</strong><small id="sidebarEmail">admin@example.com</small></div></div><div class="sidebar-section-label">ዋና ምናሌ</div><button class="active" data-page="dashboard">ዋና ገጽ (Dashboard)</button><button data-page="attendance">Attendance</button><button data-page="students">ተማሪዎች</button><button data-page="classes">ክፍሎች</button><button data-page="reports">ሪፖርት</button><button data-page="activityLogs" id="activityLogsNav">Activity Logs</button><button data-page="backup">Backup / Restore</button><button data-page="settings">Settings / ቅንብሮች</button><button id="topLogout" type="button" style="background:#b42318;color:white">ውጣ / Logout</button></nav>
 <main>
-<section id="dashboard" class="page"><div class="dashboard-title"><div><h2>ዋና ገጽ (Dashboard)</h2><p>የሰንበት ትምህርት ቤት የተማሪ እና የAttendance አጠቃላይ መረጃ</p></div></div><div class="dashboard-stats"><div class="dashboard-stat"><div class="kpi-icon">♙</div><strong id="dashboardStudentCount">0</strong><span>ጠቅላላ ተማሪዎች</span></div><div class="dashboard-stat"><div class="kpi-icon">▦</div><strong id="dashboardClassCount">0</strong><span>ጠቅላላ ክፍሎች</span></div><div class="dashboard-stat"><div class="kpi-icon">✓</div><strong id="dashboardPresentCount">0</strong><span>ዛሬ የተገኙ (P)</span></div><div class="dashboard-stat"><div class="kpi-icon">%</div><strong id="dashboardAttendancePercent">0%</strong><span>የዛሬ የAttendance መጠን</span></div></div><div class="panel inactive-panel" id="inactiveStudentsPanel"><h2 id="inactivePanelTitle">🔴 4 ተከታታይ Attendance ቀናት የቀሩ ተማሪዎች (Inactive)</h2><p class="small" id="inactivePanelDescription">በተመዘገቡ 4 ተከታታይ Attendance ቀናት A የተመረጠባቸው ተማሪዎች።</p><div id="inactiveStudentsList" class="table-wrap" aria-live="polite"></div></div><div class="panel" id="classComparisonPanel"><h2>የክፍሎች ንጽጽር • የመጨረሻዎቹ 7 ቀናት</h2><div id="classComparisonTable" class="table-wrap"></div></div><div class="panel" id="supervisorClassStatusPanel"><h2>የክፍሎች Attendance Status</h2><p class="small">ቀን፣ ክፍል እና status በመምረጥ የክፍሉን Attendance ይመልከቱ።</p><div class="grid" style="margin:12px 0"><div><label for="supervisorStatusDate">ቀን (DD/MM/YYYY)</label><input id="supervisorStatusDate" placeholder="01/02/2019"></div><div><label for="supervisorStatusClass">ክፍል</label><select id="supervisorStatusClass"><option value="__ALL__">ሁሉም ክፍሎች</option></select></div><div><label for="supervisorStatusFilter">Attendance Status</label><select id="supervisorStatusFilter"><option value="ALL">ሁሉም Status</option><option value="P">P - Present</option><option value="A">A - Absent</option><option value="L">L - Late</option><option value="E">E - Permission</option><option value="NONE">Not recorded</option></select></div></div><div class="row no-print"><button type="button" id="viewSupervisorStatus">Status አሳይ</button></div><div id="supervisorClassStatusResults" class="table-wrap" aria-live="polite"></div></div><div class="panel" id="recentActivityPanel"><h2>የቅርብ ጊዜ እንቅስቃሴዎች ማጠቃለያ (Recent Activity Stream)</h2><p class="small">በስርዓቱ ውስጥ በቅርቡ የተፈጸሙ እርምጃዎች።</p><div id="recentActivityStream" aria-live="polite"><p class="small">እንቅስቃሴዎች በመጫን ላይ…</p></div></div></section>
+<section id="dashboard" class="page"><div class="dashboard-title"><div><h2>ዋና ገጽ (Dashboard)</h2><p>የሰንበት ትምህርት ቤት የተማሪ እና የAttendance አጠቃላይ መረጃ</p></div></div><div class="dashboard-stats"><div class="dashboard-stat"><div class="kpi-icon">♙</div><strong id="dashboardStudentCount">0</strong><span>ጠቅላላ ተማሪዎች</span></div><div class="dashboard-stat"><div class="kpi-icon">▦</div><strong id="dashboardClassCount">0</strong><span>ጠቅላላ ክፍሎች</span></div><div class="dashboard-stat"><div class="kpi-icon">✓</div><strong id="dashboardPresentCount">0</strong><span>ዛሬ የተገኙ (P)</span></div><div class="dashboard-stat"><div class="kpi-icon">%</div><strong id="dashboardAttendancePercent">0%</strong><span>የዛሬ የAttendance መጠን</span></div></div><div class="panel" id="qualifiedStudentsPanel" style="display:none"><div class="row" style="justify-content:space-between;align-items:center;gap:10px"><div><h2>🏅 Qualified Students / ብቁ ተማሪዎች</h2><p class="small" id="qualifiedStudentsSummary">የተወሰነውን የAttendance መጠን ያሟሉ ተማሪዎች</p></div><button type="button" id="downloadQualifiedStudents">⬇ Download</button></div><div id="qualifiedStudentsList" class="table-responsive"></div></div><div class="panel inactive-panel" id="inactiveStudentsPanel"><h2 id="inactivePanelTitle">🔴 4 ተከታታይ Attendance ቀናት የቀሩ ተማሪዎች (Inactive)</h2><p class="small" id="inactivePanelDescription">በተመዘገቡ 4 ተከታታይ Attendance ቀናት A የተመረጠባቸው ተማሪዎች።</p><div id="inactiveStudentsList" class="table-wrap" aria-live="polite"></div></div><div class="panel" id="classComparisonPanel"><h2>የክፍሎች ንጽጽር • የመጨረሻዎቹ 7 ቀናት</h2><div id="classComparisonTable" class="table-wrap"></div></div><div class="panel" id="supervisorClassStatusPanel"><h2>የክፍሎች Attendance Status</h2><p class="small">ቀን፣ ክፍል እና status በመምረጥ የክፍሉን Attendance ይመልከቱ።</p><div class="grid" style="margin:12px 0"><div><label for="supervisorStatusDate">ቀን (DD/MM/YYYY)</label><input id="supervisorStatusDate" placeholder="01/02/2019"></div><div><label for="supervisorStatusClass">ክፍል</label><select id="supervisorStatusClass"><option value="__ALL__">ሁሉም ክፍሎች</option></select></div><div><label for="supervisorStatusFilter">Attendance Status</label><select id="supervisorStatusFilter"><option value="ALL">ሁሉም Status</option><option value="P">P - Present</option><option value="A">A - Absent</option><option value="L">L - Late</option><option value="E">E - Permission</option><option value="NONE">Not recorded</option></select></div></div><div class="row no-print"><button type="button" id="viewSupervisorStatus">Status አሳይ</button></div><div id="supervisorClassStatusResults" class="table-wrap" aria-live="polite"></div></div><div class="panel" id="recentActivityPanel"><h2>የቅርብ ጊዜ እንቅስቃሴዎች ማጠቃለያ (Recent Activity Stream)</h2><p class="small">በስርዓቱ ውስጥ በቅርቡ የተፈጸሙ እርምጃዎች።</p><div id="recentActivityStream" aria-live="polite"><p class="small">እንቅስቃሴዎች በመጫን ላይ…</p></div></div></section>
 <section id="activityLogs" class="page hidden"><div class="panel"><h2>የተጠቃሚዎች እንቅስቃሴ መዝገብ (Activity Logs)</h2><p class="small">የAttendance ማስቀመጥ፣ የተማሪ/ክፍል ለውጦች፣ ሪፖርት እና Backup/Restore እንቅስቃሴዎች። Supervisor ብቻ ያያል።</p><div class="row"><button type="button" id="refreshActivityLogs">እንደገና አድስ</button></div><div id="activityLogsMessage" class="notice">መዝገቦች በመጫን ላይ…</div><div id="activityLogsTable" class="table-wrap"></div></div></section>
 <section id="attendance" class="page hidden attendance-page">
  <div class="page-title attendance-reference-title"><i class="fa-regular fa-calendar-check"></i><span>የAttendance መዝገብ</span></div>
@@ -1107,7 +979,7 @@ body.app-dark-theme #appModalNotice{background:#142235!important;color:#e6edf6!i
  <div class="panel"><h2>1. Change Password / የይለፍ ቃል ቀይር</h2><div class="grid"><div><label for="settingsCurrentPassword">የአሁኑ Password</label><input id="settingsCurrentPassword" type="password" autocomplete="current-password" aria-describedby="settingsCurrentPasswordError"><small id="settingsCurrentPasswordError" class="password-field-error" aria-live="polite"></small></div><div><label for="settingsNewPassword">አዲስ Password (ቢያንስ 6)</label><input id="settingsNewPassword" type="password" autocomplete="new-password" aria-describedby="settingsNewPasswordError"><small id="settingsNewPasswordError" class="password-field-error" aria-live="polite"></small></div><div><label for="settingsConfirmPassword">አዲሱን ድገም</label><input id="settingsConfirmPassword" type="password" autocomplete="new-password" aria-describedby="settingsConfirmPasswordError"><small id="settingsConfirmPasswordError" class="password-field-error" aria-live="polite"></small></div></div><div class="row"><button type="button" id="changeOwnPassword">Password ቀይር</button></div><div id="passwordChangeMessage" class="small" aria-live="polite"></div></div>
  <div class="panel"><h2>2. Inactive Days / ተከታታይ የቀረበት ቀን</h2><p class="small">ተማሪው ስንት ተከታታይ የተመዘገቡ Attendance ቀናት A ከሆነ Inactive እንደሚባል ይወስኑ።</p><div class="grid"><div><label for="inactiveDaysSetting">ቀናት</label><input id="inactiveDaysSetting" type="number" min="1" max="60" value="4"></div></div><div class="row"><button type="button" id="saveInactiveDays">💾 ይህን Setting አስቀምጥ</button><span id="inactiveDaysMessage" class="small" aria-live="polite"></span></div></div>
  <div class="panel"><h2>3. Attendance Status Rules / የStatus ነጥብ</h2><p class="small">የAttendance መቶኛ ሲሰላ ለእያንዳንዱ Status የሚሰጠውን ክብደት (%) ያስተካክሉ። P=100 እና A=0 ቋሚ ናቸው።</p><div class="grid"><div><label for="lateScoreSetting">Late (L) %</label><input id="lateScoreSetting" type="number" min="0" max="100" value="75"></div><div><label for="permissionScoreSetting">Permission (E) %</label><input id="permissionScoreSetting" type="number" min="0" max="100" value="100"></div></div><div class="row"><button type="button" id="saveStatusRules">💾 ይህን Setting አስቀምጥ</button><span id="statusRulesMessage" class="small" aria-live="polite"></span></div></div>
- <div class="panel"><h2>4. Class Archive / የክፍል ታሪክ ማህደር</h2><p class="small">የተመረጠውን ክፍል የቀድሞ Attendance መዝገብ በArchive ያስቀምጣል። ዋናው መዝገብ አይሰረዝም።</p><div class="grid"><div><label for="archiveClassSelect">ክፍል</label><select id="archiveClassSelect"></select></div></div><div class="row"><button type="button" id="archiveClassButton">ክፍሉን Archive አድርግ</button></div><div id="archiveMessage" class="small" aria-live="polite"></div></div>
+ <div class="panel" id="qualifiedStudentsSettings"><h2>3A. Qualified Students / ብቁ ተማሪዎች</h2><p class="small">በተመረጠው የቀን ክልል ውስጥ የAttendance መቶኛቸው ከተወሰነው መጠን ጋር እኩል ወይም ከዚያ በላይ የሆኑ ተማሪዎችን Dashboard ላይ ያሳያል።</p><div class="grid"><div><label for="qualifiedEnabled">Feature</label><select id="qualifiedEnabled"><option value="off">Off</option><option value="on">On</option></select></div><div><label for="qualifiedStartDate">Start Date (Ethiopian)</label><input id="qualifiedStartDate" placeholder="DD/MM/YYYY"></div><div><label for="qualifiedEndDate">End Date (Ethiopian)</label><input id="qualifiedEndDate" placeholder="DD/MM/YYYY"></div><div><label for="qualifiedThreshold">Required Attendance (%)</label><input id="qualifiedThreshold" type="number" min="0" max="100" value="80"></div></div><div class="row"><button type="button" id="saveQualifiedSettings">💾 Save Qualified Students Setting</button><span id="qualifiedSettingsMessage" class="small" aria-live="polite"></span></div><p class="small">P=100፣ A=0 ቋሚ ናቸው፤ L እና E ከSetting 3 ይወሰዳሉ።</p></div><div class="panel"><h2>4. Class Archive / የክፍል ታሪክ ማህደር</h2><p class="small">የተመረጠውን ክፍል የቀድሞ Attendance መዝገብ በArchive ያስቀምጣል። ዋናው መዝገብ አይሰረዝም።</p><div class="grid"><div><label for="archiveClassSelect">ክፍል</label><select id="archiveClassSelect"></select></div></div><div class="row"><button type="button" id="archiveClassButton">ክፍሉን Archive አድርግ</button></div><div id="archiveMessage" class="small" aria-live="polite"></div></div>
  <div class="panel"><h2>5. Theme / የመልክ ቅንብር</h2><div class="grid"><div><label for="themeSetting">Theme</label><select id="themeSetting"><option value="light">Light Mode</option><option value="dark">Dark Mode</option></select></div></div><p class="small">Theme ከDropdown ሲቀየር በራሱ ይቀመጣል።</p><div id="themeSettingsMessage" class="small" aria-live="polite"></div></div>
 
  <div class="panel"><h2>6. Language / ቋንቋ</h2><div class="grid"><div><label for="languageSelect">ቋንቋ / Language</label><select id="languageSelect"><option value="am">አማርኛ</option><option value="en">English</option></select></div></div><p class="small">ቋንቋውን ከDropdown ሲቀይሩ በራሱ ይቀመጣል።</p><div id="languageSettingsNotice" class="small" aria-live="polite"></div></div>
@@ -2132,7 +2004,25 @@ async function runAutoBackupIfDue(){try{const p=JSON.parse(localStorage.getItem(
 $('backupBtn').onclick=()=>exportBackup('json').catch(e=>$('backupMessage').textContent='Backup failed: '+e.message);
 $('saveBackupPrefs').onclick=saveBackupPrefs;$('downloadSelectedBackup').onclick=()=>exportBackup($('backupFormat').value).catch(e=>$('backupMessage').textContent='Backup failed: '+e.message);
 $('downloadArchiveBackup').onclick=async()=>{try{if(role!=='supervisor')throw Error('Supervisor only.');const snap=await db.collection('classArchives').get();const archives=[];for(const doc of snap.docs){const rs=await doc.ref.collection('records').get();archives.push({id:doc.id,...doc.data(),records:rs.docs.map(x=>x.data())})}triggerDownload('sunday-school-archives-backup.json',new Blob([JSON.stringify({app:'SundaySchoolArchiveBackup',createdAt:new Date().toISOString(),archives},null,2)],{type:'application/json'}));rememberBackup();$('backupMessage').textContent=`${archives.length} archives exported.`}catch(e){$('backupMessage').textContent='Archive export failed: '+e.message}};
-$('restoreFile').onchange=async e=>{if(role!=='supervisor'){showModernNotification('Backup Restore የሚያደርገው Supervisor ብቻ ነው።');e.target.value='';return;}const f=e.target.files[0];if(!f)return;try{let d;if(/\.csv$/i.test(f.name)){const text=await f.text(),lines=text.replace(/^\ufeff/,'').trim().split(/\r?\n/),parse=line=>line.match(/("(?:[^"]|"")*"|[^,]*)(,|$)/g)?.map(x=>x.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"'))||[];const rows=lines.slice(1).map(parse);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const [date,id,name,cls,status]=r;if(!date||!id||!['P','A','L','E'].includes(status))return;d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name,className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)})}else if(/\.xlsx$/i.test(f.name)){if(typeof XLSX==='undefined')throw Error('Excel library unavailable.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const date=String(r.Date||''),id=String(r['Student ID']||r.StudentID||''),status=r.Status,cls=String(r.Class||'');if(date&&id&&['P','A','L','E'].includes(status)){d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name:String(r['Student Name']||r.StudentName||''),className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)}})}else{d=JSON.parse(await f.text());if(d.app==='SundaySchoolEncryptedBackup'){const pw=$('backupPassword').value;if(!pw)throw Error('Enter the backup password first.');d=await decryptBackupObject(d,pw)}}validateBackup(d);const mode=$('restoreMode').value;if(mode==='overwrite'){students=d.students;classes=d.classes;classPrefixes=d.classPrefixes||{};attendance=d.attendance}else{const sm=new Map(students.map(x=>[String(x.id),x]));d.students.forEach(x=>{if(!sm.has(String(x.id)))sm.set(String(x.id),x)});students=[...sm.values()];classes=[...new Set([...classes,...d.classes])];classPrefixes={...classPrefixes,...(d.classPrefixes||{})};Object.entries(d.attendance).forEach(([date,day])=>{attendance[date]=attendance[date]||{};Object.entries(day).forEach(([id,status])=>{if(attendance[date][id]===undefined)attendance[date][id]=status})})}const ok=await cloudSave('all');if(!ok)throw Error('Firebase save failed.');saveLocal();renderAll();rememberBackup();await logActivity('Backup restored',mode);$('backupMessage').textContent='Restore successful. / መረጃው ተመልሷል።'}catch(err){console.error(err);$('backupMessage').textContent='Restore rejected: '+(err.message||'Invalid or damaged backup file.');}finally{e.target.value=''}};
+$('restoreFile').onchange=async e=>{if(role!=='supervisor'){showModernNotification('Backup Restore የሚያደርገው Supervisor ብቻ ነው።');e.target.value='';return;}const f=e.target.files[0];if(!f)return;try{let d;if(/\.csv$/i.test(f.name)){const text=await f.text(),lines=text.replace(/^\ufeff/,'').trim().split(/\r?\n/),parse=line=>line.match(/("(?:[^"]|"")*"|[^,]*)(,|$)/g)?.map(x=>x.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"'))||[];const rows=lines.slice(1).map(parse);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const [date,id,name,cls,status]=r;if(!date||!id||!['P','A','L','E'].includes(status))return;d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name,className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)})}else if(/\.xlsx$/i.test(f.name)){if(typeof XLSX==='undefined')throw Error('Excel library unavailable.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const date=String(r.Date||''),id=String(r['Student ID']||r.StudentID||''),status=r.Status,cls=String(r.Class||'');if(date&&id&&['P','A','L','E'].includes(status)){d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name:String(r['Student Name']||r.StudentName||''),className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)}})}else{d=JSON.parse(await f.text());if(d.app==='SundaySchoolEncryptedBackup'){const pw=$('backupPassword').value;if(!pw)throw Error('Enter the backup password first.');d=await decryptBackupObject(d,pw)}}validateBackup(d);const mode=$('restoreMode').value;if(mode==='overwrite'){students=d.students;classes=d.classes;classPrefixes=d.classPrefixes||{};attendance=d.attendance}else{const sm=new Map(students.map(x=>[String(x.id),x]));d.students.forEach(x=>{if(!sm.has(String(x.id)))sm.set(String(x.id),x)});students=[...sm.values()];classes=[...new Set([...classes,...d.classes])];classPrefixes={...classPrefixes,...(d.classPrefixes||{})};Object.entries(d.attendance).forEach(([date,day])=>{attendance[date]=attendance[date]||{};Object.entries(day).forEach(([id,status])=>{if(attendance[date][id]===undefined)attendance[date][id]=status})})}
+// Restore shared Supervisor settings from full JSON backups as well as student/class/attendance data.
+if(d.appSettings&&typeof d.appSettings==='object'&&!Array.isArray(d.appSettings)){
+ const restoredGeneral=mode==='overwrite'?{...d.appSettings}:{...appSettings,...d.appSettings};
+ const generalRef=db.collection('appSettings').doc('general');
+ await generalRef.set({...restoredGeneral,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
+ const checkGeneral=await generalRef.get();if(!checkGeneral.exists)throw Error('General settings restore verification failed.');
+ appSettings={...appSettings,...restoredGeneral};
+ localStorage.setItem('ss_app_settings',JSON.stringify({theme:appSettings.theme||'light'}));
+}
+if(d.extendedSettings&&typeof d.extendedSettings==='object'&&!Array.isArray(d.extendedSettings)){
+ const restoredExtended=mode==='overwrite'?{...d.extendedSettings}:{...extendedSettings,...d.extendedSettings};
+ const extendedRef=db.collection('appSettings').doc('extended');
+ await extendedRef.set({...restoredExtended,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
+ const checkExtended=await extendedRef.get();if(!checkExtended.exists)throw Error('Extended settings restore verification failed.');
+ extendedSettings={...extendedSettings,...restoredExtended};
+ localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings));
+}
+const ok=await cloudSave('all');if(!ok)throw Error('Firebase save failed.');saveLocal();applyTheme(appSettings.theme||'light');syncSettingsForm();fillExtendedSettingsForm();renderAll();renderQualifiedStudents();rememberBackup();await logActivity('Backup restored',mode);$('backupMessage').textContent='Restore successful. / መረጃው ተመልሷል።'}catch(err){console.error(err);$('backupMessage').textContent='Restore rejected: '+(err.message||'Invalid or damaged backup file.');}finally{e.target.value=''}};
 loadBackupPrefs();
 
 $('viewSupervisorStatus').addEventListener('click',renderSupervisorClassStatus);$('supervisorStatusClass').addEventListener('change',renderSupervisorClassStatus);$('supervisorStatusFilter').addEventListener('change',renderSupervisorClassStatus);$('supervisorStatusDate').addEventListener('change',renderSupervisorClassStatus);
@@ -3390,6 +3280,53 @@ body>nav.no-print{z-index:2147482500!important}
 })();
 </script>
 
+
+<script id="qualified-students-feature">
+(function(){
+ const $q=id=>document.getElementById(id);
+ function qualifiedConfig(){return extendedSettings?.qualifiedStudents||{enabled:false,startDate:'',endDate:'',threshold:80}}
+ function qualifiedRows(){
+  const cfg=qualifiedConfig();if(!cfg.enabled)return [];
+  const from=dateISO(cfg.startDate),to=dateISO(cfg.endDate);if(!from||!to||from>to)return [];
+  const dates=Object.keys(attendance||{}).filter(d=>d>=from&&d<=to).sort();
+  const L=Number(appSettings.lateScore??75),E=Number(appSettings.permissionScore??100);
+  return (students||[]).map(st=>{
+   const c={P:0,A:0,L:0,E:0};
+   dates.forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(Object.prototype.hasOwnProperty.call(c,v))c[v]++});
+   const marked=c.P+c.A+c.L+c.E;
+   const percent=marked?Math.round((c.P*100+c.L*L+c.E*E)/marked):0;
+   return {st,c,marked,percent};
+  }).filter(x=>x.marked>0&&x.percent>=Number(cfg.threshold||0)).sort((a,b)=>b.percent-a.percent||String(a.st.name).localeCompare(String(b.st.name)));
+ }
+ window.renderQualifiedStudents=function(){
+  const panel=$q('qualifiedStudentsPanel'),cfg=qualifiedConfig();if(!panel)return;
+  panel.style.display=cfg.enabled?'':'none';if(!cfg.enabled)return;
+  const from=dateISO(cfg.startDate),to=dateISO(cfg.endDate);
+  const summary=$q('qualifiedStudentsSummary'),list=$q('qualifiedStudentsList');
+  if(!from||!to||from>to){summary.textContent='የቀን ክልሉ ትክክል አይደለም። Supervisor ቅንብሩን ያስተካክል።';list.innerHTML='';return}
+  const rows=qualifiedRows();summary.textContent=`${dateET(from)} – ${dateET(to)} | የሚያስፈልግ፦ ${cfg.threshold}% | ብቁ፦ ${rows.length}`;
+  list.innerHTML=rows.length?`<table class="report-table"><thead><tr><th>#</th><th>ID</th><th>ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>%</th></tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.st.id)}</td><td>${esc(x.st.name)}</td><td>${esc(x.st.className||'')}</td><td>${x.c.P}</td><td>${x.c.A}</td><td>${x.c.L}</td><td>${x.c.E}</td><td><strong>${x.percent}%</strong></td></tr>`).join('')}</tbody></table>`:'<p class="small">በዚህ የቀን ክልል መስፈርቱን ያሟላ ተማሪ አልተገኘም።</p>';
+ };
+ function syncQualifiedForm(){const c=qualifiedConfig();if($q('qualifiedEnabled'))$q('qualifiedEnabled').value=c.enabled?'on':'off';if($q('qualifiedStartDate'))$q('qualifiedStartDate').value=c.startDate||'';if($q('qualifiedEndDate'))$q('qualifiedEndDate').value=c.endDate||'';if($q('qualifiedThreshold'))$q('qualifiedThreshold').value=Number(c.threshold??80);const sup=role==='supervisor';['qualifiedEnabled','qualifiedStartDate','qualifiedEndDate','qualifiedThreshold','saveQualifiedSettings'].forEach(id=>{if($q(id))$q(id).disabled=!sup});}
+ window.syncQualifiedForm=syncQualifiedForm;
+ $q('saveQualifiedSettings')?.addEventListener('click',async()=>{
+  if(role!=='supervisor')return;
+  const enabled=$q('qualifiedEnabled').value==='on',startDate=$q('qualifiedStartDate').value.trim(),endDate=$q('qualifiedEndDate').value.trim(),threshold=Number($q('qualifiedThreshold').value);
+  if(!Number.isFinite(threshold)||threshold<0||threshold>100){$q('qualifiedSettingsMessage').textContent='0–100 መካከል ያለ መቶኛ ያስገቡ።';return}
+  if(enabled){const a=dateISO(startDate),b=dateISO(endDate);if(!a||!b||a>b){$q('qualifiedSettingsMessage').textContent='ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።';return}}
+  const btn=$q('saveQualifiedSettings');btn.disabled=true;$q('qualifiedSettingsMessage').textContent='በማስቀመጥ ላይ…';
+  try{await saveExtendedSettings({qualifiedStudents:{enabled,startDate,endDate,threshold}},'Qualified students setting updated');$q('qualifiedSettingsMessage').textContent='✅ ቅንብሩ ተቀምጧል።';renderQualifiedStudents();}
+  catch(e){$q('qualifiedSettingsMessage').textContent='❌ አልተቀመጠም። '+(e.message||'')}
+  finally{btn.disabled=role!=='supervisor'}
+ });
+ $q('downloadQualifiedStudents')?.addEventListener('click',()=>{const cfg=qualifiedConfig(),rows=qualifiedRows();if(!cfg.enabled)return;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const lines=[['ID','Student','Class','P','A','L','E','Attendance %'],...rows.map(x=>[x.st.id,x.st.name,x.st.className,x.c.P,x.c.A,x.c.L,x.c.E,x.percent])];const csv='\ufeff'+lines.map(r=>r.map(q).join(',')).join('\r\n');triggerDownload('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));});
+ document.addEventListener('DOMContentLoaded',()=>{syncQualifiedForm();renderQualifiedStudents()});
+ const oldUpdate=window.updateDashboard;
+ if(typeof oldUpdate==='function'){window.updateDashboard=function(){oldUpdate();renderQualifiedStudents()}}
+ const oldFill=window.fillExtendedSettingsForm;
+ if(typeof oldFill==='function'){window.fillExtendedSettingsForm=function(){oldFill();syncQualifiedForm()}}
+})();
+</script>
 </body></html>
 
 <style id="v8-clean-attendance-print">
