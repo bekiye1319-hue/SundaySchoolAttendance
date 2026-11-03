@@ -1559,7 +1559,7 @@ $('changeOwnPassword').addEventListener('click',changeOwnPassword);$('archiveCla
 // Settings 6-10: persist configurable values in Firestore. Supervisor-only controls are gated in UI;
 // production enforcement must also be mirrored in Firestore Security Rules.
 let extendedSettings={language:'am',lateWindowByClass:{},lateCutoffByClass:{},attendanceCloseByClass:{},attendanceCloseEnabledByClass:{},attendanceEditHours:24,rolePermissions:{teacher:{view:true,attendance:true,edit:true},class_teacher:{view:true,attendance:true,edit:true},class_assistant:{view:true,attendance:true,edit:false}},classAssignments:{}};
-async function loadExtendedSettings(){try{const snap=await db.collection('appSettings').doc('extended').get();if(snap.exists)extendedSettings={...extendedSettings,...snap.data()};}catch(e){console.warn('Extended settings read failed',e.message)}try{const local=JSON.parse(localStorage.getItem('ss_extended_settings')||'{}');extendedSettings={...extendedSettings,...local,lateCutoffByClass:{...(extendedSettings.lateCutoffByClass||{}),...(local.lateCutoffByClass||{})},attendanceCloseByClass:{...(extendedSettings.attendanceCloseByClass||{}),...(local.attendanceCloseByClass||{})},lateWindowByClass:{...(extendedSettings.lateWindowByClass||{}),...(local.lateWindowByClass||{})},attendanceCloseEnabledByClass:{...(extendedSettings.attendanceCloseEnabledByClass||{}),...(local.attendanceCloseEnabledByClass||{})}}}catch(e){}applyLanguage(extendedSettings.language||'am');watchLanguageChanges();fillExtendedSettingsForm();if(typeof window.syncQualifiedForm==='function')window.syncQualifiedForm();if(typeof window.renderQualifiedStudents==='function')window.renderQualifiedStudents()}
+async function loadExtendedSettings(){let cloudData=null;try{const snap=await db.collection('appSettings').doc('extended').get();if(snap.exists)cloudData=snap.data()||{};}catch(e){console.warn('Extended settings read failed',e.message)}try{const local=JSON.parse(localStorage.getItem('ss_extended_settings')||'{}');/* Local storage is a fallback only. Shared Supervisor settings from Firestore MUST win, otherwise stale device cache can revert Qualified ON/date/percentage after reopening. */extendedSettings={...extendedSettings,...local,...(cloudData||{}),lateCutoffByClass:{...(local.lateCutoffByClass||{}),...(cloudData?.lateCutoffByClass||{})},attendanceCloseByClass:{...(local.attendanceCloseByClass||{}),...(cloudData?.attendanceCloseByClass||{})},lateWindowByClass:{...(local.lateWindowByClass||{}),...(cloudData?.lateWindowByClass||{})},attendanceCloseEnabledByClass:{...(local.attendanceCloseEnabledByClass||{}),...(cloudData?.attendanceCloseEnabledByClass||{})}};if(cloudData?.qualifiedStudents)extendedSettings.qualifiedStudents=cloudData.qualifiedStudents;if(cloudData?.qualifiedStudentsPublic)extendedSettings.qualifiedStudentsPublic=cloudData.qualifiedStudentsPublic;/* Refresh local cache from the authoritative shared settings. */localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings));}catch(e){console.warn('Extended settings cache read/write failed',e.message)}applyLanguage(extendedSettings.language||'am');watchLanguageChanges();fillExtendedSettingsForm();if(typeof window.syncQualifiedForm==='function')window.syncQualifiedForm();if(typeof window.renderQualifiedStudents==='function')window.renderQualifiedStudents()}
 async function saveExtendedSettings(changes,activity){if(role!=='supervisor')throw new Error('ይህን ቅንብር Supervisor ብቻ ማስተካከል ይችላል።');const next={...extendedSettings,...changes};await db.collection('appSettings').doc('extended').set({...changes,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});extendedSettings=next;try{localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings))}catch(e){}if(activity)await logActivity('Settings updated',activity)}
 const LANG_TEXT_ORIGINAL=new WeakMap();
 const LANG_EN={
@@ -3311,7 +3311,7 @@ body>nav.no-print{z-index:2147482500!important}
   try{
    await docRef().set({qualifiedStudentsPublic:payload,qualifiedStudentsPublishedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
    extendedSettings={...extendedSettings,qualifiedStudentsPublic:payload};lastPublished=signature;
-  }catch(e){console.warn('Qualified students publish failed:',e);}
+  }catch(e){console.error('Qualified students publish failed:',e);throw e;}
   finally{publishing=false;}
  }
  function getVisibleRows(){
@@ -3335,16 +3335,35 @@ body>nav.no-print{z-index:2147482500!important}
  };
  function syncQualifiedForm(){const c=qualifiedConfig();if($q('qualifiedEnabled'))$q('qualifiedEnabled').value=c.enabled?'on':'off';if($q('qualifiedStartDate'))$q('qualifiedStartDate').value=c.startDate||'';if($q('qualifiedEndDate'))$q('qualifiedEndDate').value=c.endDate||'';if($q('qualifiedThreshold'))$q('qualifiedThreshold').value=Number(c.threshold??80);const sup=role==='supervisor';['qualifiedEnabled','qualifiedStartDate','qualifiedEndDate','qualifiedThreshold','saveQualifiedSettings'].forEach(id=>{if($q(id))$q(id).disabled=!sup});}
  window.syncQualifiedForm=syncQualifiedForm;
- $q('saveQualifiedSettings')?.addEventListener('click',async()=>{
-  if(role!=='supervisor')return;
+ async function saveQualifiedSettingsNow(){
+  const btn=$q('saveQualifiedSettings'),message=$q('qualifiedSettingsMessage');
+  if(!btn||!message)return;
+  if(role!=='supervisor'){message.textContent='ይህን ቅንብር Supervisor ብቻ ማስቀመጥ ይችላል።';return;}
   const enabled=$q('qualifiedEnabled').value==='on',startDate=$q('qualifiedStartDate').value.trim(),endDate=$q('qualifiedEndDate').value.trim(),threshold=Number($q('qualifiedThreshold').value);
-  if(!Number.isFinite(threshold)||threshold<0||threshold>100){$q('qualifiedSettingsMessage').textContent='0–100 መካከል ያለ መቶኛ ያስገቡ።';return}
-  if(enabled){const a=dateISO(startDate),b=dateISO(endDate);if(!a||!b||a>b){$q('qualifiedSettingsMessage').textContent='ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።';return}}
-  const btn=$q('saveQualifiedSettings');btn.disabled=true;$q('qualifiedSettingsMessage').textContent='በማስቀመጥ ላይ…';
-  try{await saveExtendedSettings({qualifiedStudents:{enabled,startDate,endDate,threshold}},'Qualified students setting updated');await publishQualifiedRows();$q('qualifiedSettingsMessage').textContent='✅ ቅንብሩ ተቀምጧል።';renderQualifiedStudents();}
-  catch(e){$q('qualifiedSettingsMessage').textContent='❌ አልተቀመጠም። '+(e.message||'')}
-  finally{btn.disabled=role!=='supervisor'}
- });
+  if(!Number.isFinite(threshold)||threshold<0||threshold>100){message.textContent='0–100 መካከል ያለ መቶኛ ያስገቡ።';return;}
+  if(enabled){const a=dateISO(startDate),b=dateISO(endDate);if(!a||!b||a>b){message.textContent='ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።';return;}}
+  btn.disabled=true;message.textContent='በFirebase ላይ በማስቀመጥ ላይ…';
+  const cfg={enabled,startDate,endDate,threshold};
+  try{
+   // Save the private supervisor configuration and the shared dashboard result together.
+   extendedSettings={...extendedSettings,qualifiedStudents:cfg};
+   const rows=enabled?calculateQualifiedRows():[];
+   const publicData={enabled,startDate,endDate,threshold,rows};
+   await docRef().set({qualifiedStudents:cfg,qualifiedStudentsPublic:publicData,qualifiedStudentsPublishedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
+   extendedSettings={...extendedSettings,qualifiedStudents:cfg,qualifiedStudentsPublic:publicData};
+   try{localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings));}catch(cacheError){console.warn('Qualified settings local cache unavailable',cacheError);}
+   lastPublished=JSON.stringify(publicData);
+   if(typeof logActivity==='function')await logActivity('Settings updated','Qualified students setting updated');
+   renderQualifiedStudents();syncQualifiedForm();
+   message.textContent='✅ Qualified Students ቅንብር እና Dashboard ውጤት Firebase ላይ ተቀምጠዋል።';
+  }catch(e){
+   console.error('Qualified Students save failed:',e);
+   message.textContent='❌ አልተቀመጠም። '+(e.code?e.code+' — ':'')+(e.message||'Firebase ግንኙነትን ያረጋግጡ።');
+  }finally{btn.disabled=role!=='supervisor';}
+ }
+ // Bind after DOM is ready and use a single guarded listener.
+ function bindQualifiedSave(){const btn=$q('saveQualifiedSettings');if(btn&&!btn.dataset.qualifiedSaveBound){btn.dataset.qualifiedSaveBound='1';btn.addEventListener('click',saveQualifiedSettingsNow);}}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindQualifiedSave,{once:true});else bindQualifiedSave();
  $q('downloadQualifiedStudents')?.addEventListener('click',()=>{const cfg=qualifiedConfig(),rows=getVisibleRows();if(!cfg.enabled)return;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const lines=[['ID','Student','Class','P','A','L','E','Attendance %'],...rows.map(x=>[x.id,x.name,x.className,x.P,x.A,x.L,x.E,x.percent])];const csv='\ufeff'+lines.map(r=>r.map(q).join(',')).join('\r\n');triggerDownload('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));});
  document.addEventListener('DOMContentLoaded',()=>{syncQualifiedForm();renderQualifiedStudents()});
  const oldUpdate=window.updateDashboard;if(typeof oldUpdate==='function'){window.updateDashboard=function(){oldUpdate();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows()}}
