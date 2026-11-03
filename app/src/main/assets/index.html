@@ -3284,8 +3284,9 @@ body>nav.no-print{z-index:2147482500!important}
 <script id="qualified-students-feature">
 (function(){
  const $q=id=>document.getElementById(id);
+ const docRef=()=>db.collection('appSettings').doc('extended');
  function qualifiedConfig(){return extendedSettings?.qualifiedStudents||{enabled:false,startDate:'',endDate:'',threshold:80}}
- function qualifiedRows(){
+ function calculateQualifiedRows(){
   const cfg=qualifiedConfig();if(!cfg.enabled)return [];
   const from=dateISO(cfg.startDate),to=dateISO(cfg.endDate);if(!from||!to||from>to)return [];
   const dates=Object.keys(attendance||{}).filter(d=>d>=from&&d<=to).sort();
@@ -3295,8 +3296,31 @@ body>nav.no-print{z-index:2147482500!important}
    dates.forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(Object.prototype.hasOwnProperty.call(c,v))c[v]++});
    const marked=c.P+c.A+c.L+c.E;
    const percent=marked?Math.round((c.P*100+c.L*L+c.E*E)/marked):0;
-   return {st,c,marked,percent};
-  }).filter(x=>x.marked>0&&x.percent>=Number(cfg.threshold||0)).sort((a,b)=>b.percent-a.percent||String(a.st.name).localeCompare(String(b.st.name)));
+   return {id:String(st.id),name:String(st.name||''),className:String(st.className||''),P:c.P,A:c.A,L:c.L,E:c.E,percent,marked};
+  }).filter(x=>x.marked>0&&x.percent>=Number(cfg.threshold??0)).sort((a,b)=>b.percent-a.percent||a.name.localeCompare(b.name));
+ }
+ let publishing=false,lastPublished='';
+ async function publishQualifiedRows(){
+  if(role!=='supervisor'||publishing)return;
+  const cfg=qualifiedConfig();if(!cfg.enabled)return;
+  const from=dateISO(cfg.startDate),to=dateISO(cfg.endDate);if(!from||!to||from>to)return;
+  const rows=calculateQualifiedRows();
+  const payload={enabled:true,startDate:cfg.startDate,endDate:cfg.endDate,threshold:Number(cfg.threshold??80),rows};
+  const signature=JSON.stringify(payload);if(signature===lastPublished)return;
+  publishing=true;
+  try{
+   await docRef().set({qualifiedStudentsPublic:payload,qualifiedStudentsPublishedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+   extendedSettings={...extendedSettings,qualifiedStudentsPublic:payload};lastPublished=signature;
+  }catch(e){console.warn('Qualified students publish failed:',e);}
+  finally{publishing=false;}
+ }
+ function getVisibleRows(){
+  const cfg=qualifiedConfig();
+  // Supervisor calculates from the complete data set; other roles read only the published summary.
+  if(role==='supervisor')return calculateQualifiedRows();
+  const pub=extendedSettings?.qualifiedStudentsPublic;
+  if(!pub||!pub.enabled||pub.startDate!==cfg.startDate||pub.endDate!==cfg.endDate||Number(pub.threshold)!==Number(cfg.threshold))return [];
+  return Array.isArray(pub.rows)?pub.rows:[];
  }
  window.renderQualifiedStudents=function(){
   const panel=$q('qualifiedStudentsPanel'),cfg=qualifiedConfig();if(!panel)return;
@@ -3304,8 +3328,10 @@ body>nav.no-print{z-index:2147482500!important}
   const from=dateISO(cfg.startDate),to=dateISO(cfg.endDate);
   const summary=$q('qualifiedStudentsSummary'),list=$q('qualifiedStudentsList');
   if(!from||!to||from>to){summary.textContent='የቀን ክልሉ ትክክል አይደለም። Supervisor ቅንብሩን ያስተካክል።';list.innerHTML='';return}
-  const rows=qualifiedRows();summary.textContent=`${dateET(from)} – ${dateET(to)} | የሚያስፈልግ፦ ${cfg.threshold}% | ብቁ፦ ${rows.length}`;
-  list.innerHTML=rows.length?`<table class="report-table"><thead><tr><th>#</th><th>ID</th><th>ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>%</th></tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.st.id)}</td><td>${esc(x.st.name)}</td><td>${esc(x.st.className||'')}</td><td>${x.c.P}</td><td>${x.c.A}</td><td>${x.c.L}</td><td>${x.c.E}</td><td><strong>${x.percent}%</strong></td></tr>`).join('')}</tbody></table>`:'<p class="small">በዚህ የቀን ክልል መስፈርቱን ያሟላ ተማሪ አልተገኘም።</p>';
+  const rows=getVisibleRows();
+  if(role!=='supervisor'&&!extendedSettings?.qualifiedStudentsPublic){summary.textContent='ውጤቱ በመጫን ላይ ነው…';list.innerHTML='';return}
+  summary.textContent=`${dateET(from)} – ${dateET(to)} | የሚያስፈልግ፦ ${cfg.threshold}% | ብቁ፦ ${rows.length}`;
+  list.innerHTML=rows.length?`<table class="report-table"><thead><tr><th>#</th><th>ID</th><th>ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>%</th></tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.id)}</td><td>${esc(x.name)}</td><td>${esc(x.className||'')}</td><td>${x.P}</td><td>${x.A}</td><td>${x.L}</td><td>${x.E}</td><td><strong>${x.percent}%</strong></td></tr>`).join('')}</tbody></table>`:'<p class="small">በዚህ የቀን ክልል መስፈርቱን ያሟላ ተማሪ አልተገኘም።</p>';
  };
  function syncQualifiedForm(){const c=qualifiedConfig();if($q('qualifiedEnabled'))$q('qualifiedEnabled').value=c.enabled?'on':'off';if($q('qualifiedStartDate'))$q('qualifiedStartDate').value=c.startDate||'';if($q('qualifiedEndDate'))$q('qualifiedEndDate').value=c.endDate||'';if($q('qualifiedThreshold'))$q('qualifiedThreshold').value=Number(c.threshold??80);const sup=role==='supervisor';['qualifiedEnabled','qualifiedStartDate','qualifiedEndDate','qualifiedThreshold','saveQualifiedSettings'].forEach(id=>{if($q(id))$q(id).disabled=!sup});}
  window.syncQualifiedForm=syncQualifiedForm;
@@ -3315,16 +3341,15 @@ body>nav.no-print{z-index:2147482500!important}
   if(!Number.isFinite(threshold)||threshold<0||threshold>100){$q('qualifiedSettingsMessage').textContent='0–100 መካከል ያለ መቶኛ ያስገቡ።';return}
   if(enabled){const a=dateISO(startDate),b=dateISO(endDate);if(!a||!b||a>b){$q('qualifiedSettingsMessage').textContent='ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።';return}}
   const btn=$q('saveQualifiedSettings');btn.disabled=true;$q('qualifiedSettingsMessage').textContent='በማስቀመጥ ላይ…';
-  try{await saveExtendedSettings({qualifiedStudents:{enabled,startDate,endDate,threshold}},'Qualified students setting updated');$q('qualifiedSettingsMessage').textContent='✅ ቅንብሩ ተቀምጧል።';renderQualifiedStudents();}
+  try{await saveExtendedSettings({qualifiedStudents:{enabled,startDate,endDate,threshold}},'Qualified students setting updated');await publishQualifiedRows();$q('qualifiedSettingsMessage').textContent='✅ ቅንብሩ ተቀምጧል።';renderQualifiedStudents();}
   catch(e){$q('qualifiedSettingsMessage').textContent='❌ አልተቀመጠም። '+(e.message||'')}
   finally{btn.disabled=role!=='supervisor'}
  });
- $q('downloadQualifiedStudents')?.addEventListener('click',()=>{const cfg=qualifiedConfig(),rows=qualifiedRows();if(!cfg.enabled)return;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const lines=[['ID','Student','Class','P','A','L','E','Attendance %'],...rows.map(x=>[x.st.id,x.st.name,x.st.className,x.c.P,x.c.A,x.c.L,x.c.E,x.percent])];const csv='\ufeff'+lines.map(r=>r.map(q).join(',')).join('\r\n');triggerDownload('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));});
+ $q('downloadQualifiedStudents')?.addEventListener('click',()=>{const cfg=qualifiedConfig(),rows=getVisibleRows();if(!cfg.enabled)return;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const lines=[['ID','Student','Class','P','A','L','E','Attendance %'],...rows.map(x=>[x.id,x.name,x.className,x.P,x.A,x.L,x.E,x.percent])];const csv='\ufeff'+lines.map(r=>r.map(q).join(',')).join('\r\n');triggerDownload('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));});
  document.addEventListener('DOMContentLoaded',()=>{syncQualifiedForm();renderQualifiedStudents()});
- const oldUpdate=window.updateDashboard;
- if(typeof oldUpdate==='function'){window.updateDashboard=function(){oldUpdate();renderQualifiedStudents()}}
- const oldFill=window.fillExtendedSettingsForm;
- if(typeof oldFill==='function'){window.fillExtendedSettingsForm=function(){oldFill();syncQualifiedForm()}}
+ const oldUpdate=window.updateDashboard;if(typeof oldUpdate==='function'){window.updateDashboard=function(){oldUpdate();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows()}}
+ const oldFill=window.fillExtendedSettingsForm;if(typeof oldFill==='function'){window.fillExtendedSettingsForm=function(){oldFill();syncQualifiedForm();renderQualifiedStudents()}}
+ window.refreshQualifiedStudentsFromSettings=()=>{syncQualifiedForm();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows()};
 })();
 </script>
 </body></html>
