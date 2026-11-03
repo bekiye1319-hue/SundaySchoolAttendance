@@ -894,6 +894,12 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
 #attendance #printAttendance,#attendance #printAllAttendance{display:none!important}
 </style>
 
+
+<style id="password-field-inline-validation">
+.password-field-error{display:block;min-height:1.15em;margin:5px 2px 0;color:#dc2626;font-size:.88rem;font-weight:600;line-height:1.35}
+input[aria-invalid="true"]{border-color:#dc2626!important;box-shadow:0 0 0 2px rgba(220,38,38,.10)!important}
+body.app-dark-theme .password-field-error{color:#fca5a5}
+</style>
 </head><body class="auth-loading">
 <header><button id="menuToggle" class="menu-toggle no-print" type="button" aria-label="ምናሌ ክፈት" aria-expanded="false">☰</button><div class="header-brand"><h1>ሰንበት ትምህርት ቤት</h1><p>የተማሪ መዝገብ • Attendance • ሪፖርት</p></div><button type="button" id="quickRefreshToggle" class="header-badge refresh-quick-toggle no-print" aria-label="Refresh data" title="Refresh data"><span class="refresh-glyph" aria-hidden="true">↻</span></button><button type="button" id="quickThemeToggle" class="header-badge theme-quick-toggle" aria-label="Switch to dark mode" title="Switch theme">☾</button></header>
 <header class="desktop-navbar no-print" id="supervisorDesktopNavbar">
@@ -970,7 +976,7 @@ button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.65);opacity:.6
 </section>
 <section id="settings" class="page hidden">
  <div class="panel"><h2>⚙️ Settings / ቅንብሮች</h2><p class="small">የስርዓቱን ቅንብሮች ከዚህ ያስተካክሉ። Supervisor ብቻ የሚፈቀዱት ቅንብሮች በRole ይገደባሉ።</p></div>
- <div class="panel"><h2>1. Change Password / የይለፍ ቃል ቀይር</h2><div class="grid"><div><label for="settingsCurrentPassword">የአሁኑ Password</label><input id="settingsCurrentPassword" type="password" autocomplete="current-password"></div><div><label for="settingsNewPassword">አዲስ Password (ቢያንስ 6)</label><input id="settingsNewPassword" type="password" autocomplete="new-password"></div><div><label for="settingsConfirmPassword">አዲሱን ድገም</label><input id="settingsConfirmPassword" type="password" autocomplete="new-password"></div></div><div class="row"><button type="button" id="changeOwnPassword">Password ቀይር</button></div><div id="passwordChangeMessage" class="small" aria-live="polite"></div></div>
+ <div class="panel"><h2>1. Change Password / የይለፍ ቃል ቀይር</h2><div class="grid"><div><label for="settingsCurrentPassword">የአሁኑ Password</label><input id="settingsCurrentPassword" type="password" autocomplete="current-password" aria-describedby="settingsCurrentPasswordError"><small id="settingsCurrentPasswordError" class="password-field-error" aria-live="polite"></small></div><div><label for="settingsNewPassword">አዲስ Password (ቢያንስ 6)</label><input id="settingsNewPassword" type="password" autocomplete="new-password" aria-describedby="settingsNewPasswordError"><small id="settingsNewPasswordError" class="password-field-error" aria-live="polite"></small></div><div><label for="settingsConfirmPassword">አዲሱን ድገም</label><input id="settingsConfirmPassword" type="password" autocomplete="new-password" aria-describedby="settingsConfirmPasswordError"><small id="settingsConfirmPasswordError" class="password-field-error" aria-live="polite"></small></div></div><div class="row"><button type="button" id="changeOwnPassword">Password ቀይር</button></div><div id="passwordChangeMessage" class="small" aria-live="polite"></div></div>
  <div class="panel"><h2>2. Inactive Days / ተከታታይ የቀረበት ቀን</h2><p class="small">ተማሪው ስንት ተከታታይ የተመዘገቡ Attendance ቀናት A ከሆነ Inactive እንደሚባል ይወስኑ።</p><div class="grid"><div><label for="inactiveDaysSetting">ቀናት</label><input id="inactiveDaysSetting" type="number" min="1" max="60" value="4"></div></div><div class="row"><button type="button" id="saveInactiveDays">💾 ይህን Setting አስቀምጥ</button><span id="inactiveDaysMessage" class="small" aria-live="polite"></span></div></div>
  <div class="panel"><h2>3. Attendance Status Rules / የStatus ነጥብ</h2><p class="small">የAttendance መቶኛ ሲሰላ ለእያንዳንዱ Status የሚሰጠውን ክብደት (%) ያስተካክሉ። P=100 እና A=0 ቋሚ ናቸው።</p><div class="grid"><div><label for="lateScoreSetting">Late (L) %</label><input id="lateScoreSetting" type="number" min="0" max="100" value="75"></div><div><label for="permissionScoreSetting">Permission (E) %</label><input id="permissionScoreSetting" type="number" min="0" max="100" value="100"></div></div><div class="row"><button type="button" id="saveStatusRules">💾 ይህን Setting አስቀምጥ</button><span id="statusRulesMessage" class="small" aria-live="polite"></span></div></div>
  <div class="panel"><h2>4. Class Archive / የክፍል ታሪክ ማህደር</h2><p class="small">የተመረጠውን ክፍል የቀድሞ Attendance መዝገብ በArchive ያስቀምጣል። ዋናው መዝገብ አይሰረዝም።</p><div class="grid"><div><label for="archiveClassSelect">ክፍል</label><select id="archiveClassSelect"></select></div></div><div class="row"><button type="button" id="archiveClassButton">ክፍሉን Archive አድርግ</button></div><div id="archiveMessage" class="small" aria-live="polite"></div></div>
@@ -1513,7 +1519,42 @@ async function saveRolePermissions(){const pr=$('permissionRole').value,perms={.
 
 
 async function archiveSelectedClass(){if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');const className=$('archiveClassSelect').value;if(!className)return;const rows=[];Object.entries(attendance).forEach(([date,day])=>Object.entries(day||{}).forEach(([studentId,status])=>{const st=students.find(x=>String(x.id)===String(studentId));if(st&&st.className===className&&['P','A','L','E'].includes(status))rows.push({date,studentId:String(studentId),status,className});}));if(!rows.length)return $('archiveMessage').textContent='ለዚህ ክፍል የተመዘገበ Attendance የለም።';if(!await showModernConfirm(`${className}: ${rows.length} የAttendance መዝገቦችን Archive ማድረግ ይፈልጋሉ? ዋናው መረጃ አይሰረዝም።`))return;const archiveId=encodeURIComponent(className+'_'+new Date().toISOString());try{const batch=db.batch();const meta=db.collection('classArchives').doc(archiveId);batch.set(meta,{className,recordCount:rows.length,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:currentUser.uid,note:'Snapshot only; original attendance records retained.'});rows.forEach((r,i)=>batch.set(meta.collection('records').doc(String(i)),r));await batch.commit();$('archiveMessage').textContent=`ተሳክቷል። ${rows.length} መዝገቦች በArchive ተቀምጠዋል፤ ዋናዎቹ አልተሰረዙም።`;await logActivity('Class archived',`${className} • ${rows.length} records`);}catch(e){console.error(e);$('archiveMessage').textContent='Archive አልተሳካም። Firebase Rules ላይ classArchives ለSupervisor ፈቃድ ያስፈልጋል። '+(e.message||'');}}
-async function changeOwnPassword(){const box=$('passwordChangeMessage'),user=auth.currentUser;const old=$('settingsCurrentPassword').value,nw=$('settingsNewPassword').value,confirmPw=$('settingsConfirmPassword').value;if(!user||!user.email){box.textContent='መጀመሪያ Sign In ያድርጉ።';return}if(!old||!nw||!confirmPw){box.textContent='ሶስቱንም Password መሙላት አለብዎት።';return}if(nw.length<6){box.textContent='አዲሱ Password ቢያንስ 6 ፊደል/ቁጥር መሆን አለበት።';return}if(nw!==confirmPw){box.textContent='አዲሱ Password እና ድጋሚ የተጻፈው አይመሳሰሉም።';return}const btn=$('changeOwnPassword');btn.disabled=true;box.textContent='በመቀየር ላይ…';try{const credential=firebase.auth.EmailAuthProvider.credential(user.email,old);await user.reauthenticateWithCredential(credential);await user.updatePassword(nw);['settingsCurrentPassword','settingsNewPassword','settingsConfirmPassword'].forEach(id=>$(id).value='');box.textContent='Password በተሳካ ሁኔታ ተቀይሯል።';await logActivity('Password changed','User changed own password');}catch(e){console.error(e);const code=e.code||'';box.textContent=code.includes('wrong-password')||code.includes('invalid-credential')?'የአሁኑ Password ትክክል አይደለም።':code.includes('weak-password')?'አዲሱ Password ደካማ ነው።':code.includes('requires-recent-login')?'እንደገና Sign In አድርገው ይሞክሩ።':'Password መቀየር አልተሳካም። '+(e.message||'');}finally{btn.disabled=false}}
+async function changeOwnPassword(){
+ const box=$('passwordChangeMessage'),user=auth.currentUser;
+ const fields={current:$('settingsCurrentPassword'),next:$('settingsNewPassword'),confirm:$('settingsConfirmPassword')};
+ const errors={current:$('settingsCurrentPasswordError'),next:$('settingsNewPasswordError'),confirm:$('settingsConfirmPasswordError')};
+ const clearError=key=>{errors[key].textContent='';fields[key].removeAttribute('aria-invalid');};
+ const setError=(key,message)=>{errors[key].textContent=message;fields[key].setAttribute('aria-invalid','true');};
+ Object.keys(errors).forEach(clearError);box.textContent='';
+ const old=fields.current.value,nw=fields.next.value,confirmPw=fields.confirm.value;
+ let invalid=false;
+ if(!old){setError('current','የአሁኑን Password ያስገቡ።');invalid=true;}
+ if(!nw){setError('next','አዲሱን Password ያስገቡ።');invalid=true;}
+ else if(nw.length<6){setError('next','Password ቢያንስ 6 ቁምፊዎች መሆን አለበት።');invalid=true;}
+ if(!confirmPw){setError('confirm','አዲሱን Password እንደገና ያስገቡ።');invalid=true;}
+ else if(nw&&nw!==confirmPw){setError('confirm','Password አይዛመዱም።');invalid=true;}
+ if(invalid){const first=Object.keys(errors).find(k=>errors[k].textContent);fields[first].focus();return;}
+ if(!user||!user.email){setError('current','መጀመሪያ Sign In ያድርጉ።');fields.current.focus();return;}
+ const btn=$('changeOwnPassword');btn.disabled=true;btn.setAttribute('aria-busy','true');box.textContent='በመቀየር ላይ…';
+ try{
+  const credential=firebase.auth.EmailAuthProvider.credential(user.email,old);
+  await user.reauthenticateWithCredential(credential);
+  await user.updatePassword(nw);
+  ['settingsCurrentPassword','settingsNewPassword','settingsConfirmPassword'].forEach(id=>$(id).value='');
+  box.textContent='';
+  try{await logActivity('Password changed','User changed own password');}catch(logError){console.warn('Password changed, but activity log failed:',logError);}
+  if(typeof window.showModernNotification==='function')window.showModernNotification('Password በተሳካ ሁኔታ ተቀይሯል።','success');
+ }catch(e){
+  console.error(e);const code=e.code||'';let message='Password መቀየር አልተሳካም። እንደገና ይሞክሩ።';
+  if(code.includes('wrong-password')||code.includes('invalid-credential')){message='የአሁኑ Password ትክክል አይደለም።';setError('current',message);fields.current.focus();}
+  else if(code.includes('weak-password')){message='አዲሱ Password ደካማ ነው።';setError('next',message);fields.next.focus();}
+  else if(code.includes('requires-recent-login')){message='ደህንነት ለማረጋገጥ እንደገና Sign In ያድርጉ።';setError('current',message);fields.current.focus();}
+  else if(code.includes('network-request-failed')){message='የInternet ግንኙነት ችግር አለ።';box.textContent=message;}
+  else {box.textContent=(e.message||message);}
+  if(typeof window.showModernNotification==='function')window.showModernNotification('Password መቀየር አልተሳካም። ከInput ስር ያለውን ማብራሪያ ይመልከቱ።','error');
+ }finally{btn.disabled=false;btn.removeAttribute('aria-busy');}
+}
+['settingsCurrentPassword','settingsNewPassword','settingsConfirmPassword'].forEach((id,index)=>{const key=['current','next','confirm'][index];$(id).addEventListener('input',()=>{const err=$(id+'Error');if(err){err.textContent='';$(id).removeAttribute('aria-invalid');}const msg=$('passwordChangeMessage');if(msg)msg.textContent='';});});
 $('changeOwnPassword').addEventListener('click',changeOwnPassword);$('archiveClassButton').addEventListener('click',archiveSelectedClass);$('saveInactiveDays').addEventListener('click',saveInactiveDays);$('saveStatusRules').addEventListener('click',saveStatusRules);$('themeSetting').addEventListener('change',saveThemeSetting);$('languageSelect').addEventListener('change',saveLanguageSetting);$('saveLateCutoff').addEventListener('click',saveLateCutoff);$('saveRolePermissions').addEventListener('click',saveRolePermissions);$('themeSetting').addEventListener('change',e=>{applyTheme(e.target.value);});document.querySelector('nav button[data-page="settings"]').addEventListener('click',()=>{syncSettingsForm();});
 // Settings 6-10: persist configurable values in Firestore. Supervisor-only controls are gated in UI;
 // production enforcement must also be mirrored in Firestore Security Rules.
