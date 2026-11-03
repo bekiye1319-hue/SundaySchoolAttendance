@@ -2089,7 +2089,7 @@ const appStateBridge={
   attendanceReasons:()=>attendanceReasons,
   extendedSettings:()=>extendedSettings,
   db:()=>db,
-  firebase:()=>firebase,
+  // Firebase is already a global SDK object; do not redefine window.firebase.
   dateISO:()=>dateISO,
   dateET:()=>dateET,
   esc:()=>esc,
