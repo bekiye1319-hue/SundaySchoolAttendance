@@ -3752,3 +3752,86 @@ renderAll();
   }
   @media print{html body #mobileBottomNav{display:none!important;}html body>nav[aria-label="ዋና ምናሌ"]{display:none!important;}}
 </style>
+
+
+<!-- Navigation correction: preserve the original sidebar and add a separate desktop top navigation. -->
+<style id="preserve-sidebar-add-desktop-top-nav">
+  /* Desktop: original sidebar stays fixed at its original left position. */
+  @media screen and (min-width:801px){
+    html body>nav[aria-label="ዋና ምናሌ"]{
+      position:fixed!important;left:0!important;top:0!important;bottom:0!important;
+      width:260px!important;height:100vh!important;min-height:100vh!important;
+      display:flex!important;flex-direction:column!important;align-items:stretch!important;
+      justify-content:flex-start!important;gap:7px!important;padding:18px 13px!important;
+      margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+      background:#0d1527!important;transform:none!important;visibility:visible!important;
+      z-index:100!important;box-shadow:3px 0 16px #02061720!important;
+    }
+    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-user,
+    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label{display:flex!important;}
+    html body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
+      width:100%!important;min-height:46px!important;flex:0 0 auto!important;
+      justify-content:flex-start!important;padding:12px 13px!important;white-space:normal!important;
+    }
+    html body>nav[aria-label="ዋና ምናሌ"] #topLogout{margin-top:auto!important;width:100%!important;}
+    html body>header:first-of-type{padding:16px 26px 16px 286px!important;min-height:78px!important;}
+    html body>nav#desktopTopSubNav{
+      position:sticky!important;top:0!important;margin-left:260px!important;width:calc(100% - 260px)!important;
+      min-height:58px!important;box-sizing:border-box!important;display:flex!important;
+      flex-direction:row!important;align-items:center!important;gap:7px!important;
+      padding:8px 22px!important;overflow-x:auto!important;overflow-y:hidden!important;
+      background:#fff!important;border-bottom:1px solid #e2e8f0!important;
+      box-shadow:0 3px 12px #0f172a0b!important;z-index:90!important;
+    }
+    html body>nav#desktopTopSubNav button{
+      flex:0 0 auto!important;width:auto!important;min-height:40px!important;
+      padding:9px 13px!important;border-radius:9px!important;background:transparent!important;
+      color:#475569!important;font-size:13px!important;white-space:nowrap!important;
+      display:flex!important;align-items:center!important;gap:8px!important;
+    }
+    html body>nav#desktopTopSubNav button.active{background:#e8f7ee!important;color:#087443!important;box-shadow:inset 0 -2px #10b981!important;}
+    html body>nav#desktopTopSubNav button:hover{background:#f1f5f9!important;}
+    html body>nav#desktopTopSubNav button:before{display:none!important;}
+    html body>nav#desktopTopSubNav #topLogout{margin-left:auto!important;background:#fff1f2!important;color:#b42318!important;}
+    html body>main{margin:0 0 0 260px!important;padding:24px 28px!important;min-height:calc(100vh - 136px)!important;}
+  }
+  /* Mobile: no bottom bar and no extra top bar; original slide-out sidebar is retained. */
+  @media screen and (max-width:800px){
+    html body>nav#desktopTopSubNav{display:none!important;}
+    html body>nav[aria-label="ዋና ምናሌ"]{position:fixed!important;}
+    html body>header:first-of-type{padding:12px 14px!important;}
+    html body>main{margin:0!important;}
+  }
+  html body #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+  @media print{html body>nav#desktopTopSubNav{display:none!important;}}
+</style>
+<script id="build-desktop-top-subnavigation">
+(()=>{
+ function build(){
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  const header=document.querySelector('body>header');
+  if(!sidebar||!header||document.getElementById('desktopTopSubNav'))return;
+  const top=document.createElement('nav');top.id='desktopTopSubNav';top.className='no-print';
+  top.setAttribute('aria-label','Desktop top navigation');
+  sidebar.querySelectorAll('button[data-page],button#topLogout').forEach(original=>{
+    const b=original.cloneNode(true);b.removeAttribute('id');
+    b.removeAttribute('data-page');b.removeAttribute('onclick');
+    b.dataset.topTarget=original.id==='topLogout'?'logout':original.dataset.page;
+    b.addEventListener('click',()=>original.click());
+    top.appendChild(b);
+  });
+  header.insertAdjacentElement('afterend',top);
+  const sync=()=>{
+    top.querySelectorAll('button[data-top-target]').forEach(b=>{
+      const target=b.dataset.topTarget;
+      const source=target==='logout'?sidebar.querySelector('#topLogout'):sidebar.querySelector('button[data-page="'+target+'"]');
+      b.classList.toggle('active',!!source&&source.classList.contains('active'));
+    });
+  };
+  new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+  top.addEventListener('click',()=>setTimeout(sync,0));sync();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build,{once:true});else build();
+ setTimeout(build,700);
+})();
+</script>
