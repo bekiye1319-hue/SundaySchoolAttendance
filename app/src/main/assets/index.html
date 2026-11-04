@@ -3538,6 +3538,17 @@ renderAll();
 (function(){
  const $q=id=>document.getElementById(id);
  const docRef=()=>db.collection('appSettings').doc('extended');
+ function applyRestoreRoleAccess(){
+  const allowed=role==='supervisor',input=$q('restoreFile');
+  if(!input)return;
+  input.disabled=!allowed;
+  const label=document.querySelector('label[for="restoreFile"]');
+  if(label){label.style.opacity=allowed?'':'0.55';label.style.pointerEvents=allowed?'':'none';label.setAttribute('aria-disabled',String(!allowed));label.title=allowed?'':'Restore የሚፈቀደው Supervisor ብቻ ነው።';}
+  input.title=allowed?'':'Restore የሚፈቀደው Supervisor ብቻ ነው።';
+ }
+ applyRestoreRoleAccess();
+ const restoreRoleTimer=setInterval(applyRestoreRoleAccess,500);
+ window.addEventListener('beforeunload',()=>clearInterval(restoreRoleTimer));
  function qualifiedConfig(){return extendedSettings?.qualifiedStudents||{enabled:false,startDate:'',endDate:'',threshold:80}}
  function calculateQualifiedRows(){
   const cfg=qualifiedConfig();if(!cfg.enabled)return [];
@@ -3573,9 +3584,12 @@ renderAll();
   if(role==='supervisor')return calculateQualifiedRows();
   const pub=extendedSettings?.qualifiedStudentsPublic;
   if(!pub||!pub.enabled||pub.startDate!==cfg.startDate||pub.endDate!==cfg.endDate||Number(pub.threshold)!==Number(cfg.threshold)||JSON.stringify(pub.classes||[])!==JSON.stringify(cfg.classes||[]))return [];
-  return Array.isArray(pub.rows)?pub.rows:[];
+  // Non-supervisor accounts may only see their own assigned class.
+  if(!assignedClass)return [];
+  return (Array.isArray(pub.rows)?pub.rows:[]).filter(row=>String(row.className||'')===String(assignedClass));
  }
  window.renderQualifiedStudents=function(){
+  applyRestoreRoleAccess();
   const panel=$q('qualifiedStudentsPanel'),cfg=qualifiedConfig();if(!panel)return;
   panel.style.display=cfg.enabled?'':'none';if(!cfg.enabled)return;
   const from=dateISO(cfg.startDate),to=dateISO(cfg.endDate);
