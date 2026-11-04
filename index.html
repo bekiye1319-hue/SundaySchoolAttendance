@@ -394,7 +394,11 @@ main{padding:27px 30px;}#dashboard .panel{padding:22px;}.dashboard-title{padding
 @media(max-width:700px){.backup-desktop-navbar{padding:12px;gap:10px;justify-content:space-between;border-radius:11px;margin-bottom:18px;}.backup-user-profile{gap:8px;}.backup-user-avatar{width:34px;height:34px;flex-basis:34px;}.backup-user-details h4{font-size:.83rem;}.backup-user-details p{font-size:.7rem;max-width:135px;}.backup-logout-btn{padding:9px 10px;font-size:.78rem;gap:5px;}.backup-new-card{padding:20px;}.backup-new-title{font-size:1.1rem;}.backup-new-action{width:100%;justify-content:center;}}
 
 /* Shared supervisor/teacher profile navbar shown on every app page */
-.global-profile-navbar{background:#059669;color:#fff;padding:13px 24px;display:flex;align-items:center;justify-content:flex-end;gap:22px;box-shadow:0 3px 12px #05966920;position:relative;z-index:10;}
+.global-profile-navbar{background:#059669;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;box-shadow:0 3px 12px #05966920;position:relative;z-index:10;}
+.global-top-nav{display:flex;align-items:center;gap:5px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin;}
+.global-top-nav button{background:transparent!important;color:#fff!important;border:0;border-radius:8px;padding:10px 11px;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;}
+.global-top-nav button:hover,.global-top-nav button.active{background:#ffffff24!important;}
+.global-top-nav button.hidden{display:none!important;}
 .global-profile-user{display:flex;align-items:center;gap:12px;min-width:0;}
 .global-profile-avatar{width:40px;height:40px;flex:0 0 40px;background:#fff;color:#059669;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
 .global-profile-details h4{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:6px;margin:0;}
@@ -403,7 +407,7 @@ main{padding:27px 30px;}#dashboard .panel{padding:22px;}.dashboard-title{padding
 .global-profile-logout:hover{opacity:.92;}
 /* The common navbar replaces page-specific duplicate profile headers. */
 #reports .report-app-header,#backup .backup-desktop-navbar{display:none!important;}
-@media(max-width:700px){.global-profile-navbar{padding:10px 12px;gap:9px;justify-content:space-between;}.global-profile-user{gap:8px;}.global-profile-avatar{width:34px;height:34px;flex-basis:34px;}.global-profile-details h4{font-size:.82rem;}.global-profile-details p{font-size:.69rem;max-width:145px;}.global-profile-logout{padding:9px 10px;font-size:.77rem;gap:5px;}}
+@media(max-width:800px){.global-top-nav{display:none!important;}.global-profile-navbar{padding:10px 12px;gap:9px;justify-content:space-between;}.global-profile-user{gap:8px;}.global-profile-avatar{width:34px;height:34px;flex-basis:34px;}.global-profile-details h4{font-size:.82rem;}.global-profile-details p{font-size:.69rem;max-width:145px;}.global-profile-logout{padding:9px 10px;font-size:.77rem;gap:5px;}}
 @media print{.global-profile-navbar{display:none!important;}}
 
 #classComparisonTable table,#activityLogsTable table{min-width:600px;}#classComparisonTable td,#classComparisonTable th,#activityLogsTable td,#activityLogsTable th{font-size:13px;padding:10px;}.mini-bar{height:8px;background:#e8efe9;border-radius:99px;overflow:hidden;min-width:70px;}.mini-bar span{display:block;height:100%;background:#16804a;border-radius:99px;}.activity-badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#e8f5ec;color:#176b40;font-size:11px;font-weight:700;}@media(max-width:760px){#classComparisonTable td,#classComparisonTable th,#activityLogsTable td,#activityLogsTable th{padding:8px;font-size:12px;}}
@@ -418,8 +422,8 @@ header h1,.header-brand h1{color:#0f623a;}
 .header-badge{background:#e6f4ea;color:#059669;border-color:#cce8d4;}
 .menu-toggle{background:#0f623a;color:#fff;}
 .menu-toggle:hover{background:#0b4a2b;}
-/* The global profile row duplicates the top bar; role/email now live in the sidebar profile card. */
-#globalProfileNavbar{display:none!important;}
+/* Desktop navigation is integrated into the shared user/profile row. */
+#supervisorDesktopNavbar{display:none!important;}
 nav.no-print{background:#0d1527;color:#fff;box-shadow:4px 0 20px #02061735;border-right:1px solid #18243a;padding:20px 16px;gap:9px;}
 .sidebar-brand{padding:4px 7px 20px;border-bottom:1px solid #ffffff18;margin-bottom:8px;}
 .brand-mark{background:transparent;color:#00bf72;border-radius:12px;font-size:29px;box-shadow:none;}
@@ -690,37 +694,6 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
 @media(min-width:801px){#mobileBottomNav{display:none!important;}}
 @media print{#mobileBottomNav{display:none!important;}body{}}
 
-/* Override the general nav.no-print sidebar styling for the bottom navigation. */
-@media screen and (max-width:800px){
- html body #mobileBottomNav{
-  display:grid!important;position:fixed!important;
-  top:auto!important;left:0!important;right:0!important;bottom:0!important;
-  width:100%!important;height:auto!important;max-height:86px!important;
-  min-height:66px!important;box-sizing:border-box!important;
-  z-index:2147483000!important;visibility:visible!important;opacity:1!important;
-  grid-template-columns:repeat(5,minmax(0,1fr))!important;
-  flex-direction:row!important;align-items:stretch!important;justify-content:stretch!important;
-  margin:0!important;overflow:visible!important;
-  padding:6px 7px calc(6px + env(safe-area-inset-bottom))!important;
-  background:var(--mobile-nav-bg,#fff)!important;
-  border-top:1px solid var(--mobile-nav-border,#e3ebe5)!important;
-  box-shadow:0 -5px 20px #102d2218!important;
- }
- html body #mobileBottomNav button{
-  display:flex!important;min-width:0!important;width:auto!important;height:auto!important;
-  min-height:52px!important;max-height:68px!important;margin:0!important;
-  padding:4px 2px!important;border:0!important;border-radius:10px!important;
-  flex-direction:column!important;align-items:center!important;justify-content:center!important;
-  gap:3px!important;background:transparent;color:var(--mobile-nav-text,#718078)!important;
-  font-size:10px!important;line-height:1.15!important;white-space:nowrap!important;
- }
- html body #mobileBottomNav button.active{background:#e9f5ed!important;color:var(--mobile-nav-active,#167a45)!important;}
- html body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important;}
- body.app-dark-theme #mobileBottomNav{--mobile-nav-bg:#111c2c;--mobile-nav-border:#35465c;--mobile-nav-text:#aab8c9;--mobile-nav-active:#6ee7a5;}
- body.app-dark-theme #mobileBottomNav button.active{background:#1e3b32!important;color:#8cf0b4!important;}
-}
-@media screen and (min-width:801px){html body #mobileBottomNav{display:none!important;}}
-@media print{html body #mobileBottomNav{display:none!important;}}
 
 /* The bottom bar shares nav.no-print with the sidebar. Explicitly cancel
    the sidebar's off-canvas transform so the fixed bar remains on-screen. */
@@ -1116,469 +1089,6 @@ body.app-dark-theme .hidden{display:none!important;}
   body>nav.no-print{top:62px!important;height:calc(100dvh - 62px)!important;}
 }
 
-/* Dark mode: override later page-specific light surfaces and keep all text readable. */
-body.app-dark-theme #attendance,
-body.app-dark-theme #reports,
-body.app-dark-theme #backup,
-body.app-dark-theme #settings{background:#0b1220!important;color:#e5edf5!important;}
-body.app-dark-theme #attendance .panel,
-body.app-dark-theme #attendance .attendance-filter-panel,
-body.app-dark-theme #attendance .attendance-list-panel,
-body.app-dark-theme #attendance .attendance-reference-form-card,
-body.app-dark-theme #attendance .attendance-search-wrap,
-body.app-dark-theme #attendance .attendance-search-field,
-body.app-dark-theme #attendance .attendance-note,
-body.app-dark-theme #attendance .status-legend,
-body.app-dark-theme #attendance .attendance-summary-panel,
-body.app-dark-theme #reports .report-card,
-body.app-dark-theme #reports .report-container,
-body.app-dark-theme #reports .report-app-header,
-body.app-dark-theme #backup .backup-status-note,
-body.app-dark-theme #settings .panel{
-  background:#172235!important;color:#e5edf5!important;border-color:#3b4b61!important;
-  box-shadow:0 3px 14px rgba(0,0,0,.22)!important;}
-body.app-dark-theme #attendance .attendance-toolbar h3,
-body.app-dark-theme #attendance .attendance-summary-panel h3,
-body.app-dark-theme #attendance .attendance-reference-title,
-body.app-dark-theme #attendance .attendance-reference-table th,
-body.app-dark-theme #attendance .attendance-reference-table td,
-body.app-dark-theme #attendance .attendance-status-btn,
-body.app-dark-theme #attendance .attendance-status-btn span,
-body.app-dark-theme #attendance .section-caption,
-body.app-dark-theme #reports .report-card-title,
-body.app-dark-theme #reports .report-form-group label,
-body.app-dark-theme #reports .report-range-note,
-body.app-dark-theme #reports .report-stat-label,
-body.app-dark-theme #reports .report-table th,
-body.app-dark-theme #reports .report-table td,
-body.app-dark-theme #backup .backup-status-note,
-body.app-dark-theme #settings label,
-body.app-dark-theme #settings h2,
-body.app-dark-theme #settings h3,
-body.app-dark-theme #settings p,
-body.app-dark-theme #settings .small{color:#e5edf5!important;}
-body.app-dark-theme #attendance .attendance-reference-table th,
-body.app-dark-theme #reports .report-table th{background:#26364d!important;border-color:#465873!important;}
-body.app-dark-theme #attendance .attendance-reference-table td,
-body.app-dark-theme #reports .report-table td{background:#172235!important;border-color:#3b4b61!important;}
-body.app-dark-theme #attendance .attendance-reference-table tr:nth-child(even) td,
-body.app-dark-theme #reports .report-table tr:nth-child(even) td{background:#1b2a40!important;}
-body.app-dark-theme #attendance .attendance-search-field input,
-body.app-dark-theme #attendance input:not([type=radio]):not([type=checkbox]),
-body.app-dark-theme #attendance select,
-body.app-dark-theme #reports .report-control,
-body.app-dark-theme #settings input,
-body.app-dark-theme #settings select,
-body.app-dark-theme #settings textarea{
-  background:#0f1a2b!important;color:#f8fafc!important;border:1px solid #52647d!important;}
-body.app-dark-theme #attendance input::placeholder,
-body.app-dark-theme #reports input::placeholder,
-body.app-dark-theme #settings input::placeholder{color:#aebdce!important;}
-/* Four generated attendance status summary tiles must not remain white. */
-body.app-dark-theme #reports .report-stat-card,
-body.app-dark-theme #reports .report-stats-grid .report-stat-card{border:1px solid #465873!important;}
-body.app-dark-theme #reports .report-stat-card.p{background:#183a2b!important;color:#bbf7d0!important;}
-body.app-dark-theme #reports .report-stat-card.a{background:#42252b!important;color:#fecaca!important;}
-body.app-dark-theme #reports .report-stat-card.l{background:#42351d!important;color:#fde68a!important;}
-body.app-dark-theme #reports .report-stat-card.e{background:#35264b!important;color:#e9d5ff!important;}
-body.app-dark-theme #reports .report-stat-card *{color:inherit!important;}
-/* Backup / Restore action buttons: dark surfaces with high-contrast labels. */
-body.app-dark-theme #backup .backup-card button,
-body.app-dark-theme #backup .backup-card .restore-file-label,
-body.app-dark-theme #backup .backup-new-action{
-  background:#26364d!important;color:#f8fafc!important;border:1px solid #64748b!important;
-  box-shadow:0 3px 10px rgba(0,0,0,.3)!important;}
-body.app-dark-theme #backup .backup-card button:hover,
-body.app-dark-theme #backup .backup-card .restore-file-label:hover,
-body.app-dark-theme #backup .backup-new-action:hover{background:#334862!important;color:#fff!important;}
-body.app-dark-theme #backup .backup-status-note{background:#172235!important;color:#e5edf5!important;}
-body.app-dark-theme #backup .backup-status-note *{color:inherit!important;}
-/* Preserve colored action buttons and visible focus indicators in dark mode. */
-body.app-dark-theme #attendance .attendance-actions button,
-body.app-dark-theme #reports .report-btn{color:#fff!important;}
-body.app-dark-theme button:focus-visible,
-body.app-dark-theme select:focus-visible,
-body.app-dark-theme input:focus-visible{outline:2px solid #60a5fa!important;outline-offset:2px;}
-
-/* Report form is content-height; don't inherit the app-wide full-screen main height. */
-#reports main.report-card{min-height:0!important;height:auto!important;max-height:none!important;flex:0 0 auto!important;align-self:stretch!important;}
-#reports #reportVisualSection{height:auto!important;min-height:0!important;align-content:start!important;align-items:start!important;}
-#reports .report-visual-card{height:auto!important;min-height:0!important;align-self:start!important;}
-#reports #comparativeAnalysisCard.hidden{display:none!important;}
-#reports #reportResultCard{height:auto!important;min-height:0!important;flex:0 0 auto!important;}
-#reports #reportResultCard.hidden{display:none!important;}
-/* Keep report sections flush to the content area on wide desktop. */
-@media(min-width:801px){#reports .report-container{padding:12px 14px!important;gap:12px!important;}#reports main.report-card{margin-bottom:0!important;}}
-/* Dark mode: Attendance legend/status strip must not revert to white. */
-body.app-dark-theme #attendance .attendance-toolbar .status-legend{background:#172235!important;color:#e5edf5!important;border-color:#465873!important;}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span{color:#e5edf5!important;}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(1){}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(2){}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(3){}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(4){}
-
-body.app-dark-theme #attendance .attendance-reference-legend,
-body.app-dark-theme #attendance .attendance-reference-legend[aria-label],
-body.app-dark-theme #attendance .attendance-reference-legend>span,
-body.app-dark-theme #attendance .attendance-reference-legend>span>span{
- background:#1e293b!important;color:#e5edf5!important;border-color:#475569!important;
-}
-body.app-dark-theme #attendance .attendance-reference-legend{box-shadow:0 4px 16px #0004!important;}
-body.app-dark-theme #attendance .attendance-reference-legend .ref-pill{color:#fff!important;}
-body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5edf5!important;}
-
-:root{--ss-navy:#111827;--ss-navy-card:#1e293b;--ss-green:#10b981;--ss-red:#e51f26;}
-/* Sidebar drawer: dark navy, profile card, matching icon colors and green active item. */
-@media screen and (max-width:800px){
- body>nav[aria-label="ዋና ምናሌ"]{
-  background:var(--ss-navy)!important;color:#f8fafc!important;
-  width:min(300px,86vw)!important;padding:20px 16px 22px!important;
-  gap:9px!important;box-sizing:border-box!important;
-  
-  align-items:stretch!important;
-  
- }
- body>nav[aria-label="ዋና ምናሌ"] .sidebar-user{
-  background:var(--ss-navy-card)!important;border:1px solid #334155!important;
-  border-radius:18px!important;padding:15px!important;margin:4px 0 20px!important;gap:12px!important;
- }
- body>nav[aria-label="ዋና ምናሌ"] .sidebar-avatar{width:48px!important;height:48px!important;background:#10b981!important;color:#fff!important;font-size:18px!important;}
- body>nav[aria-label="ዋና ምናሌ"] .sidebar-user strong{color:#fff!important;font-size:15px!important;}
- body>nav[aria-label="ዋና ምናሌ"] .sidebar-user small{color:#a8b3c5!important;font-size:12px!important;}
- body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label{display:none!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
-  display:flex!important;align-items:center!important;gap:17px!important;
-  width:100%!important;min-height:57px!important;padding:12px 15px!important;
-  border:0!important;border-radius:15px!important;background:transparent!important;
-  color:#d5dbe5!important;text-align:left!important;font-size:15px!important;font-weight:700!important;
-  white-space:normal!important;box-shadow:none!important;
- }
- body>nav[aria-label="ዋና ምናሌ"] button[data-page] .sidebar-nav-icon{width:27px!important;flex:0 0 27px!important;text-align:center!important;font-size:23px!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page="dashboard"] .sidebar-nav-icon{color:#fff!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page="attendance"] .sidebar-nav-icon{color:#60a5fa!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page="students"] .sidebar-nav-icon{color:#f472b6!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page="classes"] .sidebar-nav-icon{color:#fbbf24!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page="reports"] .sidebar-nav-icon{color:#a78bfa!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page="backup"] .sidebar-nav-icon{color:#38bdf8!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page="settings"] .sidebar-nav-icon{color:#fbbf24!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page].active{background:#10b981!important;color:#fff!important;}
- body>nav[aria-label="ዋና ምናሌ"] button[data-page].active .sidebar-nav-icon{color:#fff!important;}
- body>nav[aria-label="ዋና ምናሌ"] #topLogout{
-  align-items:center!important;justify-content:center!important;gap:12px!important;
-  min-height:58px!important;border-radius:15px!important;
-  background:#e51f26!important;color:#fff!important;font-size:15px!important;font-weight:800!important;
- }
- body>nav[aria-label="ዋና ምናሌ"] #topLogout .sidebar-nav-icon{font-size:20px!important;}
- /* Red fixed bottom bar; its icons are the same Font Awesome icons used in the drawer. */
- html body nav#mobileBottomNav{
-  
-  height:auto!important;min-height:78px!important;max-height:calc(88px + env(safe-area-inset-bottom))!important;
-  flex-direction:row!important;gap:2px!important;
-  padding:7px 6px calc(7px + env(safe-area-inset-bottom))!important;box-sizing:border-box!important;
-  border-radius:18px 18px 0 0!important;
-  box-shadow:0 -5px 20px #0003!important;z-index:2147483647!important;
-  
- }
- html body nav#mobileBottomNav>button{
-  
-  height:64px!important;min-height:64px!important;
-  
-  font-size:11px!important;font-weight:800!important;
-  
- }
- html body nav#mobileBottomNav>button .mobile-nav-icon{font-size:23px!important;color:#fff!important;}
- html body nav#mobileBottomNav>button.active{}
- html body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important;}
-}
-@media screen and (min-width:801px),print{html body nav#mobileBottomNav{}}
-
-@media screen and (max-width:800px){
-  /* Match the exact dark navy used by the sidebar. */
-  html body nav#mobileBottomNav,
-  html body nav#mobileBottomNav.no-print{
-    background:#111827!important;
-    background-color:#111827!important;
-    border-color:#111827!important;
-  }
-  /* Remove the small green status dots above each icon. */
-  html body nav#mobileBottomNav>button::before,
-  html body nav#mobileBottomNav>button::after,
-  html body nav#mobileBottomNav>button .mobile-nav-icon::after{
-    content:none!important;display:none!important;
-  }
-  html body nav#mobileBottomNav>button{
-    position:relative!important;
-    padding-top:5px!important;
-    gap:5px!important;
-  }
-  html body nav#mobileBottomNav>button .mobile-nav-icon{
-    margin:0!important;padding:0!important;
-  }
-  html body nav#mobileBottomNav>button.active{
-    background:#10b981!important;
-  }
-}
-
-/* Full-width bottom navigation: flush with both screen edges and bottom edge. */
-@media screen and (max-width:800px){
-  html, body { width:100% !important; max-width:100% !important; overflow-x:hidden !important; }
-  body > nav#mobileBottomNav, html body nav#mobileBottomNav {
-    position:fixed !important;
-    left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
-    inset-inline:0 !important;
-    width:auto !important; min-width:0 !important; max-width:none !important;
-    margin:0 !important;
-    box-sizing:border-box !important;
-    display:grid !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-    align-items:stretch !important; justify-content:stretch !important;
-    height:76px !important; min-height:76px !important; max-height:none !important;
-    padding:6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-    border-radius:16px 16px 0 0 !important;
-    background:#111827 !important;
-    z-index:2147483647 !important;
-    transform:none !important;
-  }
-  body > nav#mobileBottomNav > button {
-    width:100% !important; min-width:0 !important; max-width:none !important;
-    height:100% !important; min-height:0 !important; margin:0 !important;
-    box-sizing:border-box !important;
-  }
-  body { padding-bottom:calc(86px + env(safe-area-inset-bottom, 0px)) !important; }
-}
-
-/* Report status cards: two side-by-side columns on desktop and mobile. */
-#reports .report-stats-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;}
-#reports .report-stat-card{min-height:86px;border:1px solid transparent;transition:transform .15s ease;}
-#reports .report-stat-card.p{background:#e6f4ea!important;border-color:#a8d8b5!important;}
-#reports .report-stat-card.a{background:#fce8e6!important;border-color:#f2b8b5!important;}
-#reports .report-stat-card.l{background:#fff4d6!important;border-color:#f4d27c!important;}
-#reports .report-stat-card.e{background:#f3e8ff!important;border-color:#d8b4fe!important;}
-#reports .report-stat-badge.p{background:#16803d!important;}
-#reports .report-stat-badge.a{background:#c62828!important;}
-#reports .report-stat-badge.l{background:#d97706!important;}
-#reports .report-stat-badge.e{background:#7c3aed!important;}
-@media(max-width:360px){#reports .report-stats-grid{gap:7px!important;}#reports .report-stat-card{padding:10px 8px;gap:7px;}#reports .report-stat-val{font-size:1.1rem;}}
-
-/* Attendance controls: two columns, four distinct status colors. */
-.attendance-toolbar .status-legend{background:#fff!important;border:1px solid #e5eee8;border-radius:10px;padding:10px 12px;color:#43564a;}
-.attendance-search-wrap{margin:4px 0 14px;}.attendance-search-wrap input{max-width:100%;border:1px solid #cbded1;background:#fff;border-radius:11px;min-height:45px;padding:10px 14px;}
-.attendance-status-grid{display:grid;grid-template-columns:repeat(2,minmax(105px,1fr));gap:7px;max-width:330px;}
-.attendance-status-btn{display:flex;align-items:center;justify-content:center;min-height:38px;border-radius:9px;padding:6px 8px;font-size:12px;font-weight:800;cursor:pointer;border:1px solid transparent;}
-.attendance-status-btn input{width:16px;height:16px;min-height:16px;margin:0 6px 0 0;accent-color:currentColor;}
-.attendance-status-btn.status-P{background:#e4f7ec;color:#08783b;border-color:#9edbb5;}.attendance-status-btn.status-A{background:#fff0f0;color:#bd2525;border-color:#f2b4b4;}.attendance-status-btn.status-L{background:#eaf3ff;color:#1769b1;border-color:#b5d3f4;}.attendance-status-btn.status-E{background:#f4edff;color:#7542ad;border-color:#d7c2f2;}
-.attendance-status-btn:has(input:checked){box-shadow:0 0 0 2px currentColor inset;filter:saturate(1.2);}
-.attendance-reference-table{min-width:650px!important;}.attendance-reference-table td{vertical-align:middle!important;}
-.class-overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0 18px;}.class-overview-card{border:1px solid #dce9df;border-radius:14px;padding:14px;background:linear-gradient(145deg,#fff,#f5fbf7);}.class-overview-card h3{margin:0 0 12px;color:#176b40;}.class-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}.class-metrics>div{padding:10px;border-radius:10px;background:#fff;border:1px solid #e5eee8;min-width:0;}.class-metrics b{font-size:19px;color:#176b40;margin:0 4px;}.class-metrics span{display:block;font-size:11px;color:#64756a;margin-top:4px;}.class-metrics>div:last-child{grid-column:1/-1;}.class-delete-btn{background:#dc4545!important;color:white!important;}
-.inactive-panel{border-left:4px solid #dc4545;}.inactive-panel h2{color:#b42318;}.inactive-panel table{min-width:560px;}.inactive-panel th{background:#fff3f3;color:#8e2525;}
-.students-ref-table-wrap table{table-layout:fixed;width:100%;min-width:650px;}.students-ref-table-wrap th:nth-child(1),.students-ref-table-wrap td:nth-child(1){width:5%;}.students-ref-table-wrap th:nth-child(2),.students-ref-table-wrap td:nth-child(2){width:14%;}.students-ref-table-wrap th:nth-child(3),.students-ref-table-wrap td:nth-child(3){width:22%;}.students-ref-table-wrap th:nth-child(4),.students-ref-table-wrap td:nth-child(4){width:14%;}.students-ref-table-wrap th:nth-child(5),.students-ref-table-wrap td:nth-child(5){width:15%;}.students-ref-table-wrap th:nth-child(6),.students-ref-table-wrap td:nth-child(6){width:15%;}.students-ref-table-wrap th:nth-child(7),.students-ref-table-wrap td:nth-child(7){width:15%;}.students-ref-table-wrap td{overflow-wrap:anywhere;}.students-ref-actions button{background:#2878bd!important;border-radius:8px;}.students-ref-actions button[data-delete-student]{background:#d94b4b!important;}
-@media(max-width:600px){.attendance-status-grid{max-width:none;grid-template-columns:repeat(2,minmax(0,1fr));}.attendance-status-btn{font-size:11px;padding:5px;}.class-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}.students-ref-table-wrap table{min-width:680px;}}
-
-/* Requested attendance UI adjustment: two-by-two controls and one white legend above. */
-#attendance .attendance-toolbar .status-legend{
-  
-  
-  
-  border-radius:12px!important;
-  padding:11px 14px!important;
-  color:#34483b!important;
-  box-shadow:none!important;
-}
-#attendance .attendance-actions{
-  
-  
-  gap:9px!important;
-  margin:12px 0 14px!important;
-}
-#attendance .attendance-actions button{
-  
-  min-width:0!important;
-  
-  white-space:normal!important;
-  justify-content:center!important;
-  border-radius:11px!important;
-}
-#attendance .attendance-actions #saveAtt{background:#16834d!important;color:#fff!important;}
-#attendance .attendance-actions #allPresent{background:#2879cf!important;color:#fff!important;}
-#attendance .attendance-actions #printAttendance{background:#e08a22!important;color:#fff!important;}
-#attendance .attendance-actions #printAllAttendance{background:#7452bd!important;color:#fff!important;}
-#attendance .attendance-status-grid{
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:7px!important;
-  max-width:330px!important;
-}
-#attendance .attendance-status-btn{width:100%!important;}
-#attendance .attendance-status-btn.status-P{background:#e7f7ed!important;color:#137a43!important;border-color:#a9dfbd!important;}
-#attendance .attendance-status-btn.status-A{background:#fff0f0!important;color:#bd3030!important;border-color:#f0b5b5!important;}
-#attendance .attendance-status-btn.status-L{background:#eaf3ff!important;color:#2469bd!important;border-color:#b6d1f4!important;}
-#attendance .attendance-status-btn.status-E{background:#f4edff!important;color:#7544b6!important;border-color:#d3c0f1!important;}
-#attendance .attendance-status-btn.status-P:has(input:checked){background:#16834d!important;color:#fff!important;border-color:#16834d!important;}
-#attendance .attendance-status-btn.status-A:has(input:checked){background:#d83b3b!important;color:#fff!important;border-color:#d83b3b!important;}
-#attendance .attendance-status-btn.status-L:has(input:checked){background:#2879cf!important;color:#fff!important;border-color:#2879cf!important;}
-#attendance .attendance-status-btn.status-E:has(input:checked){background:#8053c7!important;color:#fff!important;border-color:#8053c7!important;}
-/* The lower repeated P/A/L/E summary is hidden; the single legend above remains. */
-#attendance .attendance-summary-panel{}
-@media(max-width:390px){#attendance .attendance-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;}#attendance .attendance-actions button{font-size:11px!important;padding:9px 6px!important;}}
-
-/* Students table: balanced columns, clearer rows and accessible action buttons. */
-#students .students-ref-table-wrap{border:1px solid #e3ebe5;}
-#students .students-ref-table-wrap table{min-width:820px;table-layout:fixed;border-collapse:separate;border-spacing:0;}
-#students .students-ref-table-wrap th,#students .students-ref-table-wrap td{box-sizing:border-box;padding:13px 10px;line-height:1.55;}
-#students .students-ref-table-wrap th:nth-child(1),#students .students-ref-table-wrap td:nth-child(1){width:6%;}
-#students .students-ref-table-wrap th:nth-child(2),#students .students-ref-table-wrap td:nth-child(2){width:13%;white-space:nowrap;}
-#students .students-ref-table-wrap th:nth-child(3),#students .students-ref-table-wrap td:nth-child(3){width:25%;overflow-wrap:anywhere;word-break:normal;}
-#students .students-ref-table-wrap th:nth-child(4),#students .students-ref-table-wrap td:nth-child(4){width:13%;overflow-wrap:anywhere;}
-#students .students-ref-table-wrap th:nth-child(5),#students .students-ref-table-wrap td:nth-child(5){width:14%;overflow-wrap:anywhere;}
-#students .students-ref-table-wrap th:nth-child(6),#students .students-ref-table-wrap td:nth-child(6){width:16%;white-space:normal;overflow-wrap:anywhere;}
-#students .students-ref-table-wrap th:nth-child(7),#students .students-ref-table-wrap td:nth-child(7){width:13%;}
-#students .students-ref-table-wrap th{position:sticky;top:0;z-index:1;background:#f2f8f4;color:#176b40;border-bottom:2px solid #dcebe1;white-space:normal;}
-#students .students-ref-table-wrap tbody tr:nth-child(even){}
-#students .students-ref-table-wrap tbody tr:hover{background:#edf7f0;}
-#students .students-ref-table-wrap td{border-bottom:1px solid #e9f0eb;font-weight:500;}
-#students .students-ref-table-wrap .students-ref-id{font-weight:800;color:#1f2937;}
-#students .students-ref-actions{align-items:center;gap:7px;flex-wrap:wrap;white-space:normal;}
-#students .students-ref-action{min-height:36px;padding:7px 10px;border:0;border-radius:8px;font-size:12px;font-weight:800;box-shadow:0 1px 2px #00000012;transition:background .15s ease,transform .15s ease;}
-#students .students-ref-action[data-edit-student]{background:#2476c7!important;color:#fff!important;}
-#students .students-ref-action[data-edit-student]:hover{background:#185fa7!important;transform:translateY(-1px);}
-#students .students-ref-action[data-delete-student]{background:#dc4b50!important;color:#fff!important;}
-#students .students-ref-action[data-delete-student]:hover{background:#bd3038!important;transform:translateY(-1px);}
-@media(max-width:600px){#students .students-ref-table-wrap table{min-width:820px;}#students .students-ref-table-wrap th,#students .students-ref-table-wrap td{padding:11px 8px;font-size:12px;}}
-
-/* Keep the original left sidebar navigation; only add the green desktop top bar. */
-.desktop-navbar{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:62px!important;min-height:62px!important;padding:0 30px!important;background:#059669!important;display:flex!important;align-items:center!important;justify-content:space-between!important;box-shadow:0 2px 5px rgba(0,0,0,.1)!important;color:#fff!important;z-index:1000!important;}
-.desktop-navbar .navbar-left{display:flex!important;align-items:center!important;gap:10px!important;color:#fff!important;font-size:1.15rem!important;font-weight:700!important;}
-.desktop-navbar .navbar-right{display:flex!important;align-items:center!important;gap:20px!important;}
-.desktop-navbar .user-avatar-icon{background:#fff!important;color:#059669!important;border-radius:50%!important;}
-.desktop-navbar .user-details h4{color:#fff!important;}.desktop-navbar .user-details p{color:#e2e8f0!important;}
-/* Sidebar stays at the left, directly below the top bar on desktop. */
-@media(min-width:801px){nav.no-print{top:62px!important;height:calc(100vh - 62px)!important;}header:not(.desktop-navbar){display:none!important;}main{padding-top:88px!important;}}
-/* On mobile, preserve the existing slide-out sidebar and show only the green strip. */
-@media(max-width:900px){.desktop-navbar{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:50px!important;min-height:50px!important;padding:0!important;}.desktop-navbar .navbar-left,.desktop-navbar .navbar-right{display:none!important;}}
-@media(max-width:800px){nav.no-print{top:0!important;height:100dvh!important;}header:not(.desktop-navbar){display:flex!important;}main{padding-top:15px!important;}}
-@media print{#supervisorDesktopNavbar{display:none!important;}}
-
-/* Student attendance inputs: plain circular radio buttons only. */
-#attendance .attendance-status-grid{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:13px!important;max-width:none!important;width:100%!important;}
-#attendance .attendance-status-btn{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:flex-start!important;width:auto!important;min-width:0!important;min-height:24px!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#34483b!important;font-size:12px!important;font-weight:700!important;}
-#attendance .attendance-status-btn:has(input:checked){background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;filter:none!important;}
-#attendance .attendance-status-btn input[type="radio"]{appearance:auto!important;-webkit-appearance:radio!important;width:17px!important;height:17px!important;min-height:17px!important;padding:0!important;margin:0 4px 0 0!important;border:0!important;border-radius:50%!important;background:initial!important;flex:0 0 17px!important;cursor:pointer!important;}
-#attendance .attendance-status-btn.status-P input{accent-color:#159653!important;}
-#attendance .attendance-status-btn.status-A input{accent-color:#e04b4b!important;}
-#attendance .attendance-status-btn.status-L input{accent-color:#2979d2!important;}
-#attendance .attendance-status-btn.status-E input{accent-color:#8a63cf!important;}
-#attendance .attendance-status-btn span{display:inline!important;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;color:inherit!important;font-size:12px!important;white-space:nowrap!important;}
-/* The legend above the list shows only the colored letters P A L E. */
-#attendance .attendance-toolbar .status-legend{display:flex!important;gap:18px!important;align-items:center!important;background:#fff!important;border:1px solid #e5eee8!important;border-radius:10px!important;padding:9px 13px!important;}
-#attendance .attendance-toolbar .status-legend span{display:inline-flex!important;align-items:center!important;gap:5px!important;font-size:13px!important;font-weight:800!important;}
-#attendance .attendance-toolbar .status-legend .legend-dot{display:none!important;}
-#attendance .attendance-toolbar .status-legend span:nth-child(1){color:#159653!important;}
-#attendance .attendance-toolbar .status-legend span:nth-child(2){color:#e04b4b!important;}
-#attendance .attendance-toolbar .status-legend span:nth-child(3){color:#2979d2!important;}
-#attendance .attendance-toolbar .status-legend span:nth-child(4){color:#8a63cf!important;}
-#attendance .attendance-toolbar .status-legend span:nth-child(1)::before{content:"P";}
-#attendance .attendance-toolbar .status-legend span:nth-child(2)::before{content:"A";}
-#attendance .attendance-toolbar .status-legend span:nth-child(3)::before{content:"L";}
-#attendance .attendance-toolbar .status-legend span:nth-child(4)::before{content:"E";}
-#attendance .attendance-toolbar .status-legend span{font-size:0!important;}
-#attendance .attendance-toolbar .status-legend span::before{font-size:14px!important;}
-#attendance .attendance-summary-panel{display:none!important;}
-#attendance .attendance-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;max-width:520px!important;}
-#attendance .attendance-actions button{width:100%!important;min-height:44px!important;}
-@media(max-width:390px){#attendance .attendance-status-grid{gap:7px!important;}#attendance .attendance-status-btn span{font-size:11px!important;}}
-
-/* Global responsive foundation: keep every page inside the viewport. */
-html{width:100%;max-width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%;}
-body{width:100%;max-width:100%;min-width:320px;overflow-x:hidden;}
-*,*::before,*::after{box-sizing:border-box;}
-img,svg,video,canvas{max-width:100%;height:auto;}
-main,.page,.panel,.dashboard-title,.dashboard-stats,.grid,.row,.report-visual-grid,.class-overview-grid{min-width:0;}
-main{width:auto!important;}
-input,select,textarea{max-width:100%;min-width:0;font-size:16px;}
-button,.btn,a[role="button"]{max-width:100%;overflow-wrap:anywhere;}
-.table-wrap,.students-ref-table-wrap,.attendance-table-wrap,.report-table-wrap{width:100%;max-width:100%;overflow-x:auto!important;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
-.table-wrap table,.students-ref-table-wrap table{max-width:none;}
-/* Wide desktop: use available space without stretching text too far. */
-@media(min-width:1101px){
- main{padding-left:28px!important;padding-right:28px!important;}
- .page{max-width:1500px!important;width:100%;}
- .dashboard-stats{grid-template-columns:repeat(3,minmax(0,1fr));}
- .quick-actions{grid-template-columns:repeat(3,minmax(0,1fr));}
- .grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
- .report-visual-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
- .class-overview-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
-}
-/* Laptop / tablet landscape. */
-@media(min-width:801px) and (max-width:1100px){
- main{padding:22px 18px 28px!important;}
- .page{max-width:100%;}
- .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
- .quick-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
- .class-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
- .grid{grid-template-columns:repeat(2,minmax(0,1fr));}
- .panel{padding:18px;}
-}
-/* Phones and narrow tablets: single-column content and touch-friendly controls. */
-@media(max-width:800px){
- html,body{overflow-x:hidden!important;}
- .desktop-navbar{height:50px!important;min-height:50px!important;}
- header:not(.desktop-navbar){padding:12px 14px!important;min-height:0!important;}
- header h1{font-size:clamp(17px,4.5vw,21px)!important;line-height:1.4;}
- main{margin:0!important;width:100%!important;max-width:100%!important;padding:12px 10px 24px!important;}
- .page{width:100%!important;max-width:100%!important;margin:0!important;}
- .panel{width:100%;padding:14px!important;margin:0 0 12px!important;border-radius:13px!important;}
- h2{font-size:18px!important;line-height:1.4;}
- .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;}
- .dashboard-stat{min-width:0;padding:12px!important;}
- .dashboard-stat strong{font-size:clamp(20px,6vw,26px)!important;overflow-wrap:anywhere;}
- .quick-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;}
- .quick-actions button{min-width:0;min-height:48px!important;padding:10px!important;font-size:13px;}
- .grid{grid-template-columns:1fr!important;gap:9px!important;}
- .row{width:100%;gap:8px!important;}
- .row button,.row .btn{flex:1 1 calc(50% - 8px);min-width:0;min-height:44px;white-space:normal;}
- input,select,textarea{width:100%!important;min-height:44px!important;}
- .table-wrap,.students-ref-table-wrap{border-radius:10px;}
- table{font-size:12px;}
- th,td{padding:9px 8px;}
- .dashboard-title{display:block!important;}
- .dashboard-title h2{margin-bottom:5px!important;}
- .report-visual-grid{grid-template-columns:1fr!important;}
- .report-visual-card{min-width:0;padding:13px!important;}
- #attendance .attendance-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;}
- #attendance .attendance-actions button{min-width:0!important;white-space:normal!important;}
- #attendance .attendance-reference-form-card .attendance-filters{grid-template-columns:1fr!important;}
- #attendance .attendance-four-column-radio,#attendance .attendance-reference-table{min-width:680px!important;}
- #students .students-ref-table-wrap table{min-width:820px!important;}
- #studentsTable table{min-width:620px!important;}
- #reportResult table{min-width:680px!important;}
- #classesTable table{min-width:480px!important;}
- #menuToggle{z-index:1205!important;min-width:44px!important;min-height:44px!important;touch-action:manipulation;}
- body>nav.no-print{z-index:1202!important;max-width:min(86vw,300px)!important;width:min(86vw,300px)!important;}
- #sidebarBackdrop{z-index:1200!important;}
-}
-@media(max-width:480px){
- main{padding:10px 8px 20px!important;}
- .panel{padding:12px!important;}
- .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
- .dashboard-stat .kpi-icon{width:36px!important;height:36px!important;font-size:19px!important;}
- .dashboard-stat span{font-size:11px!important;line-height:1.4;}
- .quick-actions{grid-template-columns:1fr!important;}
- .row button,.row .btn{flex-basis:100%;}
- .class-overview-grid{grid-template-columns:1fr!important;}
- #classes .class-overview-card{padding:13px!important;}
- #classes .class-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
- #attendance .attendance-status-grid{gap:9px!important;flex-wrap:wrap!important;}
- #attendance .attendance-toolbar .status-legend{gap:12px!important;flex-wrap:wrap!important;}
-}
-@media(max-width:360px){
- body{font-size:14px!important;}
- main{padding-left:6px!important;padding-right:6px!important;}
- .panel{padding:10px!important;}
- .dashboard-stats{gap:7px!important;}
- .dashboard-stat{padding:10px 8px!important;}
- .dashboard-stat strong{font-size:19px!important;}
- button,.btn{font-size:12px;}
-}
 /* Desktop navigation and content alignment. */
 @media(min-width:801px){
  #menuToggle{display:none!important;}
@@ -1591,18 +1101,6 @@ button,.btn,a[role="button"]{max-width:100%;overflow-wrap:anywhere;}
 
 #students .students-ref-search{margin-bottom:12px;}#students .students-class-filter{max-width:360px;margin:0 0 12px;}#students .students-class-filter label{display:block;font-size:13px;font-weight:700;color:#355b45;margin:0 0 6px;}#students .students-class-filter .students-ref-input{position:relative;}#students .students-class-filter select{width:100%;min-height:44px;padding:9px 38px 9px 12px;border:1px solid #d7e5dc;border-radius:9px;background:#fbfdfb;color:#243b2e;font-size:14px;}#students .students-ref-table-wrap{width:100%;overflow-x:auto;overflow-y:hidden;border:1px solid #dce8e0;border-radius:12px;background:#fff;-webkit-overflow-scrolling:touch;}#students .students-ref-table-wrap table{width:100%;min-width:760px;table-layout:auto;border-collapse:collapse;font-size:13px;}#students .students-ref-table-wrap th,#students .students-ref-table-wrap td{padding:12px 10px;line-height:1.5;vertical-align:middle;white-space:normal;overflow-wrap:anywhere;}#students .students-ref-table-wrap th{background:#edf6f0;color:#245b3b;font-size:12px;font-weight:800;white-space:nowrap;}#students .students-ref-table-wrap tbody tr:nth-child(even){background:#f8fbf9;}#students .students-ref-table-wrap td{border-bottom:1px solid #e8eee9;color:#33443a;}#students .students-ref-table-wrap th:nth-child(1),#students .students-ref-table-wrap td:nth-child(1){width:42px;text-align:center;}#students .students-ref-table-wrap th:nth-child(2),#students .students-ref-table-wrap td:nth-child(2){min-width:95px;}#students .students-ref-table-wrap th:nth-child(3),#students .students-ref-table-wrap td:nth-child(3){min-width:150px;}#students .students-ref-table-wrap th:nth-child(4),#students .students-ref-table-wrap td:nth-child(4){min-width:100px;}#students .students-ref-table-wrap th:nth-child(5),#students .students-ref-table-wrap td:nth-child(5){min-width:105px;}#students .students-ref-table-wrap th:nth-child(6),#students .students-ref-table-wrap td:nth-child(6){min-width:110px;}#students .students-ref-table-wrap th:nth-child(7),#students .students-ref-table-wrap td:nth-child(7){width:90px;text-align:center;}#students .students-ref-actions{display:flex;justify-content:center;gap:8px;flex-wrap:nowrap;}#students .students-ref-actions .students-ref-action{width:36px;height:36px;min-width:36px;min-height:36px;padding:0;display:inline-grid;place-items:center;border:0;border-radius:9px;font-size:15px;cursor:pointer;}#students .students-ref-actions .students-ref-action i{pointer-events:none;}#students .students-ref-actions [data-edit-student]{background:#2476c7!important;color:#fff!important;}#students .students-ref-actions [data-delete-student]{background:#dc4b50!important;color:#fff!important;}#students .students-ref-actions .students-ref-action:focus-visible{outline:3px solid #f4c95d;outline-offset:2px;}@media(max-width:600px){#students .students-ref-table-wrap table{min-width:760px;}#students .students-class-filter{max-width:none;}}
 
-/* Final high-specificity overrides: Attendance P/A/L/E legend must stay dark. */
-body.app-dark-theme #attendance .attendance-toolbar .status-legend,
-body.app-dark-theme #attendance .status-legend,
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span,
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span::before{
- background-color:#172235!important;color:#e5edf5!important;border-color:#465873!important;
-}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(1){color:#4ade80!important;}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(2){color:#f87171!important;}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(3){color:#60a5fa!important;}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span:nth-child(4){color:#c084fc!important;}
-body.app-dark-theme #attendance .attendance-toolbar .status-legend span::before{background:transparent!important;}
 /* Students page footer/pagination and the space after the list table. */
 body.app-dark-theme #students .students-ref-container,
 body.app-dark-theme #students .students-ref-card,
@@ -2010,7 +1508,7 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
     <button class="logout-btn-desktop" id="desktopNavbarLogout" type="button"><i class="fa-solid fa-right-from-bracket"></i> ውጣ / Logout</button>
   </div>
 </header>
-<div class="global-profile-navbar no-print" id="globalProfileNavbar"><div class="global-profile-user"><div class="global-profile-avatar"><i class="fa-solid fa-user"></i></div><div class="global-profile-details"><h4><span id="globalUserRole">Supervisor</span> <i class="fa-solid fa-chevron-down" style="font-size:.72rem"></i></h4><p id="globalUserEmail">admin@example.com</p></div></div><button id="globalNavbarLogout" class="global-profile-logout" type="button"><i class="fa-solid fa-right-from-bracket"></i> ውጣ / Logout</button></div>
+<div class="global-profile-navbar no-print" id="globalProfileNavbar"><nav class="global-top-nav" id="globalTopNav" aria-label="Desktop navigation"></nav><div class="global-profile-user"><div class="global-profile-avatar"><i class="fa-solid fa-user"></i></div><div class="global-profile-details"><h4><span id="globalUserRole">Supervisor</span> <i class="fa-solid fa-chevron-down" style="font-size:.72rem"></i></h4><p id="globalUserEmail">admin@example.com</p></div></div><button id="globalNavbarLogout" class="global-profile-logout" type="button"><i class="fa-solid fa-right-from-bracket"></i> ውጣ / Logout</button></div>
 <div id="sidebarBackdrop" class="sidebar-backdrop no-print"></div><nav class="no-print" aria-label="ዋና ምናሌ"><div class="sidebar-user"><div class="sidebar-avatar" id="sidebarAvatar">S</div><div><strong id="sidebarRole">Supervisor</strong><small id="sidebarEmail">admin@example.com</small></div></div><div class="sidebar-section-label">ዋና ምናሌ</div><button class="active" data-page="dashboard">ዋና ገጽ (Dashboard)</button><button data-page="attendance">Attendance</button><button data-page="students">ተማሪዎች</button><button data-page="classes">ክፍሎች</button><button data-page="reports">ሪፖርት</button><button data-page="activityLogs" id="activityLogsNav">Activity Logs</button><button data-page="backup">Backup / Restore</button><button data-page="settings">Settings / ቅንብሮች</button><button id="topLogout" type="button" style="background:#b42318;color:white">ውጣ / Logout</button></nav>
 <main>
 <section id="dashboard" class="page"><div class="dashboard-title"><div><h2>ዋና ገጽ (Dashboard)</h2><p>የሰንበት ትምህርት ቤት የተማሪ እና የAttendance አጠቃላይ መረጃ</p></div></div><div class="dashboard-stats"><div class="dashboard-stat"><div class="kpi-icon">♙</div><strong id="dashboardStudentCount">0</strong><span>ጠቅላላ ተማሪዎች</span></div><div class="dashboard-stat"><div class="kpi-icon">▦</div><strong id="dashboardClassCount">0</strong><span>ጠቅላላ ክፍሎች</span></div><div class="dashboard-stat"><div class="kpi-icon">✓</div><strong id="dashboardPresentCount">0</strong><span>ዛሬ የተገኙ (P)</span></div><div class="dashboard-stat"><div class="kpi-icon">%</div><strong id="dashboardAttendancePercent">0%</strong><span>የዛሬ የAttendance መጠን</span></div></div><div class="panel" id="qualifiedStudentsPanel" style="display:none"><div class="row" style="justify-content:space-between;align-items:center;gap:10px"><div><h2>🏅 Qualified Students / ብቁ ተማሪዎች</h2><p class="small" id="qualifiedStudentsSummary">የተወሰነውን የAttendance መጠን ያሟሉ ተማሪዎች</p></div><button type="button" id="downloadQualifiedStudents">⬇ Download</button></div><div id="qualifiedStudentsList" class="table-responsive"></div></div><div class="panel inactive-panel" id="inactiveStudentsPanel"><h2 id="inactivePanelTitle">🔴 4 ተከታታይ Attendance ቀናት የቀሩ ተማሪዎች (Inactive)</h2><p class="small" id="inactivePanelDescription">በተመዘገቡ 4 ተከታታይ Attendance ቀናት A የተመረጠባቸው ተማሪዎች።</p><div id="inactiveStudentsList" class="table-wrap" aria-live="polite"></div></div><div class="panel" id="classComparisonPanel"><h2>የክፍሎች ንጽጽር • የመጨረሻዎቹ 7 ቀናት</h2><div id="classComparisonTable" class="table-wrap"></div></div><div class="panel" id="supervisorClassStatusPanel"><h2>የክፍሎች Attendance Status</h2><p class="small">ቀን፣ ክፍል እና status በመምረጥ የክፍሉን Attendance ይመልከቱ።</p><div class="grid" style="margin:12px 0"><div><label for="supervisorStatusDate">ቀን (DD/MM/YYYY)</label><input id="supervisorStatusDate" placeholder="01/02/2019"></div><div><label for="supervisorStatusClass">ክፍል</label><select id="supervisorStatusClass"><option value="__ALL__">ሁሉም ክፍሎች</option></select></div><div><label for="supervisorStatusFilter">Attendance Status</label><select id="supervisorStatusFilter"><option value="ALL">ሁሉም Status</option><option value="P">P - Present</option><option value="A">A - Absent</option><option value="L">L - Late</option><option value="E">E - Permission</option><option value="NONE">Not recorded</option></select></div></div><div class="row no-print"><button type="button" id="viewSupervisorStatus">Status አሳይ</button></div><div id="supervisorClassStatusResults" class="table-wrap" aria-live="polite"></div></div><div class="panel" id="recentActivityPanel"><h2>የቅርብ ጊዜ እንቅስቃሴዎች ማጠቃለያ (Recent Activity Stream)</h2><p class="small">በስርዓቱ ውስጥ በቅርቡ የተፈጸሙ እርምጃዎች።</p><div id="recentActivityStream" aria-live="polite"><p class="small">እንቅስቃሴዎች በመጫን ላይ…</p></div></div></section>
@@ -3331,6 +2829,31 @@ renderAll();
 
 
 
+
+<script id="desktop-horizontal-navigation">
+(()=>{
+ const host=document.getElementById('globalTopNav');
+ const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+ if(!host||!sidebar)return;
+ sidebar.querySelectorAll('button[data-page]').forEach(source=>{
+  const button=document.createElement('button');
+  button.type='button';button.dataset.page=source.dataset.page;
+  button.textContent=source.textContent.trim();
+  button.addEventListener('click',()=>source.click());
+  host.appendChild(button);
+ });
+ const sync=()=>{
+  sidebar.querySelectorAll('button[data-page]').forEach(source=>{
+   const target=host.querySelector(`[data-page="${source.dataset.page}"]`);
+   if(!target)return;target.classList.toggle('hidden',source.classList.contains('hidden'));
+   target.classList.toggle('active',source.classList.contains('active'));
+  });
+ };
+ sidebar.addEventListener('click',()=>setTimeout(sync,0));
+ new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+ sync();
+})();
+</script>
 
 <script id="sidebar-navigation-icons">
 (()=>{
