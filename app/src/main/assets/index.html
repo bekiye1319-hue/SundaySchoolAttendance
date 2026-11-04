@@ -384,6 +384,10 @@ main{padding:27px 30px;}#dashboard .panel{padding:22px;}.dashboard-title{padding
 .backup-new-card{border-radius:16px;padding:25px;color:#fff;box-shadow:0 10px 25px -5px #0002;}
 .backup-new-card.green{background:#059669;box-shadow:0 10px 25px -5px #0596694d;}
 .backup-new-card.purple{background:#8b5cf6;box-shadow:0 10px 25px -5px #8b5cf64d;}
+/* Restore result text: keep readable on the purple card in light and dark themes. */
+#backupMessage.backup-message{display:block!important;color:#ffffff!important;font-weight:700!important;opacity:1!important;text-shadow:0 1px 2px rgba(35,16,75,.35);min-height:20px;}
+body.app-dark-theme #backupMessage.backup-message{color:#ffffff!important;}
+
 .backup-new-head{display:flex;align-items:center;gap:15px;margin-bottom:20px;}
 .backup-new-icon{width:48px;height:48px;flex:0 0 48px;background:#ffffff33;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
 .backup-new-titles h3{color:#fff;font-size:1.2rem;font-weight:800;margin:0 0 4px;}
@@ -2428,7 +2432,7 @@ function drawAttendance(){
      statusFilter=$('attendanceStatusFilter')?.value||'ALL',
      day=attendance[iso]||{},
      list=students.filter(st=>(c==='__ALL__'||st.className===c)&&(!q||[st.name,st.id,st.className,st.phone].some(v=>String(v||'').toLocaleLowerCase().includes(q)))&&(statusFilter==='ALL'||(statusFilter==='NONE'?!day[String(st.id)]:day[String(st.id)]===statusFilter)));
- const radioCell=(st,code)=>{const w=getLateWindow(st.className),now=localNowHHMM(),today=iso===localTodayISO(),current=day[String(st.id)],recorded=!!current,unlocked=isAttendanceRecordUnlocked(iso,st.id),close=isAttendanceClosePassed(st.className,iso);let timeBlocked=false;if(today&&!unlocked&&w.enabled!==false&&w.lateStart&&w.end){if(code==='P')timeBlocked=!(now>=w.classStart&&now<w.lateStart);if(code==='L')timeBlocked=!(now>=w.lateStart&&now<=w.end)}if(today&&!unlocked&&close)timeBlocked=true;const disabled=(recorded&&!unlocked)||timeBlocked;return `<td class="attendance-radio-td"><label class="attendance-radio-option status-${code}" title="${recorded&&!unlocked?'ይህ Status ተመዝግቧል። Supervisor Unlock ያስፈልጋል።':timeBlocked?'ይህ Status በአሁኑ ሰዓት አይፈቀድም።':code}"><input type="radio" name="st-${esc(st.id)}" value="${code}" aria-label="${esc(st.name)} ${code}" ${disabled?'disabled':''} ${current===code?'checked':''}><span class="attendance-radio-visual" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label></td>`};
+ const radioCell=(st,code)=>{const w=getLateWindow(st.className),now=localNowHHMM(),today=iso===localTodayISO(),current=day[String(st.id)],recorded=!!current,unlocked=isAttendanceRecordUnlocked(iso,st.id),close=isAttendanceClosePassed(st.className,iso);let timeBlocked=false;if(today&&!unlocked&&w.enabled!==false&&w.lateStart&&w.end){if(code==='P')timeBlocked=!(now>=w.classStart&&now<w.lateStart);if(code==='L')timeBlocked=!(now>=w.lateStart&&now<=w.end)}if(today&&!unlocked&&close)timeBlocked=true;const disabled=((recorded&&!unlocked)||timeBlocked)&&current!==code;return `<td class="attendance-radio-td"><label class="attendance-radio-option status-${code}" title="${recorded&&!unlocked?'ይህ Status ተመዝግቧል። Supervisor Unlock ያስፈልጋል።':timeBlocked?'ይህ Status በአሁኑ ሰዓት አይፈቀድም።':code}"><input type="radio" name="st-${esc(st.id)}" value="${code}" aria-label="${esc(st.name)} ${code}" ${disabled?'disabled':''} ${current===code?'checked':''}><span class="attendance-radio-visual" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label></td>`};
  $('attendanceTable').innerHTML=`<table class="attendance-reference-table attendance-four-column-radio"><thead><tr>
  <th style="width:42px">#</th><th style="width:105px">ID</th><th>ሙሉ ስም</th><th>ክፍል</th>
  <th class="radio-head head-P">P</th><th class="radio-head head-A">A</th><th class="radio-head head-L">L</th><th class="radio-head head-E">E</th><th style="width:90px">Unlock</th>
