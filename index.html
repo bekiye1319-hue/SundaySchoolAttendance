@@ -1909,6 +1909,57 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
 #qualifiedClassOptions label{padding:6px 8px!important;min-height:34px;font-size:13px;}
 #settings input[type="checkbox"]:disabled,
 #qualifiedStudentsSettings input[type="checkbox"]:disabled{cursor:not-allowed;opacity:.6;}
+
+
+/* Consolidated desktop top navigation rules (merged from the former patch block). */
+  /* Desktop: original sidebar stays fixed at its original left position. */
+  @media screen and (min-width:801px){
+    html body>nav[aria-label="ዋና ምናሌ"]{
+      position:fixed!important;left:0!important;top:0!important;bottom:0!important;
+      width:260px!important;height:100vh!important;min-height:100vh!important;
+      display:flex!important;flex-direction:column!important;align-items:stretch!important;
+      justify-content:flex-start!important;gap:7px!important;padding:18px 13px!important;
+      margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+      background:#0d1527!important;transform:none!important;visibility:visible!important;
+      z-index:100!important;box-shadow:3px 0 16px #02061720!important;
+    }
+    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-user,
+    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label{display:flex!important;}
+    html body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
+      width:100%!important;min-height:46px!important;flex:0 0 auto!important;
+      justify-content:flex-start!important;padding:12px 13px!important;white-space:normal!important;
+    }
+    html body>nav[aria-label="ዋና ምናሌ"] #topLogout{margin-top:auto!important;width:100%!important;}
+    html body>header:first-of-type{padding:16px 26px 16px 286px!important;min-height:78px!important;}
+    html body>nav#desktopTopSubNav{
+      position:sticky!important;top:0!important;margin-left:260px!important;width:calc(100% - 260px)!important;
+      min-height:58px!important;box-sizing:border-box!important;display:flex!important;
+      flex-direction:row!important;align-items:center!important;gap:7px!important;
+      padding:8px 22px!important;overflow-x:auto!important;overflow-y:hidden!important;
+      background:#fff!important;border-bottom:1px solid #e2e8f0!important;
+      box-shadow:0 3px 12px #0f172a0b!important;z-index:90!important;
+    }
+    html body>nav#desktopTopSubNav button{
+      flex:0 0 auto!important;width:auto!important;min-height:40px!important;
+      padding:9px 13px!important;border-radius:9px!important;background:transparent!important;
+      color:#475569!important;font-size:13px!important;white-space:nowrap!important;
+      display:flex!important;align-items:center!important;gap:8px!important;
+    }
+    html body>nav#desktopTopSubNav button.active{background:#e8f7ee!important;color:#087443!important;box-shadow:inset 0 -2px #10b981!important;}
+    html body>nav#desktopTopSubNav button:hover{background:#f1f5f9!important;}
+    html body>nav#desktopTopSubNav button:before{display:none!important;}
+    html body>nav#desktopTopSubNav #topLogout{margin-left:auto!important;background:#fff1f2!important;color:#b42318!important;}
+    html body>main{margin:0 0 0 260px!important;padding:24px 28px!important;min-height:calc(100vh - 136px)!important;}
+  }
+  /* Mobile: no bottom bar and no extra top bar; original slide-out sidebar is retained. */
+  @media screen and (max-width:800px){
+    html body>nav#desktopTopSubNav{display:none!important;}
+    html body>nav[aria-label="ዋና ምናሌ"]{position:fixed!important;}
+    html body>header:first-of-type{padding:12px 14px!important;}
+    html body>main{margin:0!important;}
+  }
+  html body #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+  @media print{html body>nav#desktopTopSubNav{display:none!important;}}
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -3277,22 +3328,16 @@ renderAll();
 
 
 
-<!-- Replaced by unified navigation controller: v20-mobile-navigation-and-fast-refresh -->
 
 
 
-<script id="final-matching-sidebar-bottom-icons">
+
+<script id="sidebar-navigation-icons">
 (()=>{
- // This script owns icons only. The later unified-navigation controller is
- // the sole owner of sidebar toggles, bottom-nav clicks and active-state sync.
- const iconMap={
-  dashboard:'fa-house',attendance:'fa-calendar-check',students:'fa-users',classes:'fa-cubes',
-  reports:'fa-chart-line',activityLogs:'fa-list-check',backup:'fa-cloud-arrow-up',settings:'fa-gear'
- };
+ const iconMap={dashboard:'fa-house',attendance:'fa-calendar-check',students:'fa-users',classes:'fa-cubes',reports:'fa-chart-line',activityLogs:'fa-list-check',backup:'fa-cloud-arrow-up',settings:'fa-gear'};
  function applyIcons(){
   const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
-  const bottom=document.getElementById('mobileBottomNav');
-  if(!sidebar||!bottom)return;
+  if(!sidebar)return;
   sidebar.querySelectorAll('button[data-page]').forEach(btn=>{
    const icon=iconMap[btn.dataset.page]||'fa-circle';
    let el=btn.querySelector('.sidebar-nav-icon');
@@ -3300,14 +3345,9 @@ renderAll();
    el.className='fa-solid '+icon+' sidebar-nav-icon';
   });
   const logout=sidebar.querySelector('#topLogout');
-  if(logout&&!logout.querySelector('.sidebar-nav-icon')){
-   const icon=document.createElement('i');icon.className='fa-solid fa-right-from-bracket sidebar-nav-icon';icon.setAttribute('aria-hidden','true');logout.prepend(icon);
-  }
+  if(logout&&!logout.querySelector('.sidebar-nav-icon')){const icon=document.createElement('i');icon.className='fa-solid fa-right-from-bracket sidebar-nav-icon';icon.setAttribute('aria-hidden','true');logout.prepend(icon);}
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyIcons,{once:true});
- else applyIcons();
- // Navigation nodes are static; one delayed icon pass covers late-rendered auth UI.
- setTimeout(applyIcons,500);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyIcons,{once:true});else applyIcons();
 })();
 </script>
 
@@ -3334,10 +3374,10 @@ renderAll();
 
 
 
-<!-- Replaced by unified navigation controller: final-v5-bottom-navigation-behavior -->
 
 
-<!-- Replaced by unified navigation controller: v6-final-navigation-auth-sync -->
+
+
 
 
 
@@ -3384,7 +3424,7 @@ renderAll();
 </script>
 
 
-<!-- Replaced by unified navigation controller: final-navigation-and-scroll-fixes -->
+
 
 
 
@@ -3420,28 +3460,26 @@ renderAll();
 </script>
 
 
-<!-- Replaced by unified navigation controller: final-single-owner-mobile-drawer-fix -->
 
 
 
 
-<!-- Replaced by unified navigation controller: final-sidebar-control-fix -->
 
 
 
 
-<script id="unified-navigation-and-modal-notifications">
+
+
+<script id="sidebar-drawer-and-modal-notifications">
 (()=>{
  const boot=()=>{
-  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]')||document.querySelector('body>nav.no-print:not(#mobileBottomNav)');
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
   const backdrop=document.getElementById('sidebarBackdrop');
-  const bottom=document.getElementById('mobileBottomNav');
   const menu=document.getElementById('menuToggle');
-  if(!sidebar||!menu||!backdrop||document.documentElement.dataset.unifiedNavReady==='1')return;
-  document.documentElement.dataset.unifiedNavReady='1';
-  const mobile=()=>matchMedia('(max-width:800px)').matches;
-  if(bottom&&bottom.parentElement!==document.body)document.body.appendChild(bottom);
-  const setDrawer=(open)=>{
+  if(!sidebar||!menu||!backdrop||document.documentElement.dataset.sidebarDrawerReady==='1')return;
+  document.documentElement.dataset.sidebarDrawerReady='1';
+  const mobile=()=>window.matchMedia('(max-width:800px)').matches;
+  const setDrawer=open=>{
    const value=!!open&&mobile();
    sidebar.classList.toggle('sidebar-open',value);
    document.body.classList.toggle('sidebar-drawer-open',value);
@@ -3451,42 +3489,33 @@ renderAll();
    menu.setAttribute('aria-expanded',String(value));
    menu.setAttribute('aria-label',value?'ምናሌ ዝጋ':'ምናሌ ክፈት');
    if(value){
-    sidebar.style.setProperty('visibility','visible','important');sidebar.style.setProperty('pointer-events','auto','important');sidebar.style.setProperty('transform','translate3d(0,0,0)','important');
-    backdrop.style.setProperty('display','block','important');backdrop.style.setProperty('visibility','visible','important');backdrop.style.setProperty('opacity','1','important');backdrop.style.setProperty('pointer-events','auto','important');
-    if(bottom){bottom.style.setProperty('display','none','important');bottom.style.setProperty('pointer-events','none','important');}
+    sidebar.style.setProperty('visibility','visible','important');
+    sidebar.style.setProperty('pointer-events','auto','important');
+    sidebar.style.setProperty('transform','translate3d(0,0,0)','important');
+    backdrop.style.setProperty('display','block','important');
+    backdrop.style.setProperty('visibility','visible','important');
+    backdrop.style.setProperty('opacity','1','important');
+    backdrop.style.setProperty('pointer-events','auto','important');
    }else{
-    sidebar.style.removeProperty('visibility');sidebar.style.removeProperty('pointer-events');sidebar.style.removeProperty('transform');
-    backdrop.style.removeProperty('display');backdrop.style.removeProperty('visibility');backdrop.style.removeProperty('opacity');backdrop.style.removeProperty('pointer-events');
-    if(bottom&&mobile()){bottom.style.setProperty('display','grid','important');bottom.style.setProperty('visibility','visible','important');bottom.style.setProperty('pointer-events','auto','important');}
+    ['visibility','pointer-events','transform'].forEach(p=>sidebar.style.removeProperty(p));
+    ['display','visibility','opacity','pointer-events'].forEach(p=>backdrop.style.removeProperty(p));
    }
   };
-  const syncBottom=()=>{
-   if(!bottom)return;
-   sidebar.querySelectorAll('button[data-page]').forEach(src=>{const dst=bottom.querySelector('[data-mobile-page="'+src.dataset.page+'"]');if(dst)dst.classList.toggle('hidden',src.classList.contains('hidden'));});
-   const active=sidebar.querySelector('button[data-page].active');
-   bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',!!active&&b.dataset.mobilePage===active.dataset.page));
-  };
-  // One delegated capture handler owns every drawer trigger, avoiding competing toggles.
   window.addEventListener('click',ev=>{
-   const t=ev.target instanceof Element?ev.target:null;if(!t)return;
-   const trigger=t.closest('#menuToggle,#mobileBottomNav [data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
+   const target=ev.target instanceof Element?ev.target:null;if(!target)return;
+   const trigger=target.closest('#menuToggle,[data-action="menu"],#moreToggle,.more-toggle,.menu-open-trigger');
    if(trigger){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(!sidebar.classList.contains('sidebar-open'));return;}
-   if(t.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(false);return;}
-   const page=t.closest('body>nav[aria-label="ዋና ምናሌ"] button[data-page]');
-   if(page){setTimeout(()=>{setDrawer(false);syncBottom();window.scrollTo({top:0,left:0,behavior:'instant'});},0);return;}
-   const mobilePage=t.closest('#mobileBottomNav [data-mobile-page]');
-   if(mobilePage&&bottom){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();const source=sidebar.querySelector('button[data-page="'+mobilePage.dataset.mobilePage+'"]');if(source&&!source.classList.contains('hidden'))source.click();setTimeout(syncBottom,80);return;}
-   const mobileLogout=t.closest('#mobileBottomNav [data-mobile-logout]');
-   if(mobileLogout){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();const logout=sidebar.querySelector('#topLogout');if(logout)logout.click();}
+   if(target.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(false);return;}
+   if(target.closest('body>nav[aria-label="ዋና ምናሌ"] button[data-page]')){setTimeout(()=>{setDrawer(false);window.scrollTo({top:0,left:0,behavior:'instant'});},0);}
   },true);
   document.addEventListener('keydown',ev=>{if(ev.key==='Escape')setDrawer(false);});
-  window.addEventListener('resize',()=>{if(!mobile())setDrawer(false);syncBottom();});
-  const observer=new MutationObserver(syncBottom);observer.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
-  window.openAppSidebar=()=>setDrawer(true);window.closeAppSidebar=()=>setDrawer(false);window.syncMobileBottomNavigation=syncBottom;
-  syncBottom();setDrawer(false);
+  window.addEventListener('resize',()=>{if(!mobile())setDrawer(false);});
+  window.openAppSidebar=()=>setDrawer(true);
+  window.closeAppSidebar=()=>setDrawer(false);
+  setDrawer(false);
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
- setTimeout(boot,300);setTimeout(boot,1000);
+ setTimeout(boot,300);
 })();
 (()=>{
  const icons={success:'✓',error:'×',warning:'⚠',info:'💡'};
@@ -3509,6 +3538,7 @@ renderAll();
  window.showAppModalNotice=notice;
  window.alert=(message)=>notice(message,classify(message));
 })();
+
 </script>
 
 
@@ -3637,51 +3667,9 @@ renderAll();
  window.refreshQualifiedStudentsFromSettings=()=>{syncQualifiedForm();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows().catch(e=>console.error('Qualified dashboard refresh failed:',e))};
 })();
 </script>
-</body></html>
 
-
-
-
-
-
-
-
-
-
-
-<script id="final-auth-aware-bottom-nav-and-notice-icon">
+<script id="notice-icon-polish">
 (()=>{
- const sync=()=>{
-   const nav=document.getElementById('mobileBottomNav');
-   if(!nav)return;
-   const body=document.body;
-   const login=document.getElementById('cloudLogin');
-   const loginVisible=!!login && getComputedStyle(login).display!=='none' &&
-     login.getBoundingClientRect().width>0 && login.getBoundingClientRect().height>0;
-   const hide=body.classList.contains('auth-loading') ||
-     body.classList.contains('auth-locked') || loginVisible;
-   body.classList.toggle('login-visible',hide);
-   if(hide){
-     nav.style.setProperty('display','none','important');
-     nav.style.setProperty('visibility','hidden','important');
-     nav.style.setProperty('pointer-events','none','important');
-   }else{
-     nav.style.removeProperty('display');
-     nav.style.removeProperty('visibility');
-     nav.style.removeProperty('pointer-events');
-   }
- };
- const start=()=>{
-   sync();
-   const observer=new MutationObserver(sync);
-   observer.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true,childList:true});
-   const login=document.getElementById('cloudLogin');
-   if(login)observer.observe(login,{attributes:true,attributeFilter:['style','class','hidden']});
-   window.addEventListener('pageshow',sync);
-   window.addEventListener('resize',sync);
-   setInterval(sync,700);
- };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
  // Keep notice symbols consistent: use clean SVG icons, never emoji/text glyphs.
  const polishSettingIcons=()=>{
    const svg=(name)=> name==='gear'
@@ -3712,100 +3700,9 @@ renderAll();
  if(document.body){polishObserver.observe(document.body,{childList:true,subtree:true});polishSettingIcons();}
 
 })();
-</script>
 
 
-
-<!-- Navigation layout update: no bottom navigation; desktop uses a top sub-navigation. -->
-<style id="top-subnavigation-no-bottom-bar">
-  /* The bottom navigation is intentionally removed from the visible interface. */
-  html body #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important;}
-  @media screen and (min-width:801px){
-    html body>header:first-of-type{padding:16px 26px!important;min-height:78px!important;}
-    html body>nav[aria-label="ዋና ምናሌ"]{
-      position:sticky!important;top:0!important;left:auto!important;right:auto!important;bottom:auto!important;
-      width:100%!important;height:auto!important;min-height:64px!important;
-      display:flex!important;flex-direction:row!important;align-items:center!important;
-      justify-content:flex-start!important;gap:7px!important;
-      padding:9px 22px!important;margin:0!important;overflow-x:auto!important;overflow-y:hidden!important;
-      background:#0d1527!important;border:0!important;border-bottom:1px solid #263449!important;
-      border-radius:0!important;box-shadow:0 4px 14px #02061718!important;
-      transform:none!important;visibility:visible!important;z-index:40!important;
-    }
-    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-user,
-    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label{display:none!important;}
-    html body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
-      flex:0 0 auto!important;width:auto!important;min-height:43px!important;
-      padding:10px 15px!important;border-radius:10px!important;white-space:nowrap!important;
-      font-size:13px!important;gap:8px!important;
-    }
-    html body>nav[aria-label="ዋና ምናሌ"] button[data-page] .sidebar-nav-icon{font-size:15px!important;}
-    html body>nav[aria-label="ዋና ምናሌ"] #topLogout{
-      flex:0 0 auto!important;width:auto!important;min-height:43px!important;
-      margin:0 0 0 auto!important;padding:10px 16px!important;white-space:nowrap!important;
-    }
-    html body>main{margin:0!important;padding:24px 28px!important;min-height:calc(100vh - 150px)!important;}
-  }
-  @media screen and (max-width:800px){
-    html body #mobileBottomNav{display:none!important;}
-    /* On phones the existing menu button and slide-out sidebar remain the navigation. */
-  }
-  @media print{html body #mobileBottomNav{display:none!important;}html body>nav[aria-label="ዋና ምናሌ"]{display:none!important;}}
-</style>
-
-
-<!-- Navigation correction: preserve the original sidebar and add a separate desktop top navigation. -->
-<style id="preserve-sidebar-add-desktop-top-nav">
-  /* Desktop: original sidebar stays fixed at its original left position. */
-  @media screen and (min-width:801px){
-    html body>nav[aria-label="ዋና ምናሌ"]{
-      position:fixed!important;left:0!important;top:0!important;bottom:0!important;
-      width:260px!important;height:100vh!important;min-height:100vh!important;
-      display:flex!important;flex-direction:column!important;align-items:stretch!important;
-      justify-content:flex-start!important;gap:7px!important;padding:18px 13px!important;
-      margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;
-      background:#0d1527!important;transform:none!important;visibility:visible!important;
-      z-index:100!important;box-shadow:3px 0 16px #02061720!important;
-    }
-    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-user,
-    html body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label{display:flex!important;}
-    html body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
-      width:100%!important;min-height:46px!important;flex:0 0 auto!important;
-      justify-content:flex-start!important;padding:12px 13px!important;white-space:normal!important;
-    }
-    html body>nav[aria-label="ዋና ምናሌ"] #topLogout{margin-top:auto!important;width:100%!important;}
-    html body>header:first-of-type{padding:16px 26px 16px 286px!important;min-height:78px!important;}
-    html body>nav#desktopTopSubNav{
-      position:sticky!important;top:0!important;margin-left:260px!important;width:calc(100% - 260px)!important;
-      min-height:58px!important;box-sizing:border-box!important;display:flex!important;
-      flex-direction:row!important;align-items:center!important;gap:7px!important;
-      padding:8px 22px!important;overflow-x:auto!important;overflow-y:hidden!important;
-      background:#fff!important;border-bottom:1px solid #e2e8f0!important;
-      box-shadow:0 3px 12px #0f172a0b!important;z-index:90!important;
-    }
-    html body>nav#desktopTopSubNav button{
-      flex:0 0 auto!important;width:auto!important;min-height:40px!important;
-      padding:9px 13px!important;border-radius:9px!important;background:transparent!important;
-      color:#475569!important;font-size:13px!important;white-space:nowrap!important;
-      display:flex!important;align-items:center!important;gap:8px!important;
-    }
-    html body>nav#desktopTopSubNav button.active{background:#e8f7ee!important;color:#087443!important;box-shadow:inset 0 -2px #10b981!important;}
-    html body>nav#desktopTopSubNav button:hover{background:#f1f5f9!important;}
-    html body>nav#desktopTopSubNav button:before{display:none!important;}
-    html body>nav#desktopTopSubNav #topLogout{margin-left:auto!important;background:#fff1f2!important;color:#b42318!important;}
-    html body>main{margin:0 0 0 260px!important;padding:24px 28px!important;min-height:calc(100vh - 136px)!important;}
-  }
-  /* Mobile: no bottom bar and no extra top bar; original slide-out sidebar is retained. */
-  @media screen and (max-width:800px){
-    html body>nav#desktopTopSubNav{display:none!important;}
-    html body>nav[aria-label="ዋና ምናሌ"]{position:fixed!important;}
-    html body>header:first-of-type{padding:12px 14px!important;}
-    html body>main{margin:0!important;}
-  }
-  html body #mobileBottomNav{display:none!important;visibility:hidden!important;pointer-events:none!important;}
-  @media print{html body>nav#desktopTopSubNav{display:none!important;}}
-</style>
-<script id="build-desktop-top-subnavigation">
+// Consolidated desktop top-subnavigation initializer.
 (()=>{
  function build(){
   const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
@@ -3835,3 +3732,9 @@ renderAll();
  setTimeout(build,700);
 })();
 </script>
+
+
+
+
+</body>
+</html>
