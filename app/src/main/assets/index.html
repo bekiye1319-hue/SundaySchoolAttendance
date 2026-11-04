@@ -2851,27 +2851,11 @@ function requestNativePrint(){
   if(typeof window.print==='function')window.print();else showModernNotification('Print በዚህ browser ላይ አይደገፍም።');
  }));
 }
-function saveWorkbookFile(workbook,filename){
+async function saveWorkbookFile(workbook,filename){
  const mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
- const bridge=window.AndroidBridge;
- if(bridge&&typeof bridge.saveTextFile==='function'){
-   // This Android wrapper exposes a UTF-8 text-file bridge, not a binary XLSX bridge.
-   // Export an Excel-compatible SpreadsheetML workbook so every sheet is preserved.
-   const xmlEscape=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
-   const sheets=(workbook.SheetNames||[]).map(name=>{
-     const sheet=workbook.Sheets[name];
-     const rows=XLSX.utils.sheet_to_json(sheet,{header:1,raw:true,defval:''});
-     const rowXml=rows.map(row=>'<Row>'+row.map(value=>{
-       const type=typeof value==='number'?'Number':'String';
-       return '<Cell><Data ss:Type="'+type+'">'+xmlEscape(value)+'</Data></Cell>';
-     }).join('')+'</Row>').join('');
-     return '<Worksheet ss:Name="'+xmlEscape(String(name).slice(0,31))+'"><Table>'+rowXml+'</Table></Worksheet>';
-   }).join('');
-   const xml='<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'+sheets+'</Workbook>';
-   const xmlName=filename.replace(/\.xlsx$/i,'')+'.xml';
-   bridge.saveTextFile(xmlName,xml,'application/xml;charset=utf-8');
-   if(typeof window.showModernNotification==='function')window.showModernNotification('Excel ተስማሚ XML ፋይል ተዘጋጅቷል።','success');
-   return;
+ if(window.Android && typeof window.Android.saveBase64File==='function'){
+  const base64=XLSX.write(workbook,{bookType:'xlsx',type:'base64'});
+  return androidSaveFile(filename,base64,mime,true);
  }
  XLSX.writeFile(workbook,filename);
 }
@@ -3033,7 +3017,7 @@ $('printAttendance').onclick=()=>{
  document.body.classList.remove('print-report','print-all-attendance');document.body.classList.add('print-clean-sheet');const pdfTable=pdfArea.querySelector('table');const classPart=cls==='__ALL__'?'All-Classes':safeFilePart(cls);exportTablePdf(`Attendance_EC-${dateETFile(iso)}_${classPart}.pdf`,'Daily Attendance',`Date: ${iso} | Class: ${clsLabel} | Reason: ${reasonLabel}`,pdfTable).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});
 };
 $('printAllAttendance').onclick=()=>{const iso=dateISO($('attDate').value);if(!iso)return showModernNotification('ከመታተም በፊት ትክክለኛ ቀን ያስገቡ።');const dateLabel=dateET(iso);const visibleClasses=isClassScoped()?[assignedClass]:classes;const area=document.createElement('div');area.id='printAllAttendanceArea';let html=`<h1>ሰንበት ትምህርት ቤት</h1><h2>የAttendance መዝገብ — ሁሉም ክፍሎች</h2><p>ቀን: ${esc(dateLabel)}</p>`;visibleClasses.forEach(cls=>{const list=students.filter(st=>st.className===cls);html+=`<section class="print-class"><h2>${esc(cls)}</h2><table><thead><tr><th>ተ.ቁ</th><th>ID</th><th>ሙሉ ስም</th><th>Attendance Status (P/A/L/E)</th></tr></thead><tbody>${list.map((st,i)=>{const status=(attendance[iso]||{})[String(st.id)]||'';return `<tr><td>${i+1}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td>${status==='P'?'✓':''}</td><td>${status==='A'?'✓':''}</td><td>${status==='L'?'✓':''}</td><td>${status==='E'?'✓':''}</td></tr>`}).join('')}</tbody></table></section>`});area.innerHTML=html;const prior=$('printAllAttendanceArea');if(prior)prior.remove();document.body.appendChild(area);document.body.classList.remove('print-attendance','print-report');document.body.classList.add('print-all-attendance');const allTables=Array.from(area.querySelectorAll('table'));const combined=document.createElement('table');combined.innerHTML='<thead><tr><th>Class</th><th>Student ID</th><th>Student Name</th><th>Present</th><th>Absent</th><th>Late</th><th>Permission</th></tr></thead><tbody>'+visibleClasses.flatMap(cls=>students.filter(st=>st.className===cls).map(st=>{const v=(attendance[iso]||{})[String(st.id)]||'';return `<tr><td>${esc(cls)}</td><td>${esc(st.id)}</td><td>${esc(st.name)}</td><td><strong>${esc(v||'—')}</strong></td></tr>`})).join('')+'</tbody>';exportTablePdf(`Attendance_EC-${dateETFile(iso)}_All-Classes.pdf`,'All Classes Attendance',`Date: ${iso}`,combined).catch(err=>{console.error(err);showModernNotification('PDF export failed: '+err.message)});};
-$('exportExcel').onclick=()=>{if(typeof XLSX==='undefined')return showModernNotification('Excel መሳሪያው አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።');const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);if(!from||!to||from>to)return showModernNotification('Excel ለማውረድ የቀን ክልሉን ያስተካክሉ።');const rangeDays=Math.round((Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000)+1;if($('reportPeriod').value==='monthly'&&rangeDays<=30)return showModernNotification('ወርሃዊ Excel ለማውረድ ከ30 ቀናት በላይ የሆነ የቀን ክልል ይምረጡ (ቢያንስ 31 ቀናት)።');const dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort();const sid=$('reportStudent').value;const classFilter=$('reportClass').value;const reasonFilter=$('reportReason')?.value||'__ALL__';const list=students.filter(st=>(!isClassScoped()||st.className===assignedClass)&&(classFilter==='__ALL__'||st.className===classFilter)&&(sid==='__ALL__'||String(st.id)===sid));const rows=[['Student ID','Full Name','Phone','Class','Attendance Reason','Other Reason','P Present','A Absent','L Late','E Permission','Recorded Days','Attendance %','From','To']];list.forEach(st=>{const c={P:0,A:0,L:0,E:0};dates.filter(d=>reasonFilter==='__ALL__'||(getAttendanceReason(d,st.className)||{}).type===reasonFilter).forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(c[v]!==undefined)c[v]++});const marked=c.P+c.A+c.L+c.E;const pct=marked?Math.round((c.P*100+c.L*Number(appSettings.lateScore??75)+c.E*Number(appSettings.permissionScore??100))/marked):0;const reasonEntries=dates.map(d=>getAttendanceReason(d,st.className)).filter(r=>r&&(reasonFilter==='__ALL__'||r.type===reasonFilter));const reasonLabel=[...new Set(reasonEntries.map(r=>r.type))].join(', '),otherLabel=[...new Set(reasonEntries.map(r=>r.other).filter(Boolean))].join(', ');rows.push([st.id,st.name,st.phone||'',st.className||'',reasonLabel,otherLabel,c.P,c.A,c.L,c.E,marked,pct+'%',dateET(from),dateET(to)])});const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:14},{wch:28},{wch:18},{wch:18},{wch:20},{wch:24},{wch:12},{wch:12},{wch:12},{wch:14},{wch:16},{wch:16},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,ws,'Attendance Report');saveWorkbookFile(wb,`Attendance_EC-${dateETFile(from)}_to_EC-${dateETFile(to)}_Report.xlsx`)};
+$('exportExcel').onclick=async()=>{if(typeof XLSX==='undefined')return showModernNotification('Excel መሳሪያው አልተጫነም። ኢንተርኔት ከፍተው እንደገና ይሞክሩ።');const from=dateISO($('fromDate').value),to=dateISO($('toDate').value);if(!from||!to||from>to)return showModernNotification('Excel ለማውረድ የቀን ክልሉን ያስተካክሉ።');const rangeDays=Math.round((Date.parse(to+'T00:00:00Z')-Date.parse(from+'T00:00:00Z'))/86400000)+1;if($('reportPeriod').value==='monthly'&&rangeDays<=30)return showModernNotification('ወርሃዊ Excel ለማውረድ ከ30 ቀናት በላይ የሆነ የቀን ክልል ይምረጡ (ቢያንስ 31 ቀናት)።');const dates=Object.keys(attendance).filter(d=>d>=from&&d<=to).sort();const sid=$('reportStudent').value;const classFilter=$('reportClass').value;const reasonFilter=$('reportReason')?.value||'__ALL__';const list=students.filter(st=>(!isClassScoped()||st.className===assignedClass)&&(classFilter==='__ALL__'||st.className===classFilter)&&(sid==='__ALL__'||String(st.id)===sid));const rows=[['Student ID','Full Name','Phone','Class','Attendance Reason','Other Reason','P Present','A Absent','L Late','E Permission','Recorded Days','Attendance %','From','To']];list.forEach(st=>{const c={P:0,A:0,L:0,E:0};dates.filter(d=>reasonFilter==='__ALL__'||(getAttendanceReason(d,st.className)||{}).type===reasonFilter).forEach(d=>{const v=(attendance[d]||{})[String(st.id)];if(c[v]!==undefined)c[v]++});const marked=c.P+c.A+c.L+c.E;const pct=marked?Math.round((c.P*100+c.L*Number(appSettings.lateScore??75)+c.E*Number(appSettings.permissionScore??100))/marked):0;const reasonEntries=dates.map(d=>getAttendanceReason(d,st.className)).filter(r=>r&&(reasonFilter==='__ALL__'||r.type===reasonFilter));const reasonLabel=[...new Set(reasonEntries.map(r=>r.type))].join(', '),otherLabel=[...new Set(reasonEntries.map(r=>r.other).filter(Boolean))].join(', ');rows.push([st.id,st.name,st.phone||'',st.className||'',reasonLabel,otherLabel,c.P,c.A,c.L,c.E,marked,pct+'%',dateET(from),dateET(to)])});const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:14},{wch:28},{wch:18},{wch:18},{wch:20},{wch:24},{wch:12},{wch:12},{wch:12},{wch:14},{wch:16},{wch:16},{wch:14},{wch:14}];XLSX.utils.book_append_sheet(wb,ws,'Attendance Report');await saveWorkbookFile(wb,`Attendance_EC-${dateETFile(from)}_to_EC-${dateETFile(to)}_Report.xlsx`)};
 function download(name,text){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 const BACKUP_PREF_KEY='ss_backup_preferences_v2',BACKUP_LAST_KEY='ss_last_backup_v2';
 function backupPayload(){return {app:'SundaySchoolAttendance',schemaVersion:2,createdAt:new Date().toISOString(),students,classes,classPrefixes,attendance,appSettings,extendedSettings};}
@@ -3042,20 +3026,38 @@ function refreshBackupLast(){const v=localStorage.getItem(BACKUP_LAST_KEY);if($(
 function rememberBackup(){const now=new Date().toISOString();localStorage.setItem(BACKUP_LAST_KEY,now);refreshBackupLast()}
 function saveBackupPrefs(){const p={frequency:$('autoBackupFrequency').value,format:$('backupFormat').value,mode:$('restoreMode').value};localStorage.setItem(BACKUP_PREF_KEY,JSON.stringify(p));$('autoBackupInfo').textContent='Settings saved. Automatic local backup is checked whenever this app is opened.'}
 function loadBackupPrefs(){try{const p=JSON.parse(localStorage.getItem(BACKUP_PREF_KEY)||'{}');if($('autoBackupFrequency'))$('autoBackupFrequency').value=p.frequency||'off';if($('backupFormat'))$('backupFormat').value=p.format||'json';if($('restoreMode'))$('restoreMode').value=p.mode||'overwrite'}catch(e){}refreshBackupLast()}
-function triggerDownload(name,blob){
+let androidDownloadSequence=0;
+const androidDownloadWaiters=new Map();
+window.onAndroidDownloadResult=function(id,ok,message){
+ const waiter=androidDownloadWaiters.get(String(id));if(!waiter)return;
+ androidDownloadWaiters.delete(String(id));clearTimeout(waiter.timer);
+ if(ok)waiter.resolve({method:'android-downloads',filename:waiter.filename});
+ else waiter.reject(new Error(message||'Android ፋይሉን ማስቀመጥ አልቻለም።'));
+};
+function androidSaveFile(name,data,mime,isBase64=false){
+ return new Promise((resolve,reject)=>{
+  const id=String(++androidDownloadSequence);
+  const timer=setTimeout(()=>{androidDownloadWaiters.delete(id);reject(new Error('Android የማስቀመጫ ምላሽ አልሰጠም።'));},60000);
+  androidDownloadWaiters.set(id,{resolve,reject,timer,filename:name});
+  try{
+   if(isBase64)window.Android.saveBase64FileWithCallback(name,data,mime,id);
+   else window.Android.saveTextFileWithCallback(name,data,mime,id);
+  }catch(e){clearTimeout(timer);androidDownloadWaiters.delete(id);reject(e);}
+ });
+}
+async function triggerDownload(name,blob){
  if(!(blob instanceof Blob))throw new TypeError('Download data is not a Blob.');
- const bridge=window.AndroidBridge;
- if(bridge&&typeof bridge.saveTextFile==='function'&&/^(text\/|application\/(json|xml))/i.test(blob.type||'')){
-  return blob.text().then(content=>{
-   bridge.saveTextFile(name,content,blob.type||'text/plain;charset=utf-8');
-   return {method:'android',filename:name};
-  });
+ if(window.Android && typeof window.Android.saveTextFile==='function'){
+  const mime=blob.type||'application/octet-stream';
+  if(/^(text\/|application\/(json|xml))/i.test(mime))return androidSaveFile(name,await blob.text(),mime,false);
+  const bytes=new Uint8Array(await blob.arrayBuffer());let binary='';
+  const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+  return androidSaveFile(name,btoa(binary),mime,true);
  }
- // XLSX/binary files and normal browsers use the browser download path.
  const url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(url),3000);
- return Promise.resolve({method:'browser',filename:name});
+ return {method:'browser',filename:name};
 }
 // Qualified Students is in a separate script; expose this one real helper instead of
 // duplicating download logic or adding another wrapper.
@@ -3088,16 +3090,16 @@ async function exportBackup(format){
   XLSX.utils.book_append_sheet(wb,ws,'Attendance');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(students),'Students');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(classes.map(name=>({Class:name}))), 'Classes');
-  saveWorkbookFile(wb,'sunday-school-backup.xlsx');
+  await saveWorkbookFile(wb,'sunday-school-backup.xlsx');
  }else throw Error('Unknown backup format: '+format);
  rememberBackup();
  await logActivity('Backup downloaded',format+' backup');
 }
 async function runAutoBackupIfDue(){try{const p=JSON.parse(localStorage.getItem(BACKUP_PREF_KEY)||'{}');if(!p.frequency||p.frequency==='off'||!currentUser)return;const last=localStorage.getItem('ss_auto_backup_snapshot_time_v2'),now=new Date(),lastDate=last?new Date(last):null;let due=!lastDate||!Number.isFinite(lastDate.getTime());if(!due&&p.frequency==='weekly')due=(now-lastDate)>=7*86400000;if(!due&&p.frequency==='monthly')due=now.getFullYear()>lastDate.getFullYear()||now.getMonth()>lastDate.getMonth();if(due){const payload=JSON.stringify(backupPayload());localStorage.setItem('ss_auto_backup_snapshot_v2',payload);localStorage.setItem('ss_auto_backup_snapshot_time_v2',now.toISOString());rememberBackup();if($('autoBackupInfo'))$('autoBackupInfo').textContent='Automatic local backup saved on this device. / በዚህ መሣሪያ ላይ Backup ተቀምጧል።'}}catch(e){console.warn('Auto backup skipped',e)}}
 function setBackupMessage(message,isError=false){const box=$('backupMessage');if(box)box.textContent=message;if(typeof window.showModernNotification==='function')window.showModernNotification(message,isError?'error':'success');}
-$('backupBtn').onclick=async()=>{try{await exportBackup('json');setBackupMessage('Backup JSON ተዘጋጅቶ ለማውረድ ተልኳል።')}catch(e){console.error('JSON backup failed:',e);setBackupMessage('Backup failed: '+(e.message||e),true)}};
+$('backupBtn').onclick=async()=>{try{await exportBackup('json');setBackupMessage('Backup JSON በDownloads ውስጥ ተቀምጧል።')}catch(e){console.error('JSON backup failed:',e);setBackupMessage('Backup failed: '+(e.message||e),true)}};
 $('saveBackupPrefs').onclick=()=>{try{saveBackupPrefs();if(typeof window.showModernNotification==='function')window.showModernNotification('Backup Settings ተቀምጠዋል።','success')}catch(e){console.error('Backup preferences save failed:',e);setBackupMessage('Backup settings ማስቀመጥ አልተሳካም፦ '+(e.message||e),true)}};
-$('downloadSelectedBackup').onclick=async()=>{try{const format=$('backupFormat').value;await exportBackup(format);setBackupMessage(format.toUpperCase()+' Backup ተዘጋጅቶ ለማውረድ ተልኳል።')}catch(e){console.error('Selected backup failed:',e);setBackupMessage('Backup failed: '+(e.message||e),true)}};
+$('downloadSelectedBackup').onclick=async()=>{try{const format=$('backupFormat').value;await exportBackup(format);setBackupMessage(format.toUpperCase()+' Backup በDownloads ውስጥ ተቀምጧል።')}catch(e){console.error('Selected backup failed:',e);setBackupMessage('Backup failed: '+(e.message||e),true)}};
 $('downloadArchiveBackup').onclick=async()=>{try{if(role!=='supervisor')throw Error('Supervisor only.');const snap=await db.collection('classArchives').get();const archives=[];for(const doc of snap.docs){const rs=await doc.ref.collection('records').get();archives.push({id:doc.id,...doc.data(),records:rs.docs.map(x=>x.data())})}await triggerDownload('sunday-school-archives-backup.json',new Blob([JSON.stringify({app:'SundaySchoolArchiveBackup',createdAt:new Date().toISOString(),archives},null,2)],{type:'application/json'}));rememberBackup();setBackupMessage(`${archives.length} archives exported.`)}catch(e){console.error('Archive backup failed:',e);setBackupMessage('Archive export failed: '+(e.message||e),true)}};
 $('restoreFile').onchange=async e=>{if(role!=='supervisor'){showModernNotification('Backup Restore የሚያደርገው Supervisor ብቻ ነው።');e.target.value='';return;}const f=e.target.files[0];if(!f)return;try{let d;if(/\.csv$/i.test(f.name)){const text=await f.text(),lines=text.replace(/^\ufeff/,'').trim().split(/\r?\n/),parse=line=>line.match(/("(?:[^"]|"")*"|[^,]*)(,|$)/g)?.map(x=>x.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"'))||[];const rows=lines.slice(1).map(parse);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const [date,id,name,cls,status]=r;if(!date||!id||!['P','A','L','E'].includes(status))return;d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name,className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)})}else if(/\.xlsx$/i.test(f.name)){if(typeof XLSX==='undefined')throw Error('Excel library unavailable.');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const date=String(r.Date||''),id=String(r['Student ID']||r.StudentID||''),status=r.Status,cls=String(r.Class||'');if(date&&id&&['P','A','L','E'].includes(status)){d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name:String(r['Student Name']||r.StudentName||''),className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)}})}else{d=JSON.parse(await f.text());if(d.app==='SundaySchoolEncryptedBackup'){const pw=$('backupPassword').value;if(!pw)throw Error('Enter the backup password first.');d=await decryptBackupObject(d,pw)}}validateBackup(d);const mode=$('restoreMode').value;if(mode==='overwrite'){students=d.students;classes=d.classes;classPrefixes=d.classPrefixes||{};attendance=d.attendance}else{const sm=new Map(students.map(x=>[String(x.id),x]));d.students.forEach(x=>{if(!sm.has(String(x.id)))sm.set(String(x.id),x)});students=[...sm.values()];classes=[...new Set([...classes,...d.classes])];classPrefixes={...classPrefixes,...(d.classPrefixes||{})};Object.entries(d.attendance).forEach(([date,day])=>{attendance[date]=attendance[date]||{};Object.entries(day).forEach(([id,status])=>{if(attendance[date][id]===undefined)attendance[date][id]=status})})}
 // Restore shared Supervisor settings from full JSON backups as well as student/class/attendance data.
@@ -3572,7 +3574,7 @@ renderAll();
    const csv='\ufeff'+lines.map(r=>r.map(quote).join(',')).join('\r\n');
    if(typeof window.downloadAppFile!=='function')throw new Error('Download service አልተገኘም።');
    await window.downloadAppFile('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));
-   showModernNotification('Qualified Students ፋይል ለማውረድ ተልኳል።','success');
+   showModernNotification('Qualified Students ፋይል በDownloads ውስጥ ተቀምጧል።','success');
   }catch(error){console.error('Qualified students download failed:',error);showModernNotification('Download አልተሳካም፦ '+(error?.message||error),'error');}
  });
  document.addEventListener('DOMContentLoaded',()=>{syncQualifiedForm();renderQualifiedStudents()});
