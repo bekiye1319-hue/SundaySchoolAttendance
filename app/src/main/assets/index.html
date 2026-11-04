@@ -1069,6 +1069,13 @@ body.app-dark-theme .password-field-error{color:#fca5a5}
 'use strict';
 /* IMPORTANT FIX: define $ before it is used by the login listeners. */
 const $=id=>document.getElementById(id);
+// Keep legacy in-scope calls safe while the notification UI is attached later.
+// Do not expose this wrapper through a window getter: that creates self-recursion.
+const showModernNotification=(...args)=>{
+ const notify=window.showModernNotification;
+ if(typeof notify==='function')return notify(...args);
+ console.warn('Notification runtime is not ready:',...args);
+};
 const cfg={apiKey:'AIzaSyCNi9XeY7lpu_swv_3Kqbh1kRaziupQTxc',authDomain:'sundayschoolattendance-932d4.firebaseapp.com',projectId:'sundayschoolattendance-932d4',storageBucket:'sundayschoolattendance-932d4.firebasestorage.app',messagingSenderId:'555888361635',appId:'1:555888361635:web:f2858fe235299677257f16',measurementId:'G-L7CCVY14F4'};
 firebase.initializeApp(cfg);const auth=firebase.auth(),db=firebase.firestore();auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e=>console.warn('Auth LOCAL persistence unavailable',e));
 const AUTH_STARTED_KEY='ss_auth_started_at_v1',AUTH_MAX_AGE=24*60*60*1000;
@@ -1988,7 +1995,29 @@ function refreshBackupLast(){const v=localStorage.getItem(BACKUP_LAST_KEY);if($(
 function rememberBackup(){const now=new Date().toISOString();localStorage.setItem(BACKUP_LAST_KEY,now);refreshBackupLast()}
 function saveBackupPrefs(){const p={frequency:$('autoBackupFrequency').value,format:$('backupFormat').value,mode:$('restoreMode').value};localStorage.setItem(BACKUP_PREF_KEY,JSON.stringify(p));$('autoBackupInfo').textContent='Settings saved. Automatic local backup is checked whenever this app is opened.'}
 function loadBackupPrefs(){try{const p=JSON.parse(localStorage.getItem(BACKUP_PREF_KEY)||'{}');if($('autoBackupFrequency'))$('autoBackupFrequency').value=p.frequency||'off';if($('backupFormat'))$('backupFormat').value=p.format||'json';if($('restoreMode'))$('restoreMode').value=p.mode||'overwrite'}catch(e){}refreshBackupLast()}
-function triggerDownload(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+function triggerDownload(name,blob){
+ // Android WebView does not reliably support the HTMLAnchorElement download attribute.
+ // Prefer the native bridge when it is available; retain browser download as fallback.
+ const bridge=window.AndroidBridge;
+ if(bridge&&typeof bridge.saveTextFile==='function'&&blob){
+  const mime=blob.type||'application/octet-stream';
+  if(typeof blob.text==='function'){
+   blob.text().then(content=>bridge.saveTextFile(name,content,mime)).catch(error=>{
+    console.error('Native file save failed:',error);
+    if(typeof window.showModernNotification==='function')window.showModernNotification('ፋይሉን ማስቀመጥ አልተሳካም።','error');
+   });
+   return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>bridge.saveTextFile(name,String(reader.result??''),mime);
+  reader.onerror=()=>{if(typeof window.showModernNotification==='function')window.showModernNotification('ፋይሉን ማንበብ አልተቻለም።','error')};
+  reader.readAsText(blob);
+  return;
+ }
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
 async function encryptedBackupBlob(data,password){if(String(password||'').length<8)throw Error('Encrypted backup password must be at least 8 characters.');const enc=new TextEncoder(),salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));const base=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt']);const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(JSON.stringify(data)));const toB64=a=>btoa(String.fromCharCode(...a));return new Blob([JSON.stringify({app:'SundaySchoolEncryptedBackup',version:1,algorithm:'AES-GCM',kdf:'PBKDF2-SHA256',iterations:250000,salt:toB64(salt),iv:toB64(iv),ciphertext:toB64(new Uint8Array(cipher))})],{type:'application/json'})}
 async function decryptBackupObject(obj,password){if(!obj||obj.version!==1||obj.algorithm!=='AES-GCM'||obj.kdf!=='PBKDF2-SHA256'||!Number.isInteger(obj.iterations)||obj.iterations<100000||obj.iterations>1000000||!obj.salt||!obj.iv||!obj.ciphertext)throw Error('Encrypted backup format is invalid.');if(String(password||'').length<8)throw Error('Password must contain at least 8 characters.');const dec=new TextDecoder(),fromB64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:fromB64(obj.salt),iterations:obj.iterations||250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);return JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:fromB64(obj.iv)},key,fromB64(obj.ciphertext))))}
 function validateBackup(d){
@@ -2096,7 +2125,6 @@ const appStateBridge={
   logActivity:()=>logActivity,
   saveExtendedSettings:()=>saveExtendedSettings,
   triggerDownload:()=>triggerDownload,
-  showModernNotification:()=>showModernNotification
 };
 Object.entries(appStateBridge).forEach(([key,getValue])=>{
   try{Object.defineProperty(window,key,{configurable:true,get:getValue,set:value=>{
