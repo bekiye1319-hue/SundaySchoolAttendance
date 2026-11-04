@@ -979,7 +979,7 @@ body.app-dark-theme .password-field-error{color:#fca5a5}
  <div class="panel"><h2>1. Change Password / የይለፍ ቃል ቀይር</h2><div class="grid"><div><label for="settingsCurrentPassword">የአሁኑ Password</label><input id="settingsCurrentPassword" type="password" autocomplete="current-password" aria-describedby="settingsCurrentPasswordError"><small id="settingsCurrentPasswordError" class="password-field-error" aria-live="polite"></small></div><div><label for="settingsNewPassword">አዲስ Password (ቢያንስ 6)</label><input id="settingsNewPassword" type="password" autocomplete="new-password" aria-describedby="settingsNewPasswordError"><small id="settingsNewPasswordError" class="password-field-error" aria-live="polite"></small></div><div><label for="settingsConfirmPassword">አዲሱን ድገም</label><input id="settingsConfirmPassword" type="password" autocomplete="new-password" aria-describedby="settingsConfirmPasswordError"><small id="settingsConfirmPasswordError" class="password-field-error" aria-live="polite"></small></div></div><div class="row"><button type="button" id="changeOwnPassword">Password ቀይር</button></div><div id="passwordChangeMessage" class="small" aria-live="polite"></div></div>
  <div class="panel"><h2>2. Inactive Days / ተከታታይ የቀረበት ቀን</h2><p class="small">ተማሪው ስንት ተከታታይ የተመዘገቡ Attendance ቀናት A ከሆነ Inactive እንደሚባል ይወስኑ።</p><div class="grid"><div><label for="inactiveDaysSetting">ቀናት</label><input id="inactiveDaysSetting" type="number" min="1" max="60" value="4"></div></div><div class="row"><button type="button" id="saveInactiveDays">💾 ይህን Setting አስቀምጥ</button><span id="inactiveDaysMessage" class="small" aria-live="polite"></span></div></div>
  <div class="panel"><h2>3. Attendance Status Rules / የStatus ነጥብ</h2><p class="small">የAttendance መቶኛ ሲሰላ ለእያንዳንዱ Status የሚሰጠውን ክብደት (%) ያስተካክሉ። P=100 እና A=0 ቋሚ ናቸው።</p><div class="grid"><div><label for="lateScoreSetting">Late (L) %</label><input id="lateScoreSetting" type="number" min="0" max="100" value="75"></div><div><label for="permissionScoreSetting">Permission (E) %</label><input id="permissionScoreSetting" type="number" min="0" max="100" value="100"></div></div><div class="row"><button type="button" id="saveStatusRules">💾 ይህን Setting አስቀምጥ</button><span id="statusRulesMessage" class="small" aria-live="polite"></span></div></div>
- <div class="panel" id="qualifiedStudentsSettings"><h2>3A. Qualified Students / ብቁ ተማሪዎች</h2><p class="small">በተመረጠው የቀን ክልል ውስጥ የAttendance መቶኛቸው ከተወሰነው መጠን ጋር እኩል ወይም ከዚያ በላይ የሆኑ ተማሪዎችን Dashboard ላይ ያሳያል።</p><div class="grid"><div><label for="qualifiedEnabled">Feature</label><select id="qualifiedEnabled"><option value="off">Off</option><option value="on">On</option></select></div><div><label for="qualifiedStartDate">Start Date (Ethiopian)</label><input id="qualifiedStartDate" placeholder="DD/MM/YYYY"></div><div><label for="qualifiedEndDate">End Date (Ethiopian)</label><input id="qualifiedEndDate" placeholder="DD/MM/YYYY"></div><div><label for="qualifiedThreshold">Required Attendance (%)</label><input id="qualifiedThreshold" type="number" min="0" max="100" value="80"></div></div><div class="row"><button type="button" id="saveQualifiedSettings">💾 Save Qualified Students Setting</button><span id="qualifiedSettingsMessage" class="small" aria-live="polite"></span></div><p class="small">P=100፣ A=0 ቋሚ ናቸው፤ L እና E ከSetting 3 ይወሰዳሉ።</p></div><div class="panel"><h2>4. Class Archive / የክፍል ታሪክ ማህደር</h2><p class="small">የተመረጠውን ክፍል የቀድሞ Attendance መዝገብ በArchive ያስቀምጣል። ዋናው መዝገብ አይሰረዝም።</p><div class="grid"><div><label for="archiveClassSelect">ክፍል</label><select id="archiveClassSelect"></select></div></div><div class="row"><button type="button" id="archiveClassButton">ክፍሉን Archive አድርግ</button></div><div id="archiveMessage" class="small" aria-live="polite"></div></div>
+ <div class="panel" id="qualifiedStudentsSettings"><h2>3A. Qualified Students / ብቁ ተማሪዎች</h2><p class="small">በተመረጠው የቀን ክልል ውስጥ የAttendance መቶኛቸው ከተወሰነው መጠን ጋር እኩል ወይም ከዚያ በላይ የሆኑ ተማሪዎችን Dashboard ላይ ያሳያል።</p><div class="grid"><div><label for="qualifiedEnabled">Feature</label><select id="qualifiedEnabled"><option value="off">Off</option><option value="on">On</option></select></div><div><label for="qualifiedStartDate">Start Date (Ethiopian)</label><input id="qualifiedStartDate" placeholder="DD/MM/YYYY"></div><div><label for="qualifiedEndDate">End Date (Ethiopian)</label><input id="qualifiedEndDate" placeholder="DD/MM/YYYY"></div><div><label for="qualifiedThreshold">Required Attendance (%)</label><input id="qualifiedThreshold" type="number" min="0" max="100" value="80"></div></div><div style="margin:12px 0"><strong>የሚካተቱ ክፍሎች / Classes</strong><p class="small">ምንም ክፍል ካልመረጡ ሁሉም ክፍሎች ይካተታሉ።</p><div id="qualifiedClassOptions" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px"></div></div><div class="row"><button type="button" id="saveQualifiedSettings">💾 Save Qualified Students Setting</button><span id="qualifiedSettingsMessage" class="small" aria-live="polite"></span></div><p class="small">P=100፣ A=0 ቋሚ ናቸው፤ L እና E ከSetting 3 ይወሰዳሉ።</p></div><div class="panel"><h2>4. Class Archive / የክፍል ታሪክ ማህደር</h2><p class="small">የተመረጠውን ክፍል የቀድሞ Attendance መዝገብ በArchive ያስቀምጣል። ዋናው መዝገብ አይሰረዝም።</p><div class="grid"><div><label for="archiveClassSelect">ክፍል</label><select id="archiveClassSelect"></select></div></div><div class="row"><button type="button" id="archiveClassButton">ክፍሉን Archive አድርግ</button></div><div id="archiveMessage" class="small" aria-live="polite"></div></div>
  <div class="panel"><h2>5. Theme / የመልክ ቅንብር</h2><div class="grid"><div><label for="themeSetting">Theme</label><select id="themeSetting"><option value="light">Light Mode</option><option value="dark">Dark Mode</option></select></div></div><p class="small">Theme ከDropdown ሲቀየር በራሱ ይቀመጣል።</p><div id="themeSettingsMessage" class="small" aria-live="polite"></div></div>
 
  <div class="panel"><h2>6. Language / ቋንቋ</h2><div class="grid"><div><label for="languageSelect">ቋንቋ / Language</label><select id="languageSelect"><option value="am">አማርኛ</option><option value="en">English</option></select></div></div><p class="small">ቋንቋውን ከDropdown ሲቀይሩ በራሱ ይቀመጣል።</p><div id="languageSettingsNotice" class="small" aria-live="polite"></div></div>
@@ -3304,7 +3304,7 @@ body>nav.no-print{z-index:2147482500!important}
   window.addEventListener('click',ev=>{
    const t=ev.target instanceof Element?ev.target:null;if(!t)return;
    const trigger=t.closest('#menuToggle,#mobileBottomNav [data-mobile-more],[data-action="menu"],[data-action="more"],#moreToggle,.more-toggle,.menu-open-trigger');
-   if(trigger){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(true);return;}
+   if(trigger){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(!sidebar.classList.contains('sidebar-open'));return;}
    if(t.closest('#sidebarBackdrop')){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();setDrawer(false);return;}
    const page=t.closest('body>nav[aria-label="ዋና ምናሌ"] button[data-page]');
    if(page){setTimeout(()=>{setDrawer(false);syncBottom();window.scrollTo({top:0,left:0,behavior:'instant'});},0);return;}
@@ -3362,7 +3362,7 @@ body>nav.no-print{z-index:2147482500!important}
    const marked=c.P+c.A+c.L+c.E;
    const percent=marked?Math.round((c.P*100+c.L*L+c.E*E)/marked):0;
    return {id:String(st.id),name:String(st.name||''),className:String(st.className||''),P:c.P,A:c.A,L:c.L,E:c.E,percent,marked};
-  }).filter(x=>x.marked>0&&x.percent>=Number(cfg.threshold??0)).sort((a,b)=>b.percent-a.percent||a.name.localeCompare(b.name));
+  }).filter(x=>(!Array.isArray(cfg.classes)||!cfg.classes.length||cfg.classes.includes(x.className))&&x.marked>0&&x.percent>=Number(cfg.threshold??0)).sort((a,b)=>b.percent-a.percent||a.name.localeCompare(b.name));
  }
  let publishing=false,lastPublished='';
  async function publishQualifiedRows(){
@@ -3370,7 +3370,7 @@ body>nav.no-print{z-index:2147482500!important}
   const cfg=qualifiedConfig();if(!cfg.enabled)return;
   const from=dateISO(cfg.startDate),to=dateISO(cfg.endDate);if(!from||!to||from>to)return;
   const rows=calculateQualifiedRows();
-  const payload={enabled:true,startDate:cfg.startDate,endDate:cfg.endDate,threshold:Number(cfg.threshold??80),rows};
+  const payload={enabled:true,startDate:cfg.startDate,endDate:cfg.endDate,threshold:Number(cfg.threshold??80),classes:Array.isArray(cfg.classes)?cfg.classes:[],rows};
   const signature=JSON.stringify(payload);if(signature===lastPublished)return;
   publishing=true;
   try{
@@ -3384,7 +3384,7 @@ body>nav.no-print{z-index:2147482500!important}
   // Supervisor calculates from the complete data set; other roles read only the published summary.
   if(role==='supervisor')return calculateQualifiedRows();
   const pub=extendedSettings?.qualifiedStudentsPublic;
-  if(!pub||!pub.enabled||pub.startDate!==cfg.startDate||pub.endDate!==cfg.endDate||Number(pub.threshold)!==Number(cfg.threshold))return [];
+  if(!pub||!pub.enabled||pub.startDate!==cfg.startDate||pub.endDate!==cfg.endDate||Number(pub.threshold)!==Number(cfg.threshold)||JSON.stringify(pub.classes||[])!==JSON.stringify(cfg.classes||[]))return [];
   return Array.isArray(pub.rows)?pub.rows:[];
  }
  window.renderQualifiedStudents=function(){
@@ -3398,7 +3398,8 @@ body>nav.no-print{z-index:2147482500!important}
   summary.textContent=`${dateET(from)} – ${dateET(to)} | የሚያስፈልግ፦ ${cfg.threshold}% | ብቁ፦ ${rows.length}`;
   list.innerHTML=rows.length?`<table class="report-table"><thead><tr><th>#</th><th>ID</th><th>ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>%</th></tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.id)}</td><td>${esc(x.name)}</td><td>${esc(x.className||'')}</td><td>${x.P}</td><td>${x.A}</td><td>${x.L}</td><td>${x.E}</td><td><strong>${x.percent}%</strong></td></tr>`).join('')}</tbody></table>`:'<p class="small">በዚህ የቀን ክልል መስፈርቱን ያሟላ ተማሪ አልተገኘም።</p>';
  };
- function syncQualifiedForm(){const c=qualifiedConfig();if($q('qualifiedEnabled'))$q('qualifiedEnabled').value=c.enabled?'on':'off';if($q('qualifiedStartDate'))$q('qualifiedStartDate').value=c.startDate||'';if($q('qualifiedEndDate'))$q('qualifiedEndDate').value=c.endDate||'';if($q('qualifiedThreshold'))$q('qualifiedThreshold').value=Number(c.threshold??80);const sup=role==='supervisor';['qualifiedEnabled','qualifiedStartDate','qualifiedEndDate','qualifiedThreshold','saveQualifiedSettings'].forEach(id=>{if($q(id))$q(id).disabled=!sup});}
+ function populateQualifiedClassOptions(selected){const box=$q('qualifiedClassOptions');if(!box)return;const chosen=Array.isArray(selected)?selected:[];const list=(Array.isArray(classes)?classes:[]).filter(Boolean);box.innerHTML=list.map((name,i)=>`<label style="display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line,#ddd);border-radius:9px"><input type="checkbox" class="qualified-class-choice" value="${esc(name)}" ${chosen.includes(name)?'checked':''}> ${esc(name)}</label>`).join('')||'<span class="small">ክፍል አልተገኘም።</span>';box.querySelectorAll('input').forEach(el=>el.disabled=role!=='supervisor');}
+ function syncQualifiedForm(){const c=qualifiedConfig();populateQualifiedClassOptions(c.classes||[]);if($q('qualifiedEnabled'))$q('qualifiedEnabled').value=c.enabled?'on':'off';if($q('qualifiedStartDate'))$q('qualifiedStartDate').value=c.startDate||'';if($q('qualifiedEndDate'))$q('qualifiedEndDate').value=c.endDate||'';if($q('qualifiedThreshold'))$q('qualifiedThreshold').value=Number(c.threshold??80);const sup=role==='supervisor';['qualifiedEnabled','qualifiedStartDate','qualifiedEndDate','qualifiedThreshold','saveQualifiedSettings'].forEach(id=>{if($q(id))$q(id).disabled=!sup});}
  window.syncQualifiedForm=syncQualifiedForm;
  async function saveQualifiedSettingsNow(){
   const btn=$q('saveQualifiedSettings'),message=$q('qualifiedSettingsMessage');
@@ -3408,16 +3409,16 @@ body>nav.no-print{z-index:2147482500!important}
   if(!Number.isFinite(threshold)||threshold<0||threshold>100){message.textContent='0–100 መካከል ያለ መቶኛ ያስገቡ።';return;}
   if(enabled){const a=dateISO(startDate),b=dateISO(endDate);if(!a||!b||a>b){message.textContent='ትክክለኛ የመጀመሪያና የመጨረሻ ቀን ያስገቡ።';return;}}
   btn.disabled=true;message.textContent='በFirebase ላይ በማስቀመጥ ላይ…';
-  const cfg={enabled,startDate,endDate,threshold};
+  const selectedClasses=[...document.querySelectorAll('#qualifiedClassOptions .qualified-class-choice:checked')].map(x=>x.value);const cfg={enabled,startDate,endDate,threshold,classes:selectedClasses};
   try{
    // Save the private supervisor configuration and the shared dashboard result together.
    extendedSettings={...extendedSettings,qualifiedStudents:cfg};
    const rows=enabled?calculateQualifiedRows():[];
-   const publicData={enabled,startDate,endDate,threshold,rows};
+   const publicData={enabled,startDate,endDate,threshold,classes:selectedClasses,rows};
    await docRef().set({qualifiedStudents:cfg,qualifiedStudentsPublic:publicData,qualifiedStudentsPublishedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentUser.uid},{merge:true});
    const verifySnap=await docRef().get();
    const savedCfg=verifySnap.exists?(verifySnap.data()||{}).qualifiedStudents:null;
-   if(!savedCfg||Boolean(savedCfg.enabled)!==enabled||String(savedCfg.startDate||'')!==startDate||String(savedCfg.endDate||'')!==endDate||Number(savedCfg.threshold)!==threshold){throw new Error('Firebase ላይ የተቀመጠውን ቅንብር ማረጋገጥ አልተቻለም።');}
+   if(!savedCfg||Boolean(savedCfg.enabled)!==enabled||String(savedCfg.startDate||'')!==startDate||String(savedCfg.endDate||'')!==endDate||Number(savedCfg.threshold)!==threshold||JSON.stringify(savedCfg.classes||[])!==JSON.stringify(selectedClasses)){throw new Error('Firebase ላይ የተቀመጠውን ቅንብር ማረጋገጥ አልተቻለም።');}
    extendedSettings={...extendedSettings,qualifiedStudents:cfg,qualifiedStudentsPublic:publicData};
    try{localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings));}catch(cacheError){console.warn('Qualified settings local cache unavailable',cacheError);}
    lastPublished=JSON.stringify(publicData);
@@ -3434,7 +3435,7 @@ body>nav.no-print{z-index:2147482500!important}
  // Bind after DOM is ready and use a single guarded listener.
  function bindQualifiedSave(){const btn=$q('saveQualifiedSettings');if(btn&&!btn.dataset.qualifiedSaveBound){btn.dataset.qualifiedSaveBound='1';btn.addEventListener('click',saveQualifiedSettingsNow);}}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindQualifiedSave,{once:true});else bindQualifiedSave();
- $q('downloadQualifiedStudents')?.addEventListener('click',()=>{const cfg=qualifiedConfig(),rows=getVisibleRows();if(!cfg.enabled)return;const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const lines=[['ID','Student','Class','P','A','L','E','Attendance %'],...rows.map(x=>[x.id,x.name,x.className,x.P,x.A,x.L,x.E,x.percent])];const csv='\ufeff'+lines.map(r=>r.map(q).join(',')).join('\r\n');triggerDownload('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));});
+ $q('downloadQualifiedStudents')?.addEventListener('click',()=>{try{const cfg=qualifiedConfig();if(!cfg.enabled){showModernNotification('Qualified Students ቅንብር አልተከፈተም።','error');return;}const rows=getVisibleRows();if(!Array.isArray(rows))throw new Error('የተማሪዎች ዝርዝር ትክክል አይደለም።');const quote=v=>'\"'+String(v??'').replace(/\"/g,'\"\"')+'\"';const lines=[['ID','Student','Class','P','A','L','E','Attendance %'],...rows.map(x=>[x.id,x.name,x.className,x.P,x.A,x.L,x.E,x.percent])];const csv='\ufeff'+lines.map(r=>r.map(quote).join(',')).join('\r\n');const bridge=window.AndroidBridge;if(bridge&&typeof bridge.saveTextFile==='function'){bridge.saveTextFile('qualified-students.csv',csv,'text/csv;charset=utf-8');showModernNotification('ፋይሉን ለማስቀመጥ ቦታ ይምረጡ።','success');}else triggerDownload('qualified-students.csv',new Blob([csv],{type:'text/csv;charset=utf-8'}));}catch(error){console.error('Qualified students download failed:',error);showModernNotification('Download አልተሳካም፦ '+(error?.message||error),'error');}});
  document.addEventListener('DOMContentLoaded',()=>{syncQualifiedForm();renderQualifiedStudents()});
  // Do not wrap updateDashboard or fillExtendedSettingsForm here. The main app
  // already calls renderQualifiedStudents() from updateDashboard and refreshes
