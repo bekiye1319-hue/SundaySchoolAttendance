@@ -1761,7 +1761,7 @@ $('saveAtt').onclick=async()=>{
  unlockedAttendanceRecords.clear();saveLocal();drawAttendance();renderStats();updateDashboard();await logActivity('Attendance saved',`ቀን ${dateET(iso)} • ${isClassScoped()?assignedClass:$('attClass').value}`);showModernNotification('Attendanceው በFirebase በትክክል ተቀምጧል።');
 };
 $('addStudent').onclick=async()=>{if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');let name=$('studentName').value.trim();if(!name)return showModernNotification('ስም ያስገቡ።');let phone=$('studentPhone').value.trim(),gender=$('studentGender').value;if(!gender)return showModernNotification('የተማሪውን ፆታ ይምረጡ።');const normName=name.toLocaleLowerCase().replace(/\s+/g,' ');if(students.some(s=>String(s.name||'').trim().toLocaleLowerCase().replace(/\s+/g,' ')===normName))return showModernNotification('ይህ ስም ቀድሞ ተመዝግቧል። ተመሳሳይ ተማሪ ደግሞ መመዝገብ አይቻልም።');if(phone&&students.some(s=>String(s.phone||'').trim().replace(/\s+/g,'')===phone.replace(/\s+/g,'')))return showModernNotification('ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል።');const className=$('studentClass').value;let newId;try{newId=nextStudentId(className)}catch(e){return showModernNotification(e.message)}const st={id:newId,name,className,phone,gender};students.push(st);const ok=await cloudSave();if(!ok){students=students.filter(s=>String(s.id)!==String(st.id));return;}saveLocal();$('studentName').value='';$('studentPhone').value='';$('studentGender').value='';renderAll();await logActivity('Student added',`${st.name} • ${st.id} • ${st.className}`);closeStudentRegistration();showModernNotification('ምዝገባ በተሳካ ሁኔታ ተጠናቋል። ID: '+st.id)};
-$('className').addEventListener('input',()=>{const c=$('className').value.trim();$('classPrefix').value=classPrefixes[c]||defaultPrefixForClass(c)});$('addClass').onclick=async()=>{if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');let c=$('className').value.trim(),prefix=$('classPrefix').value.trim().toUpperCase();if(!c||classes.includes(c))return showModernNotification('የክፍል ስም ያስገቡ፤ እንደገና ያለ ክፍል አይጨምሩ።');if(!/^[A-Z]{2,8}$/.test(prefix))return showModernNotification('Prefix ከ2 እስከ 8 የእንግሊዝኛ ፊደላት ብቻ መሆን አለበት።');if(Object.entries(classPrefixes).some(([name,p])=>name!==c&&String(p).toUpperCase()===prefix))return showModernNotification('ይህ Prefix ለሌላ ክፍል ተመድቧል። ሌላ ይምረጡ።');classes.push(c);classPrefixes[c]=prefix;const ok=await cloudSave();if(!ok){classes=classes.filter(x=>x!==c);delete classPrefixes[c];return}saveLocal();$('className').value='';$('classPrefix').value='';renderAll();await logActivity('Class added',c)};
+$('className').addEventListener('input',()=>{const c=$('className').value.trim();$('classPrefix').value=classPrefixes[c]||defaultPrefixForClass(c)});$('addClass').onclick=async()=>{if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');let c=$('className').value.trim(),prefix=$('classPrefix').value.trim().toUpperCase();if(!c||classes.includes(c))return showModernNotification('የክፍል ስም ያስገቡ፤ እንደገና ያለ ክፍል አይጨምሩ።');if(!/^[A-Z]{2,8}$/.test(prefix))return showModernNotification('Prefix ከ2 እስከ 8 የእንግሊዝኛ ፊደላት ብቻ መሆን አለበት።');if(Object.entries(classPrefixes).some(([name,p])=>name!==c&&String(p).toUpperCase()===prefix))return showModernNotification('ይህ Prefix ለሌላ ክፍል ተመድቧል። ሌላ ይምረጡ።');classes.push(c);classPrefixes[c]=prefix;const ok=await cloudSave();if(!ok){classes=classes.filter(x=>x!==c);delete classPrefixes[c];return}saveLocal();$('className').value='';$('classPrefix').value='';if(typeof window.syncQualifiedForm==='function')window.syncQualifiedForm();renderAll();await logActivity('Class added',c)};
 function openStudentEdit(id){
  if(role!=='supervisor')return showModernNotification('Supervisor ብቻ ነው።');
  const st=students.find(x=>String(x.id)===String(id)); if(!st)return;
@@ -1776,7 +1776,7 @@ document.addEventListener('click',async e=>{
  const studentAction=e.target.closest('[data-edit-student],[data-delete-student]');
  if(studentAction?.dataset.editStudent)openStudentEdit(studentAction.dataset.editStudent);
  if(studentAction?.dataset.deleteStudent){if(role!=='supervisor')return;const id=studentAction.dataset.deleteStudent;if(!await showModernConfirm('ይህን ተማሪ መሰረዝ ይፈልጋሉ?'))return;const oldStudents=students.slice(),oldAttendance=JSON.parse(JSON.stringify(attendance));students=students.filter(s=>String(s.id)!==String(id));Object.values(attendance).forEach(d=>delete d[id]);const ok=await cloudSave();if(!ok){students=oldStudents;attendance=oldAttendance;return;}saveLocal();renderAll();}
- if(e.target.dataset.deleteClass){if(role!=='supervisor')return;let c=e.target.dataset.deleteClass;if(students.some(s=>s.className===c))return showModernNotification('በዚህ ክፍል ተማሪ አለ።');classes=classes.filter(x=>x!==c);const ok=await cloudSave();if(!ok)return;saveLocal();renderAll();}
+ if(e.target.dataset.deleteClass){if(role!=='supervisor')return;let c=e.target.dataset.deleteClass;if(students.some(s=>s.className===c))return showModernNotification('በዚህ ክፍል ተማሪ አለ።');classes=classes.filter(x=>x!==c);const ok=await cloudSave();if(!ok)return;saveLocal();if(typeof window.syncQualifiedForm==='function')window.syncQualifiedForm();renderAll();}
 });
 $('cancelStudentEdit').onclick=closeStudentEdit;
 $('editStudentModal').addEventListener('click',e=>{if(e.target===$('editStudentModal'))closeStudentEdit()});
@@ -2610,6 +2610,8 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
 </style>
 <script id="final-matching-sidebar-bottom-icons">
 (()=>{
+ // This script owns icons only. The later unified-navigation controller is
+ // the sole owner of sidebar toggles, bottom-nav clicks and active-state sync.
  const iconMap={
   dashboard:'fa-house',attendance:'fa-calendar-check',students:'fa-users',classes:'fa-cubes',
   reports:'fa-chart-line',activityLogs:'fa-list-check',backup:'fa-cloud-arrow-up',settings:'fa-gear'
@@ -2619,36 +2621,20 @@ body.app-dark-theme #attendance .attendance-reference-legend span span{color:#e5
   const bottom=document.getElementById('mobileBottomNav');
   if(!sidebar||!bottom)return;
   sidebar.querySelectorAll('button[data-page]').forEach(btn=>{
-   const page=btn.dataset.page,icon=iconMap[page]||'fa-circle';
+   const icon=iconMap[btn.dataset.page]||'fa-circle';
    let el=btn.querySelector('.sidebar-nav-icon');
-   if(!el){el=document.createElement('i');el.className='fa-solid sidebar-nav-icon';el.setAttribute('aria-hidden','true');btn.prepend(el)}
+   if(!el){el=document.createElement('i');el.className='fa-solid sidebar-nav-icon';el.setAttribute('aria-hidden','true');btn.prepend(el);}
    el.className='fa-solid '+icon+' sidebar-nav-icon';
   });
   const logout=sidebar.querySelector('#topLogout');
-  if(logout&&!logout.querySelector('.sidebar-nav-icon')){const i=document.createElement('i');i.className='fa-solid fa-right-from-bracket sidebar-nav-icon';i.setAttribute('aria-hidden','true');logout.prepend(i)}
-  const sync=()=>{
-   sidebar.querySelectorAll('button[data-page]').forEach(src=>{
-    const dest=bottom.querySelector('[data-mobile-page="'+src.dataset.page+'"]');
-    if(dest)dest.classList.toggle('hidden',src.classList.contains('hidden'));
-   });
-   const active=sidebar.querySelector('button[data-page].active');
-   if(active)bottom.querySelectorAll('[data-mobile-page]').forEach(b=>b.classList.toggle('active',b.dataset.mobilePage===active.dataset.page));
-  };
-  if(!bottom.dataset.finalBound){
-   bottom.dataset.finalBound='1';
-   bottom.addEventListener('click',e=>{
-    const logoutBtn=e.target.closest('[data-mobile-logout]');
-    if(logoutBtn){const out=sidebar.querySelector('#topLogout');if(out)out.click();return;}
-    const btn=e.target.closest('[data-mobile-page]');
-    if(btn){const source=sidebar.querySelector('button[data-page="'+btn.dataset.mobilePage+'"]');if(source&&!source.classList.contains('hidden'))source.click();}
-   });
-   sidebar.querySelectorAll('button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(sync,0)));
-   new MutationObserver(sync).observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class']});
+  if(logout&&!logout.querySelector('.sidebar-nav-icon')){
+   const icon=document.createElement('i');icon.className='fa-solid fa-right-from-bracket sidebar-nav-icon';icon.setAttribute('aria-hidden','true');logout.prepend(icon);
   }
-  sync();window.syncMobileBottomNavigation=sync;
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyIcons,{once:true});else applyIcons();
- setTimeout(applyIcons,500);setTimeout(applyIcons,1500);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyIcons,{once:true});
+ else applyIcons();
+ // Navigation nodes are static; one delayed icon pass covers late-rendered auth UI.
+ setTimeout(applyIcons,500);
 })();
 </script>
 
@@ -3169,9 +3155,6 @@ body.auth-locked #quickRefreshToggle,body.auth-loading #quickRefreshToggle{displ
 <script id="modern-notification-runtime">
 (()=>{
  const icons={success:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.8"/></svg>',error:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>',warning:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg>',info:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v5m0-8h.01"/></svg>'};
- function kindOf(message){const t=String(message||'').toLowerCase();if(/አልተሳካ|ስህተት|error|failed|denied|cannot|unable|አይቻልም|አልተገኘ/.test(t))return'error';if(/ይፈልጋሉ|ማስጠንቀቂያ|warning|ጥንቃቄ|ትኩረት/.test(t))return'warning';if(/ተሳክቷል|በተሳካ|ተመዝግቧል|ተዘምኗል|ተሰርዟል|success|saved|updated|completed/.test(t))return'success';return'info'}
- function toast(message,type){let region=document.getElementById('modernToastRegion');if(!region){region=document.createElement('div');region.id='modernToastRegion';region.setAttribute('aria-live','polite');region.setAttribute('aria-atomic','false');document.body.appendChild(region)}const k=type||kindOf(message),el=document.createElement('div');el.className='modern-toast '+k;el.setAttribute('role',k==='error'?'alert':'status');const icon=document.createElement('span');icon.className='modern-toast-icon';icon.innerHTML=icons[k]||icons.info;const body=document.createElement('div');body.className='modern-toast-message';body.textContent=String(message??'');const close=document.createElement('button');close.className='modern-toast-close';close.type='button';close.setAttribute('aria-label','Close notification');close.textContent='×';close.onclick=()=>el.remove();el.append(icon,body,close);region.appendChild(el);const timer=setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-6px)';setTimeout(()=>el.remove(),180)},4200);close.addEventListener('click',()=>clearTimeout(timer));return el}
- window.showModernNotification=toast;
  // Consistent visual feedback for buttons without changing their existing actions.
  document.addEventListener('click',event=>{
   const target=event.target&&event.target.closest?event.target.closest('button,.btn,[role="button"]'):null;
@@ -3181,7 +3164,6 @@ body.auth-locked #quickRefreshToggle,body.auth-loading #quickRefreshToggle{displ
   target.classList.add('modern-click-feedback');
   setTimeout(()=>target.classList.remove('modern-click-feedback'),240);
  },true);
- window.alert=(message)=>toast(message);
  window.showModernConfirm=(message,{title='ማረጋገጫ',yes='እሺ',no='ይቅር',danger=false}={})=>new Promise(resolve=>{const back=document.createElement('div');back.id='modernConfirmBackdrop';const box=document.createElement('section');box.id='modernConfirmBox';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');const h=document.createElement('h3');h.textContent=title;h.style.margin='0 0 12px';const p=document.createElement('p');p.textContent=String(message??'');const actions=document.createElement('div');actions.className='confirm-actions';const cancel=document.createElement('button');cancel.type='button';cancel.textContent=no;const ok=document.createElement('button');ok.type='button';ok.id='modernConfirmYes';ok.textContent=yes;if(danger)ok.style.background='#dc2626';actions.append(cancel,ok);box.append(h,p,actions);back.appendChild(box);document.body.appendChild(back);const finish=value=>{back.remove();resolve(value)};cancel.onclick=()=>finish(false);ok.onclick=()=>finish(true);back.addEventListener('click',e=>{if(e.target===back)finish(false)});const key=e=>{if(e.key==='Escape'){document.removeEventListener('keydown',key);finish(false)}if(e.key==='Enter'){document.removeEventListener('keydown',key);finish(true)}};document.addEventListener('keydown',key);cancel.focus()});
 })();
 </script>
@@ -3398,7 +3380,7 @@ body>nav.no-print{z-index:2147482500!important}
   summary.textContent=`${dateET(from)} – ${dateET(to)} | የሚያስፈልግ፦ ${cfg.threshold}% | ብቁ፦ ${rows.length}`;
   list.innerHTML=rows.length?`<table class="report-table"><thead><tr><th>#</th><th>ID</th><th>ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>%</th></tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.id)}</td><td>${esc(x.name)}</td><td>${esc(x.className||'')}</td><td>${x.P}</td><td>${x.A}</td><td>${x.L}</td><td>${x.E}</td><td><strong>${x.percent}%</strong></td></tr>`).join('')}</tbody></table>`:'<p class="small">በዚህ የቀን ክልል መስፈርቱን ያሟላ ተማሪ አልተገኘም።</p>';
  };
- function populateQualifiedClassOptions(selected){const box=$q('qualifiedClassOptions');if(!box)return;const chosen=Array.isArray(selected)?selected:[];const list=(Array.isArray(classes)?classes:[]).filter(Boolean);box.innerHTML=list.map((name,i)=>`<label style="display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line,#ddd);border-radius:9px"><input type="checkbox" class="qualified-class-choice" value="${esc(name)}" ${chosen.includes(name)?'checked':''}> ${esc(name)}</label>`).join('')||'<span class="small">ክፍል አልተገኘም።</span>';box.querySelectorAll('input').forEach(el=>el.disabled=role!=='supervisor');}
+ function populateQualifiedClassOptions(selected){const box=$q('qualifiedClassOptions');if(!box)return;const chosen=Array.isArray(selected)?selected:[];const list=[...new Set((Array.isArray(classes)?classes:[]).filter(Boolean))];const allChecked=chosen.length===0;box.innerHTML='<label style="display:flex;align-items:center;gap:8px;padding:9px;border:1px solid var(--line,#ddd);border-radius:9px;font-weight:800"><input type="checkbox" id="qualifiedAllClasses" '+(allChecked?'checked':'')+'> ሁሉንም ክፍሎች / All classes</label>'+ (list.map(name=>`<label style="display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line,#ddd);border-radius:9px"><input type="checkbox" class="qualified-class-choice" value="${esc(name)}" ${chosen.includes(name)?'checked':''}> ${esc(name)}</label>`).join('')||'<span class="small">ክፍል አልተገኘም።</span>');box.querySelectorAll('input').forEach(el=>el.disabled=role!=='supervisor');if(!box.dataset.qualifiedClassBound){box.dataset.qualifiedClassBound='1';box.addEventListener('change',event=>{if(event.target.id==='qualifiedAllClasses'){box.querySelectorAll('.qualified-class-choice').forEach(el=>el.checked=false);}else if(event.target.classList.contains('qualified-class-choice')){const any=[...box.querySelectorAll('.qualified-class-choice')].some(el=>el.checked);const all=$q('qualifiedAllClasses');if(all)all.checked=!any;}});}}
  function syncQualifiedForm(){const c=qualifiedConfig();populateQualifiedClassOptions(c.classes||[]);if($q('qualifiedEnabled'))$q('qualifiedEnabled').value=c.enabled?'on':'off';if($q('qualifiedStartDate'))$q('qualifiedStartDate').value=c.startDate||'';if($q('qualifiedEndDate'))$q('qualifiedEndDate').value=c.endDate||'';if($q('qualifiedThreshold'))$q('qualifiedThreshold').value=Number(c.threshold??80);const sup=role==='supervisor';['qualifiedEnabled','qualifiedStartDate','qualifiedEndDate','qualifiedThreshold','saveQualifiedSettings'].forEach(id=>{if($q(id))$q(id).disabled=!sup});}
  window.syncQualifiedForm=syncQualifiedForm;
  async function saveQualifiedSettingsNow(){
