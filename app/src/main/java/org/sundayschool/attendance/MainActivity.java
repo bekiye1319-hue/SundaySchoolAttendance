@@ -1,11 +1,13 @@
 package org.sundayschool.attendance;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.AlertDialog;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,9 +15,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
-import android.Manifest;
 import android.content.ContentValues;
-import android.content.pm.PackageManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -58,7 +58,6 @@ public class MainActivity extends Activity {
     private String pendingContent;
     private byte[] pendingBytes;
     private String pendingDownloadCallbackId;
-    private String pendingDownloadFilename;
 
     private static final String GITHUB_RELEASES_API =
         "https://api.github.com/repos/bekiye1319-hue/SundaySchoolAttendance/releases/latest";
@@ -71,7 +70,7 @@ public class MainActivity extends Activity {
         Log.d(TAG, "App started");
         getWindow().setStatusBarColor(0xFF174EA6);
         getWindow().setNavigationBarColor(0xFF174EA6);
-        WebView.setWebContentsDebuggingEnabled(true);
+        WebView.setWebContentsDebuggingEnabled(false);
 
         webView = new WebView(this);
         webView.setBackgroundColor(0xFFF4F7FB);
@@ -79,8 +78,16 @@ public class MainActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
-        settings.setAllowFileAccess(true);
+        settings.setAllowFileAccess(true); // Required for bundled file:///android_asset/index.html
         settings.setAllowContentAccess(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            settings.setAllowFileAccessFromFileURLs(false);
+            settings.setAllowUniversalAccessFromFileURLs(false);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            settings.setSafeBrowsingEnabled(true);
+        }
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         Log.d(TAG, "WebView settings configured");
         webView.addJavascriptInterface(new AndroidBridge(), "Android");
 
@@ -105,12 +112,20 @@ public class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String scheme = uri.getScheme();
-                if ("file".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme)) return false;
-                try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
-                catch (Exception e) {
-                    Log.e(TAG, "Unable to open external link", e);
-                    Toast.makeText(MainActivity.this, "Unable to open link", Toast.LENGTH_SHORT).show();
+                // Keep the Android-JS bridge inside the bundled local app. Open web links
+                // in the external browser so untrusted pages never share this WebView.
+                if ("file".equalsIgnoreCase(scheme)
+                        && uri.getPath() != null
+                        && uri.getPath().startsWith("/android_asset/")) return false;
+                if ("https".equalsIgnoreCase(scheme)) {
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
+                    catch (Exception e) {
+                        Log.e(TAG, "Unable to open external link", e);
+                        Toast.makeText(MainActivity.this, "Unable to open link", Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
                 }
+                Toast.makeText(MainActivity.this, "Blocked unsupported or insecure link", Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -197,13 +212,12 @@ public class MainActivity extends Activity {
                     complete.put(MediaStore.Downloads.IS_PENDING, 0);
                     getContentResolver().update(savedUri, complete, null, null);
                     Log.d(TAG, "Saved to Downloads: " + savedUri);
-                    showSaveResult(callbackId, true, "Saved to Downloads/SundaySchoolAttendance", safeName, savedUri);
+                    showSaveResult(callbackId, true, "Saved to Downloads/SundaySchoolAttendance");
                 } else {
                     // Older Android versions use the system document picker because scoped Downloads access is unavailable.
                     pendingBytes = bytes;
                     pendingContent = null;
                     pendingDownloadCallbackId = callbackId;
-                    pendingDownloadFilename = safeName;
                     runOnUiThread(() -> {
                         try {
                             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -215,7 +229,6 @@ public class MainActivity extends Activity {
                             Log.e(TAG, "Legacy save picker error", e);
                             pendingBytes = null;
                             pendingDownloadCallbackId = null;
-                            pendingDownloadFilename = null;
                             showSaveResult(callbackId, false, "Unable to open save location");
                         }
                     });
@@ -243,24 +256,16 @@ public class MainActivity extends Activity {
             if (manager == null) return;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(
-                    DOWNLOAD_CHANNEL_ID,
-                    "Downloads",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                );
+                    DOWNLOAD_CHANNEL_ID, "Downloads", NotificationManager.IMPORTANCE_DEFAULT);
                 channel.setDescription("Notifications when Sunday School Attendance files are saved");
                 manager.createNotificationChannel(channel);
             }
-
             Intent openFile = new Intent(Intent.ACTION_VIEW);
             openFile.setDataAndType(savedUri, getContentResolver().getType(savedUri));
             openFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             PendingIntent pending = PendingIntent.getActivity(
-                this,
-                (int) (System.currentTimeMillis() & 0x0fffffff),
-                openFile,
-                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0)
-            );
-
+                this, (int) (System.currentTimeMillis() & 0x0fffffff), openFile,
+                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
             Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 ? new Notification.Builder(this, DOWNLOAD_CHANNEL_ID)
                 : new Notification.Builder(this);
@@ -268,33 +273,32 @@ public class MainActivity extends Activity {
                 .setContentTitle("Download complete")
                 .setContentText(filename + " saved in Downloads/SundaySchoolAttendance")
                 .setStyle(new Notification.BigTextStyle().bigText(filename + " was saved in Downloads/SundaySchoolAttendance."))
-                .setContentIntent(pending)
-                .setAutoCancel(true)
-                .setCategory(Notification.CATEGORY_PROGRESS)
-                .setPriority(Notification.PRIORITY_DEFAULT);
-
+                .setContentIntent(pending).setAutoCancel(true)
+                .setCategory(Notification.CATEGORY_PROGRESS).setPriority(Notification.PRIORITY_DEFAULT);
             if (Build.VERSION.SDK_INT < 33 || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 manager.notify((int) (System.currentTimeMillis() & 0x7fffffff), builder.build());
             } else {
-                Log.w(TAG, "Notification permission denied; download is saved but system notification is unavailable.");
+                Log.w(TAG, "Notification permission denied; file is saved but notification is unavailable.");
             }
         } catch (Exception e) {
             Log.e(TAG, "Could not show download notification", e);
         }
     }
 
-    private void showSaveResult(String callbackId, boolean success, String message) {
-        showSaveResult(callbackId, success, message, "download", null);
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == DOWNLOAD_NOTIFICATION_PERMISSION_REQUEST) {
+            boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            Log.d(TAG, "Download notification permission: " + (granted ? "granted" : "denied"));
+            if (!granted) Toast.makeText(this,
+                "Download notifications are disabled. Files will still be saved in Downloads.", Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void showSaveResult(String callbackId, boolean success, String message, String filename, Uri savedUri) {
+    private void showSaveResult(String callbackId, boolean success, String message) {
         runOnUiThread(() -> {
-            if (success) {
-                Toast.makeText(this, "Download complete: " + filename, Toast.LENGTH_LONG).show();
-                if (savedUri != null) postDownloadNotification(filename, savedUri);
-            } else {
-                Toast.makeText(this, "Download failed: " + message, Toast.LENGTH_LONG).show();
-            }
+            if (success) Toast.makeText(this, "Saved in Downloads/SundaySchoolAttendance", Toast.LENGTH_LONG).show();
+            else Toast.makeText(this, "Download failed: " + message, Toast.LENGTH_LONG).show();
             if (callbackId != null && webView != null) {
                 String id = JSONObject.quote(callbackId);
                 String msg = JSONObject.quote(message == null ? "" : message);
@@ -348,8 +352,6 @@ public class MainActivity extends Activity {
         }
         if (requestCode == SAVE_FILE_REQUEST) {
             String callbackId = pendingDownloadCallbackId;
-            String filename = pendingDownloadFilename == null ? "download" : pendingDownloadFilename;
-            Uri savedUri = null;
             boolean success = false;
             String message = "Save cancelled";
             if (resultCode == RESULT_OK && data != null && data.getData() != null) {
@@ -359,7 +361,6 @@ public class MainActivity extends Activity {
                     else out.write((pendingContent == null ? "" : pendingContent).getBytes(StandardCharsets.UTF_8));
                     out.flush();
                     success = true;
-                    savedUri = data.getData();
                     message = "File saved";
                 } catch (Exception e) {
                     Log.e(TAG, "File writing error", e);
@@ -369,18 +370,7 @@ public class MainActivity extends Activity {
             pendingContent = null;
             pendingBytes = null;
             pendingDownloadCallbackId = null;
-            pendingDownloadFilename = null;
-            showSaveResult(callbackId, success, message, filename, savedUri);
-        }
-    }
-
-
-    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == DOWNLOAD_NOTIFICATION_PERMISSION_REQUEST) {
-            boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-            Log.d(TAG, "Download notification permission: " + (granted ? "granted" : "denied"));
-            if (!granted) Toast.makeText(this, "Download notifications are disabled. Files will still be saved in Downloads.", Toast.LENGTH_LONG).show();
+            showSaveResult(callbackId, success, message);
         }
     }
 
