@@ -2127,16 +2127,10 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
     if(document.body.classList.contains('auth-loading'))
       reveal('መተግበሪያው ከFirebase ጋር መገናኘት አልቻለም። Internet ያረጋግጡና እንደገና ይክፈቱ። / Firebase sign-in is taking too long. Check your internet connection, then tap Sign in again.');
   },45000);
-  window.addEventListener('error',function(e){
-    // Ignore failed external assets (icons, fonts, PDF libraries, etc.).
-    // Their load errors bubble through the window error event but do not mean
-    // Firebase authentication or application startup has failed.
-    if(e.target && e.target !== window) return;
-    if(document.body.classList.contains('auth-loading')){
-      console.error('Startup JavaScript error:',e.message,e.filename,e.lineno);
-      reveal('የመተግበሪያ መነሻ ስህተት ተፈጥሯል። Internet ያረጋግጡና እንደገና ይክፈቱ። / App startup error. Please retry.');
-    }
-  });
+  // Do not turn every uncaught page error into a Firebase startup failure.
+  // Optional modules and later UI features can report unrelated errors while
+  // the login form is already usable. The timeout above remains the fallback
+  // only when Firebase auth never finishes initializing.
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
