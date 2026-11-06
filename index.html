@@ -3645,38 +3645,7 @@ renderAll();
 #attendance .attendance-radio-option input{touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;}
 #attendance .attendance-radio-option input:checked + .attendance-radio-visual i{opacity:1!important;transform:none!important;}
 
-/* Keep the open drawer above its dimming backdrop and preserve readable contrast. */
-@media(max-width:800px){
-  html body>nav[aria-label="ዋና ምናሌ"],
-  html body>nav.no-print.sidebar-open{
-    z-index:2147483002!important;
-    background:#102d22!important;
-    color:#f1fff6!important;
-    opacity:1!important;
-    filter:none!important;
-  }
-  html body>nav[aria-label="ዋና ምናሌ"] .sidebar-user,
-  html body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label,
-  html body>nav[aria-label="ዋና ምናሌ"] button,
-  html body>nav[aria-label="ዋና ምናሌ"] button:before,
-  html body>nav[aria-label="ዋና ምናሌ"] button:after{
-    opacity:1!important;
-    filter:none!important;
-  }
-  html body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
-    color:#e8f5ed!important;
-    background:transparent!important;
-  }
-  html body>nav[aria-label="ዋና ምናሌ"] button[data-page].active{
-    color:#fff!important;
-    background:#087a50!important;
-  }
-  html body>#sidebarBackdrop,
-  html body>.sidebar-backdrop{
-    z-index:2147483001!important;
-    background:rgba(4,18,12,.52)!important;
-  }
-}
+/* Sidebar styling overrides removed: retain the original sidebar design. */
 
 /* Individual report summary has EIGHT columns (ID, student, class, P/A/L/E, rate).
    Give each a real share of the phone width; the old seven-column sizing caused overlap. */
