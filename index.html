@@ -3709,6 +3709,9 @@ renderAll();
   const observer=new MutationObserver(sync);observer.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class','style']});
   bar.addEventListener('click',()=>setTimeout(sync,0));
   sync();
+  // A normal website uses the header navigation exclusively. Remove the
+  // Android-only bottom navigation node so later mobile-nav styles cannot show it.
+  document.getElementById('mobileBottomNav')?.remove();
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
