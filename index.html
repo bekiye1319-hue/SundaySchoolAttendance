@@ -1937,6 +1937,20 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
   #attendance .attendance-reference-table{min-width:680px!important;}
   #students .students-ref-table-wrap table{min-width:570px!important;}
 }
+
+/* Website horizontal navigation: GitHub-style active bottom indicator. */
+.website-navigation-bar{display:flex;align-items:stretch;gap:4px;width:100%;min-height:54px;padding:0 22px;background:var(--surface,#fff);border-bottom:1px solid var(--border,#e2e8f0);overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:thin;position:relative;z-index:30;}
+.website-navigation-bar button{appearance:none;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;min-height:54px;padding:0 14px;margin:0;border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:var(--text,#334155);font-family:inherit;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;}
+.website-navigation-bar button:hover{background:var(--surface-soft,#f1f5f9);color:var(--primary,#087b50);}
+.website-navigation-bar button.active{color:var(--primary,#087b50);border-bottom-color:var(--primary,#087b50);font-weight:750;}
+.website-navigation-bar button:focus-visible{outline:2px solid #3b82f6;outline-offset:-3px;}
+body.website-mode #mobileBottomNav{display:none!important;}
+body.website-mode .website-navigation-bar{display:flex;}
+body.app-dark-theme .website-navigation-bar{background:#172235;border-bottom-color:#334155;}
+body.app-dark-theme .website-navigation-bar button{color:#cbd5e1;}
+body.app-dark-theme .website-navigation-bar button.active{color:#6ee7a5;border-bottom-color:#6ee7a5;}
+@media(max-width:800px){.website-navigation-bar{min-height:50px;padding:0 8px;gap:0;}.website-navigation-bar button{min-height:50px;padding:0 12px;font-size:13px;}}
+@media print{.website-navigation-bar{display:none!important;}}
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -3668,6 +3682,35 @@ renderAll();
  // settings after load. Wrapping global functions caused recursive call chains
  // in some WebView builds (Maximum call stack size exceeded).
  window.refreshQualifiedStudentsFromSettings=()=>{syncQualifiedForm();renderQualifiedStudents();if(role==='supervisor')publishQualifiedRows().catch(e=>console.error('Qualified dashboard refresh failed:',e))};
+})();
+</script>
+
+<script id="website-horizontal-navigation">
+(()=>{
+ const init=()=>{
+  // The Android wrapper owns its native bottom navigation; website mode uses the top bar.
+  if(window.Android)return;
+  document.body.classList.add('website-mode');
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  if(!sidebar||document.getElementById('websiteNavigationBar'))return;
+  const bar=document.createElement('nav');bar.id='websiteNavigationBar';bar.className='website-navigation-bar no-print';bar.setAttribute('aria-label','Website navigation');
+  sidebar.querySelectorAll('button[data-page]').forEach(source=>{
+   const item=document.createElement('button');item.type='button';item.dataset.page=source.dataset.page;
+   const icon=source.querySelector('.sidebar-nav-icon');if(icon){const copy=icon.cloneNode(true);item.appendChild(copy);}
+   const label=document.createElement('span');label.textContent=source.textContent.trim();item.appendChild(label);
+   item.classList.toggle('active',source.classList.contains('active'));
+   item.addEventListener('click',()=>source.click());bar.appendChild(item);
+  });
+  const anchor=document.querySelector('body>header.desktop-navbar')||document.querySelector('body>header');
+  if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(bar,anchor.nextSibling);else document.body.insertBefore(bar,document.body.firstChild);
+  const sync=()=>{
+   sidebar.querySelectorAll('button[data-page]').forEach(source=>{const target=bar.querySelector('button[data-page="'+source.dataset.page+'"]');if(target){target.classList.toggle('active',source.classList.contains('active'));target.hidden=source.classList.contains('hidden');}});
+  };
+  const observer=new MutationObserver(sync);observer.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class','style']});
+  bar.addEventListener('click',()=>setTimeout(sync,0));
+  sync();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
 </body></html>
