@@ -362,12 +362,34 @@ main{padding:27px 30px;}#dashboard .panel{padding:22px;}.dashboard-title{padding
 #reports .report-table th{color:#0f623a;font-weight:800;font-size:.92rem;background:#fafafa;}
 #reports .report-table .report-id-col{font-weight:700;color:#718096;font-size:.85rem;width:100px;}
 #reports .report-table .report-student-name{text-align:left;font-weight:700;color:#2d3748;min-width:145px;}
+/* Individual-student summary: reserve usable space for the name and keep compact headings horizontal. */
+#reports .report-table.individual-summary-table{width:100%;min-width:850px;table-layout:fixed;}
+#reports .report-table.individual-summary-table th,
+#reports .report-table.individual-summary-table td{white-space:nowrap;word-break:normal;overflow-wrap:normal;writing-mode:horizontal-tb;text-orientation:mixed;vertical-align:middle;}
+#reports .report-table.individual-summary-table th:nth-child(1),
+#reports .report-table.individual-summary-table td:nth-child(1){width:110px;}
+#reports .report-table.individual-summary-table th:nth-child(2),
+#reports .report-table.individual-summary-table td:nth-child(2){width:230px;min-width:230px;text-align:left;}
+#reports .report-table.individual-summary-table td:nth-child(2){white-space:normal;word-break:normal;overflow-wrap:break-word;}
+#reports .report-table.individual-summary-table th:nth-child(3),
+#reports .report-table.individual-summary-table td:nth-child(3){width:110px;}
+#reports .report-table.individual-summary-table th:nth-child(4),
+#reports .report-table.individual-summary-table td:nth-child(4),
+#reports .report-table.individual-summary-table th:nth-child(5),
+#reports .report-table.individual-summary-table td:nth-child(5),
+#reports .report-table.individual-summary-table th:nth-child(6),
+#reports .report-table.individual-summary-table td:nth-child(6),
+#reports .report-table.individual-summary-table th:nth-child(7),
+#reports .report-table.individual-summary-table td:nth-child(7){width:58px;text-align:center;}
+#reports .report-table.individual-summary-table th:nth-child(8),
+#reports .report-table.individual-summary-table td:nth-child(8){width:160px;text-align:center;}
+
 #reports .report-circle-badge{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.88rem;margin:0 auto;box-shadow:0 2px 4px #00000014;}
 #reports .report-circle-badge.p{background:#107c41;}#reports .report-circle-badge.a{background:#d93025;}#reports .report-circle-badge.l{background:#d97706;}#reports .report-circle-badge.e{background:#7c3aed;}
 #reports .report-percent{font-weight:800;font-size:.95rem;}#reports .report-percent.high{color:#107c41;}#reports .report-percent.mid{color:#16803d;}#reports .report-percent.low{color:#d93025;}
 #reports .report-range-note{color:#718096;font-size:.85rem;margin-bottom:2px;}
 @media(min-width:600px){#reports .report-stats-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
-@media(max-width:700px){#reports .report-container{padding:9px;gap:12px;}#reports .report-card{padding:14px;border-radius:12px;gap:14px;}#reports .report-filter-grid{grid-template-columns:minmax(0,1fr);gap:8px;}#reports .report-button-group{gap:8px;}#reports .report-btn{flex:1 1 100%;width:100%;}#reports .report-table th,#reports .report-table td{padding:10px 8px;}#reports .report-brand-title{font-size:1.05rem;}}
+@media(max-width:700px){#reports .report-container{padding:9px;gap:12px;}#reports .report-card{padding:14px;border-radius:12px;gap:14px;}#reports .report-filter-grid{grid-template-columns:minmax(0,1fr);gap:8px;}#reports .report-button-group{gap:8px;}#reports .report-btn{flex:1 1 100%;width:100%;}#reports .report-table th,#reports .report-table td{padding:10px 8px;}#reports .report-table.individual-summary-table{min-width:850px;}#reports .report-table.individual-summary-table th,#reports .report-table.individual-summary-table td{font-size:14px;padding:11px 9px;}#reports .report-brand-title{font-size:1.05rem;}}
 @media print{#reports.report-page{display:block!important;background:#fff;}#reports .report-container{max-width:none;padding:0;gap:8px;}#reports .report-app-header{box-shadow:none;}#reports .report-card{box-shadow:none;padding:8px;border:0;break-inside:avoid;}#reports .report-button-group{display:none!important;}#reports .report-table-responsive{overflow:visible;}#reports .report-table{min-width:0;font-size:10px;}#reports .report-table th,#reports .report-table td{padding:5px 4px;}}
 
 
@@ -812,10 +834,6 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
 /* Reliable refresh animation */
 #quickRefreshToggle.is-refreshing .refresh-glyph{animation:ssRefreshSpin .55s linear infinite!important;transform-origin:50% 50%;will-change:transform;}
 #quickRefreshToggle.is-refreshing{opacity:1!important;}
-/* Give the attendance-rate column more room in an individual report on phones. */
-#reports #reportResult.individual-report-result table{}
-#reports #reportResult.individual-report-result th:last-child,#reports #reportResult.individual-report-result td:last-child{width:42%!important;min-width:132px!important;white-space:normal!important;line-height:1.35;}
-#reports #reportResult.individual-report-result th:first-child,#reports #reportResult.individual-report-result td:first-child{width:58%!important;}
 /* Modern alert dialog */
 #ssModernNotice{display:none;position:fixed;inset:0;z-index:100500;}
 #ssModernNotice.show{display:block;}
@@ -1778,7 +1796,7 @@ body>nav.no-print{z-index:2147482500!important;}
 #appModalNotice .notice-ok{width:100%;min-height:48px;border:0;border-radius:13px;background:linear-gradient(135deg,#087344,#15965c);color:#fff;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 7px 18px rgba(8,115,68,.2);}
 #appModalNotice.error .notice-ok{background:linear-gradient(135deg,#b42318,#dc4545);}#appModalNotice.warning .notice-ok{background:linear-gradient(135deg,#a66300,#d18a16);}#appModalNotice.info .notice-ok{background:linear-gradient(135deg,#1769aa,#318bd0);}
 @keyframes appNoticeFade{from{opacity:0;}to{opacity:1;}}@keyframes appNoticePop{from{opacity:0;transform:translateY(9px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
-@media(prefers-color-scheme:dark){#appModalNotice{background:#17251e;color:#e8f2ec;border-color:#34483c;}}
+body.app-dark-theme #appModalNotice{background:#17251e;color:#e8f2ec;border-color:#34483c;}
 
 #printCleanArea{display:none;}
 @media print{
@@ -1804,10 +1822,6 @@ body>nav.no-print{z-index:2147482500!important;}
  html body.print-clean-sheet>*:not(#printCleanArea){display:none!important;visibility:hidden!important;}
  html body.print-clean-sheet #printCleanArea{display:block!important;visibility:visible!important;}
 }
-/* Individual-student report: fit the detail table to a phone screen instead of forcing sideways scrolling. */
-#reports #reportResult.individual-report-result{width:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important;}
-#reports #reportResult.individual-report-result table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important;}
-#reports #reportResult.individual-report-result th,#reports #reportResult.individual-report-result td{white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;padding:8px 5px!important;}
 #reports #reportResultCard{scroll-margin-top:88px;}
 @media(max-width:800px){#reports #reportResultCard{scroll-margin-top:78px;}}
 
@@ -1836,29 +1850,6 @@ body>nav.no-print{z-index:2147482500!important;}
     padding:5px 6px!important; white-space:normal!important; overflow-wrap:anywhere!important;
   }
   #printCleanArea th { background:#eee!important; }
-}
-/* Seven-column individual summary: give the attendance-rate label enough room. */
-#reports #reportResult.individual-report-result > table:first-of-type { width:100%!important; min-width:0!important; table-layout:fixed!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(1),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(1) { width:13%!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(2),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(2) { width:27%!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(3),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(3),
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(4),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(4),
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(5),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(5),
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(6),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(6) { width:7%!important; text-align:center!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(7),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(7) { width:25%!important; min-width:0!important; white-space:normal!important; line-height:1.35!important; text-align:center!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th,
-#reports #reportResult.individual-report-result > table:first-of-type td { padding:7px 4px!important; overflow-wrap:anywhere!important; word-break:normal!important; }
-@media(max-width:480px){
- #reports #reportResult.individual-report-result > table:first-of-type { font-size:12px!important; }
- #reports #reportResult.individual-report-result > table:first-of-type th:nth-child(7),
- #reports #reportResult.individual-report-result > table:first-of-type td:nth-child(7) { font-size:11px!important; }
 }
 
 @media print {
@@ -1909,6 +1900,43 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
 #qualifiedClassOptions label{padding:6px 8px!important;min-height:34px;font-size:13px;}
 #settings input[type="checkbox"]:disabled,
 #qualifiedStudentsSettings input[type="checkbox"]:disabled{cursor:not-allowed;opacity:.6;}
+
+/* Final phone-table readability overrides: preserve all columns and allow intentional horizontal scrolling. */
+@media(max-width:700px){
+  #attendance .attendance-table-wrap{width:100%;overflow-x:auto!important;-webkit-overflow-scrolling:touch;}
+  #attendance .attendance-reference-table{width:max-content!important;min-width:690px!important;table-layout:auto!important;}
+  #attendance .attendance-reference-table th,
+  #attendance .attendance-reference-table td{white-space:normal!important;overflow-wrap:anywhere;word-break:normal;line-height:1.45;padding:10px 8px!important;font-size:12px!important;vertical-align:middle;}
+  #attendance .attendance-reference-table th:nth-child(1),
+  #attendance .attendance-reference-table td:nth-child(1){min-width:34px;width:34px;}
+  #attendance .attendance-reference-table th:nth-child(2),
+  #attendance .attendance-reference-table td:nth-child(2){min-width:76px;width:76px;overflow-wrap:normal;}
+  #attendance .attendance-reference-table th:nth-child(3),
+  #attendance .attendance-reference-table td:nth-child(3){min-width:145px;width:145px;}
+  #attendance .attendance-reference-table th:nth-child(4),
+  #attendance .attendance-reference-table td:nth-child(4){min-width:88px;width:88px;}
+  #attendance .attendance-reference-table th.status-head,
+  #attendance .attendance-reference-table td.status{min-width:38px;width:38px;padding-left:4px!important;padding-right:4px!important;text-align:center!important;}
+  #attendance .attendance-reference-table th:last-child,
+  #attendance .attendance-reference-table td:last-child{min-width:42px;width:42px;text-align:center!important;}
+  #attendance .attendance-radio-option{margin:0 auto;}
+  #attendance .attendance-unlock-btn{width:34px;height:34px;min-width:34px;min-height:34px;padding:0!important;display:inline-grid;place-items:center;font-size:17px;line-height:1;}
+  #students .students-ref-table-wrap{width:100%;overflow-x:auto!important;-webkit-overflow-scrolling:touch;}
+  #students .students-ref-table-wrap table{width:max-content!important;min-width:590px!important;table-layout:auto!important;font-size:12px!important;}
+  #students .students-ref-table-wrap th,
+  #students .students-ref-table-wrap td{padding:10px 8px!important;white-space:normal!important;overflow-wrap:anywhere;word-break:normal;line-height:1.45;font-size:12px!important;}
+  #students .students-ref-table-wrap th:nth-child(1),#students .students-ref-table-wrap td:nth-child(1){min-width:38px;width:38px;}
+  #students .students-ref-table-wrap th:nth-child(2),#students .students-ref-table-wrap td:nth-child(2){min-width:78px;width:78px;overflow-wrap:normal;}
+  #students .students-ref-table-wrap th:nth-child(3),#students .students-ref-table-wrap td:nth-child(3){min-width:145px;width:145px;}
+  #students .students-ref-table-wrap th:nth-child(4),#students .students-ref-table-wrap td:nth-child(4){min-width:90px;width:90px;}
+  #students .students-ref-table-wrap th:nth-child(5),#students .students-ref-table-wrap td:nth-child(5){min-width:100px;width:100px;}
+  #students .students-ref-table-wrap th:nth-child(6),#students .students-ref-table-wrap td:nth-child(6){min-width:95px;width:95px;text-align:center;}
+  #students .students-ref-actions{gap:6px;justify-content:flex-start;}
+}
+@media(max-width:380px){
+  #attendance .attendance-reference-table{min-width:680px!important;}
+  #students .students-ref-table-wrap table{min-width:570px!important;}
+}
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -1940,6 +1968,7 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
 
 
 \n
+
 
 
 
@@ -2098,12 +2127,10 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
     if(document.body.classList.contains('auth-loading'))
       reveal('መተግበሪያው ከFirebase ጋር መገናኘት አልቻለም። Internet ያረጋግጡና እንደገና ይክፈቱ። / Firebase sign-in is taking too long. Check your internet connection, then tap Sign in again.');
   },45000);
-  window.addEventListener('error',function(e){
-    if(document.body.classList.contains('auth-loading')){
-      console.error('Startup error:',e.message,e.filename,e.lineno);
-      reveal('የመተግበሪያ መነሻ ስህተት ተፈጥሯል። Internet ያረጋግጡና እንደገና ይክፈቱ። / App startup error. Please retry.');
-    }
-  });
+  // Do not turn every uncaught page error into a Firebase startup failure.
+  // Optional modules and later UI features can report unrelated errors while
+  // the login form is already usable. The timeout above remains the fallback
+  // only when Firebase auth never finishes initializing.
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -2356,9 +2383,9 @@ function renderStudents(){
  const source=isClassScoped()?students.filter(st=>st.className===assignedClass):students;
  const list=source.filter(st=>(selectedClass==='__ALL__'||st.className===selectedClass)&&(!q||[st.name,st.phone,st.className,st.id].some(x=>String(x||'').toLowerCase().includes(q))));
  $('totalStudentsCount').textContent=list.length;
- const headers='<th>#</th><th>ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>ስልክ</th><th>የመመዝገቢያ ቀን</th><th>እርምጃ</th>';
- if(!list.length){box.innerHTML=`<table><thead><tr>${headers}</tr></thead><tbody><tr><td colspan="7" class="students-ref-empty">${q||selectedClass!=='__ALL__'?'በዚህ ማጣሪያ የተገኘ ተማሪ የለም።':'ገና ተማሪ አልተመዘገበም።'}</td></tr></tbody></table>`;return;}
- box.innerHTML='<table><thead><tr>'+headers+'</tr></thead><tbody>'+list.map((st,idx)=>`<tr><td>${idx+1}</td><td class="students-ref-id">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:isolate">${esc(st.name)}</td><td>${esc(st.className)}</td><td>${esc(st.phone||'-')}</td><td>${esc(st.regDate||st.createdAt||'—')}</td><td><div class="students-ref-actions">${role==='supervisor'?`<button type="button" class="students-ref-action" data-edit-student="${esc(st.id)}" title="አስተካክል" aria-label="${esc(st.name)} አስተካክል"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button><button type="button" class="students-ref-action" data-delete-student="${esc(st.id)}" title="ሰርዝ" aria-label="${esc(st.name)} ሰርዝ"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>`:'—'}</div></td></tr>`).join('')+'</tbody></table>';
+ const headers='<th>#</th><th>ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>ስልክ</th><th>እርምጃ</th>';
+ if(!list.length){box.innerHTML=`<table><thead><tr>${headers}</tr></thead><tbody><tr><td colspan="6" class="students-ref-empty">${q||selectedClass!=='__ALL__'?'በዚህ ማጣሪያ የተገኘ ተማሪ የለም።':'ገና ተማሪ አልተመዘገበም።'}</td></tr></tbody></table>`;return;}
+ box.innerHTML='<table><thead><tr>'+headers+'</tr></thead><tbody>'+list.map((st,idx)=>`<tr><td>${idx+1}</td><td class="students-ref-id">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:isolate">${esc(st.name)}</td><td>${esc(st.className)}</td><td>${esc(st.phone||'-')}</td><td><div class="students-ref-actions">${role==='supervisor'?`<button type="button" class="students-ref-action" data-edit-student="${esc(st.id)}" title="አስተካክል" aria-label="${esc(st.name)} አስተካክል"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button><button type="button" class="students-ref-action" data-delete-student="${esc(st.id)}" title="ሰርዝ" aria-label="${esc(st.name)} ሰርዝ"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>`:'—'}</div></td></tr>`).join('')+'</tbody></table>';
 }
 function renderClasses(){const visibleClasses=isClassScoped()?[assignedClass]:classes;const overview=$('classOverview');if(overview){overview.innerHTML=visibleClasses.map(c=>{const roster=students.filter(st=>st.className===c);let p=0,marked=0,last='—';Object.keys(attendance).sort().forEach(d=>{let any=false;roster.forEach(st=>{const v=(attendance[d]||{})[String(st.id)];if(['P','A','L','E'].includes(v)){marked++;if(v==='P')p++;any=true;}});if(any)last=d;});const active=roster.length;const pct=marked?Math.round(p/marked*100):0;return `<div class="class-overview-card"><h3>${esc(c)}</h3><div class="class-metrics"><div>👨‍🎓 <b>${active}</b><span>Total Students</span></div><div>🟢 <b>${active-inactiveForClass(c).length}</b><span>Active Students</span></div><div>🔴 <b>${inactiveForClass(c).length}</b><span>Inactive Students</span></div><div>📊 <b>${pct}%</b><span>Attendance Percentage</span></div><div>📅 <b>${esc(last==='—'?'—':dateET(last))}</b><span>የመጨረሻው Attendance ቀን</span></div></div></div>`}).join('');} $('classesTable').innerHTML='<table><thead><tr><th>ክፍል</th><th>Total Students</th><th>Active</th><th>Inactive</th><th>Attendance %</th><th>የመጨረሻ Attendance</th><th>እርምጃ</th></tr></thead><tbody>'+visibleClasses.map(c=>{const roster=students.filter(st=>st.className===c);let p=0,m=0,last='—';Object.keys(attendance).sort().forEach(d=>{let any=false;roster.forEach(st=>{const v=(attendance[d]||{})[String(st.id)];if(['P','A','L','E'].includes(v)){m++;if(v==='P')p++;any=true}});if(any)last=d});const inactive=inactiveForClass(c).length;return `<tr><td>${esc(c)}</td><td>${roster.length}</td><td>${roster.length-inactive}</td><td class="A">${inactive}</td><td>${m?Math.round(p/m*100):0}%</td><td>${last==='—'?'—':dateET(last)}</td><td>${role==='supervisor'?`<button class="class-delete-btn" data-delete-class="${esc(c)}">ሰርዝ</button>`:''}</td></tr>`}).join('')+'</tbody></table>'}
 function inactiveForClass(className){const threshold=Math.max(1,Number(appSettings.inactiveDays??4));return students.filter(st=>st.className===className&&consecutiveAbsentCount(st)>=threshold)}
@@ -2422,7 +2449,7 @@ function drawAttendance(){
  </tr></thead><tbody>${list.map((st,i)=>{const recorded=!!day[String(st.id)],unlocked=isAttendanceRecordUnlocked(iso,st.id);return `<tr>
  <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="text-align:left;unicode-bidi:isolate">${esc(st.name)}</td><td>${esc(st.className||'')}</td>
  ${['P','A','L','E'].map(code=>radioCell(st,code)).join('')}
- <td>${role==='supervisor'&&recorded&&!unlocked?`<button type="button" class="attendance-unlock-btn" data-attendance-unlock="${esc(st.id)}" title="Unlock this attendance">🔓 Unlock</button>`:unlocked?'<span class="small">Unlocked</span>':''}</td>
+ <td>${role==='supervisor'&&recorded&&!unlocked?`<button type="button" class="attendance-unlock-btn" data-attendance-unlock="${esc(st.id)}" title="Unlock this attendance" aria-label="Unlock this attendance">🔓</button>`:unlocked?'<span class="small">Unlocked</span>':''}</td>
  </tr>`}).join('')||'<tr><td colspan="9" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
  renderAttendanceSummary(list,day,iso)
 }
@@ -2474,7 +2501,7 @@ function report(){
     rows.forEach(({st})=>{const status=(attendance[dailyIso]||{})[String(st.id)]||'—';html+=`<tr><td>${rows.indexOf(rows.find(r=>r.st===st))+1}</td><td>${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${esc(st.className||'')}</td><td>${esc(dailyReasonByClass(st.className))}</td><td><strong class="${['P','A','L','E'].includes(status)?status:''}">${status}</strong></td></tr>`;});
     if(!rows.length)html+='<tr><td colspan="6">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   }else{
-    html+='<table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>';
+    html+=`<table class="report-table${sid!=='__ALL__'?' individual-summary-table':''}"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>`;
     rows.forEach(({st,c,percent},i)=>{const pc=percent>=100?'high':percent>=75?'mid':'low';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${esc(st.className||'')}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
     if(!rows.length)html+='<tr><td colspan="8">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   }
@@ -2800,7 +2827,7 @@ $('lateCutoffClass').addEventListener('change',e=>{const cls=e.target.value,w=ge
 
 $('desktopNavbarLogout').addEventListener('click',()=>{const logout=$('topLogout');if(logout)logout.click()});const syncDesktopNavbar=()=>{const r=$('sidebarRole'),e=$('sidebarEmail');if(r)$('desktopNavbarRole').textContent=r.textContent;if(e)$('desktopNavbarEmail').textContent=e.textContent};syncDesktopNavbar();const navbarObserver=new MutationObserver(syncDesktopNavbar);['sidebarRole','sidebarEmail'].forEach(id=>{const el=$(id);if(el)navbarObserver.observe(el,{childList:true,subtree:true,characterData:true})});
 /* Mobile drawer events are handled once by mobile-sidebar-drawer-reliable-handler below. */
-setInterval(()=>{if(currentUser)runAttendanceClosingCatchUp();},60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentUser)runAttendanceClosingCatchUp();});window.addEventListener('focus',()=>{if(currentUser)runAttendanceClosingCatchUp();});
+setInterval(()=>{if(currentUser)runAttendanceClosingCatchUp();},300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentUser)runAttendanceClosingCatchUp();});window.addEventListener('focus',()=>{if(currentUser)runAttendanceClosingCatchUp();});
 $('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attendanceReason').addEventListener('change',()=>{$('attendanceReasonOtherWrap').classList.toggle('hidden',$('attendanceReason').value!=='ሌላ')});$('showComparativeAnalysis').addEventListener('change',e=>{$('comparativeAnalysisCard').classList.toggle('hidden',!e.target.checked)});$('reportReason').addEventListener('change',()=>{if(!$('reportResultCard').classList.contains('hidden'))report()});$('attDate').addEventListener('change',drawAttendance);if($('attendanceSearch'))$('attendanceSearch').addEventListener('input',drawAttendance);if($('attendanceStatusFilter'))$('attendanceStatusFilter').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;if($('studentsClassFilter'))$('studentsClassFilter').onchange=renderStudents;$('attendanceTable').addEventListener('change',e=>{if(e.target.matches('input[type=radio]')){const iso=dateISO($('attDate').value);const c=isClassScoped()?assignedClass:$('attClass').value;const list=students.filter(st=>c==='__ALL__'||st.className===c);const day={...(attendance[iso]||{})};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);renderAttendanceSummary(list,day,iso)}});$('allPresent').onclick=()=>{const iso=dateISO($('attDate').value);if(!iso)return showModernNotification('ትክክለኛ ቀን ያስገቡ።','warning','Attendance Date Required');const c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(st=>c==='__ALL__'||st.className===c),day={...(attendance[iso]||{})};let changed=0,locked=0;list.forEach(st=>{const id=String(st.id);if(!day[id]&&!isAttendanceRecordUnlocked(iso,id)){day[id]='P';changed++;}else if(day[id]&&!isAttendanceRecordUnlocked(iso,id))locked++;});document.querySelectorAll('#attendanceTable input[type=radio]').forEach(x=>{const id=x.name.slice(3);x.checked=day[id]===x.value});renderAttendanceSummary(list,day,iso);if(changed)showModernNotification(`${changed} ተማሪዎች P ተመርጠዋል። ለማስቀመጥ Attendance አስቀምጥ ይጫኑ።`,'success','All Present Selected');else showModernNotification(locked?'ሁሉም የሚታዩ መዝገቦች አስቀድመው ተመዝግበዋል።':'ለመመዝገብ ተማሪ አልተገኘም።','info','No New Attendance');};
 $('attendanceTable').addEventListener('click',async e=>{const btn=e.target.closest('[data-attendance-unlock]');if(!btn)return;if(role!=='supervisor')return showModernNotification('Supervisor ብቻ Unlock ማድረግ ይችላል።');const iso=dateISO($('attDate').value),id=String(btn.dataset.attendanceUnlock),st=students.find(x=>String(x.id)===id);if(!attendance[iso]||!attendance[iso][id]||!st)return;btn.disabled=true;try{const docId=encodeURIComponent(iso+'_'+id);await db.collection('attendanceUnlocks').doc(docId).set({date:iso,studentId:id,className:String(st.className||''),unlockedBy:currentUser.uid,expiresAt:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+10*60*1000)),createdAt:firebase.firestore.FieldValue.serverTimestamp()});unlockedAttendanceRecords.add(attendanceRecordKey(iso,id));drawAttendance();}catch(error){console.error('Attendance unlock failed:',error);showModernNotification(friendlyFirebaseError(error,'save'));btn.disabled=false;}});
 $('saveAtt').onclick=async()=>{
