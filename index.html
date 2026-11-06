@@ -1954,6 +1954,41 @@ body.app-dark-theme .website-navigation-bar button{color:#cbd5e1;}
 body.app-dark-theme .website-navigation-bar button.active{color:#6ee7a5;border-bottom-color:#6ee7a5;}
 @media(max-width:800px){.website-navigation-bar{min-height:50px;padding:0 8px;gap:0;}.website-navigation-bar button{min-height:50px;padding:0 12px;font-size:13px;}body.website-mode main{padding:15px 12px;min-height:0;}}
 @media print{.website-navigation-bar{display:none;}}
+
+/* Website: one unified header containing the brand, page navigation and actions. */
+body.website-mode > header:not(.desktop-navbar){
+ display:flex;align-items:center;gap:22px;flex-wrap:nowrap;min-height:76px;height:auto;
+ padding:12px clamp(16px,3vw,42px);box-sizing:border-box;position:relative;z-index:100;
+}
+body.website-mode > header:not(.desktop-navbar) .header-brand{flex:0 0 auto;min-width:190px;}
+body.website-mode > header:not(.desktop-navbar) .header-brand h1{margin:0;font-size:clamp(17px,1.5vw,22px);}
+body.website-mode > header:not(.desktop-navbar) .header-brand p{margin:3px 0 0;font-size:11px;}
+body.website-mode > header:not(.desktop-navbar) .website-header-navigation{
+ display:flex;align-items:stretch;justify-content:flex-end;gap:4px;flex:1 1 auto;
+ width:auto;min-width:0;height:auto;position:static;transform:none;overflow-x:auto;
+ padding:0;margin:0;background:transparent;border:0;box-shadow:none;
+}
+body.website-mode > header:not(.desktop-navbar) .website-header-navigation button[data-page]{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;
+ width:auto;min-height:54px;padding:10px 13px;margin:0;border:0;border-bottom:3px solid transparent;
+ border-radius:0;background:transparent;color:inherit;font:inherit;font-weight:650;
+ white-space:nowrap;box-shadow:none;
+}
+body.website-mode > header:not(.desktop-navbar) .website-header-navigation button[data-page].active{
+ border-bottom-color:var(--primary,#2563eb);color:var(--primary,#2563eb);background:transparent;
+}
+body.website-mode > header:not(.desktop-navbar) .website-header-navigation button[data-page]:hover{background:rgba(100,116,139,.10);}
+body.website-mode > header:not(.desktop-navbar) .website-header-navigation #topLogout{
+ flex:0 0 auto;margin-left:8px;border:0;border-radius:9px;padding:10px 13px;
+}
+body.website-mode #mobileBottomNav,body.website-mode #sidebarBackdrop{display:none!important;}
+body.website-mode main{margin-left:0!important;width:100%;}
+@media(max-width:900px){
+ body.website-mode > header:not(.desktop-navbar){gap:10px;flex-wrap:wrap;padding:10px 14px;}
+ body.website-mode > header:not(.desktop-navbar) .header-brand{min-width:0;flex:1 1 55%;}
+ body.website-mode > header:not(.desktop-navbar) .website-header-navigation{order:3;flex:1 1 100%;width:100%;justify-content:flex-start;}
+ body.website-mode > header:not(.desktop-navbar) .website-header-navigation button[data-page]{min-height:48px;padding:8px 11px;font-size:13px;}
+}
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -3691,41 +3726,33 @@ renderAll();
 <script id="website-horizontal-navigation">
 (()=>{
  const init=()=>{
-  // Android keeps its native navigation. The browser website uses the header bar.
+  // The Android APK keeps its existing sidebar and bottom navigation.
   if(window.Android)return;
   document.body.classList.add('website-mode');
-  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
-  if(!sidebar||document.getElementById('websiteNavigationBar'))return;
-  const bar=document.createElement('div');
-  bar.id='websiteNavigationBar';
-  bar.className='website-navigation-bar no-print';
-  bar.setAttribute('role','navigation');
-  bar.setAttribute('aria-label','Website navigation');
-  sidebar.querySelectorAll('button[data-page]').forEach(source=>{
-   const item=document.createElement('button');
-   item.type='button';
-   item.dataset.page=source.dataset.page;
-   const icon=source.querySelector('.sidebar-nav-icon');
-   if(icon)item.appendChild(icon.cloneNode(true));
-   const label=document.createElement('span');
-   label.textContent=source.textContent.trim();
-   item.appendChild(label);
-   item.classList.toggle('active',source.classList.contains('active'));
-   item.addEventListener('click',()=>source.click());
-   bar.appendChild(item);
-  });
   const header=document.querySelector('body>header:not(.desktop-navbar)');
-  if(header&&header.parentNode)header.parentNode.insertBefore(bar,header.nextSibling);
-  else document.body.insertBefore(bar,document.body.firstChild);
-  const sync=()=>sidebar.querySelectorAll('button[data-page]').forEach(source=>{
-   const target=bar.querySelector('button[data-page="'+source.dataset.page+'"]');
-   if(target){target.classList.toggle('active',source.classList.contains('active'));target.hidden=source.classList.contains('hidden');}
-  });
-  const observer=new MutationObserver(sync);
-  observer.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class','style']});
-  bar.addEventListener('click',()=>setTimeout(sync,0));
-  sync();
+  const sidebar=document.querySelector('body>nav[aria-label="ዋና ምናሌ"]');
+  if(!header||!sidebar||header.contains(sidebar))return;
+  // Use the original navigation element and buttons so role access and active
+  // state remain connected to the app's existing navigation logic.
+  sidebar.classList.add('website-header-navigation');
+  sidebar.querySelector('.sidebar-user')?.remove();
+  sidebar.querySelector('.sidebar-section-label')?.remove();
+  header.appendChild(sidebar);
+  // The single website header owns branding, navigation and account actions.
+  document.getElementById('supervisorDesktopNavbar')?.remove();
+  document.getElementById('globalProfileNavbar')?.remove();
   document.getElementById('mobileBottomNav')?.remove();
+  document.getElementById('sidebarBackdrop')?.remove();
+  const menu=document.getElementById('menuToggle');
+  if(menu)menu.remove();
+  const sync=()=>{
+   sidebar.querySelectorAll('button[data-page]').forEach(button=>{
+    button.setAttribute('aria-current',button.classList.contains('active')?'page':'false');
+   });
+  };
+  const observer=new MutationObserver(sync);
+  observer.observe(sidebar,{subtree:true,attributes:true,attributeFilter:['class','hidden','style']});
+  sync();
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
  else init();
