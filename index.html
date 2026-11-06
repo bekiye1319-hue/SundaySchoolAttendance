@@ -362,12 +362,34 @@ main{padding:27px 30px;}#dashboard .panel{padding:22px;}.dashboard-title{padding
 #reports .report-table th{color:#0f623a;font-weight:800;font-size:.92rem;background:#fafafa;}
 #reports .report-table .report-id-col{font-weight:700;color:#718096;font-size:.85rem;width:100px;}
 #reports .report-table .report-student-name{text-align:left;font-weight:700;color:#2d3748;min-width:145px;}
+/* Individual-student summary: reserve usable space for the name and keep compact headings horizontal. */
+#reports .report-table.individual-summary-table{width:100%;min-width:850px;table-layout:fixed;}
+#reports .report-table.individual-summary-table th,
+#reports .report-table.individual-summary-table td{white-space:nowrap;word-break:normal;overflow-wrap:normal;writing-mode:horizontal-tb;text-orientation:mixed;vertical-align:middle;}
+#reports .report-table.individual-summary-table th:nth-child(1),
+#reports .report-table.individual-summary-table td:nth-child(1){width:110px;}
+#reports .report-table.individual-summary-table th:nth-child(2),
+#reports .report-table.individual-summary-table td:nth-child(2){width:230px;min-width:230px;text-align:left;}
+#reports .report-table.individual-summary-table td:nth-child(2){white-space:normal;word-break:normal;overflow-wrap:break-word;}
+#reports .report-table.individual-summary-table th:nth-child(3),
+#reports .report-table.individual-summary-table td:nth-child(3){width:110px;}
+#reports .report-table.individual-summary-table th:nth-child(4),
+#reports .report-table.individual-summary-table td:nth-child(4),
+#reports .report-table.individual-summary-table th:nth-child(5),
+#reports .report-table.individual-summary-table td:nth-child(5),
+#reports .report-table.individual-summary-table th:nth-child(6),
+#reports .report-table.individual-summary-table td:nth-child(6),
+#reports .report-table.individual-summary-table th:nth-child(7),
+#reports .report-table.individual-summary-table td:nth-child(7){width:58px;text-align:center;}
+#reports .report-table.individual-summary-table th:nth-child(8),
+#reports .report-table.individual-summary-table td:nth-child(8){width:160px;text-align:center;}
+
 #reports .report-circle-badge{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.88rem;margin:0 auto;box-shadow:0 2px 4px #00000014;}
 #reports .report-circle-badge.p{background:#107c41;}#reports .report-circle-badge.a{background:#d93025;}#reports .report-circle-badge.l{background:#d97706;}#reports .report-circle-badge.e{background:#7c3aed;}
 #reports .report-percent{font-weight:800;font-size:.95rem;}#reports .report-percent.high{color:#107c41;}#reports .report-percent.mid{color:#16803d;}#reports .report-percent.low{color:#d93025;}
 #reports .report-range-note{color:#718096;font-size:.85rem;margin-bottom:2px;}
 @media(min-width:600px){#reports .report-stats-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
-@media(max-width:700px){#reports .report-container{padding:9px;gap:12px;}#reports .report-card{padding:14px;border-radius:12px;gap:14px;}#reports .report-filter-grid{grid-template-columns:minmax(0,1fr);gap:8px;}#reports .report-button-group{gap:8px;}#reports .report-btn{flex:1 1 100%;width:100%;}#reports .report-table th,#reports .report-table td{padding:10px 8px;}#reports .report-brand-title{font-size:1.05rem;}}
+@media(max-width:700px){#reports .report-container{padding:9px;gap:12px;}#reports .report-card{padding:14px;border-radius:12px;gap:14px;}#reports .report-filter-grid{grid-template-columns:minmax(0,1fr);gap:8px;}#reports .report-button-group{gap:8px;}#reports .report-btn{flex:1 1 100%;width:100%;}#reports .report-table th,#reports .report-table td{padding:10px 8px;}#reports .report-table.individual-summary-table{min-width:850px;}#reports .report-table.individual-summary-table th,#reports .report-table.individual-summary-table td{font-size:14px;padding:11px 9px;}#reports .report-brand-title{font-size:1.05rem;}}
 @media print{#reports.report-page{display:block!important;background:#fff;}#reports .report-container{max-width:none;padding:0;gap:8px;}#reports .report-app-header{box-shadow:none;}#reports .report-card{box-shadow:none;padding:8px;border:0;break-inside:avoid;}#reports .report-button-group{display:none!important;}#reports .report-table-responsive{overflow:visible;}#reports .report-table{min-width:0;font-size:10px;}#reports .report-table th,#reports .report-table td{padding:5px 4px;}}
 
 
@@ -812,10 +834,6 @@ body.app-dark-theme .attendance-table-wrap tbody tr:focus-within td:first-child{
 /* Reliable refresh animation */
 #quickRefreshToggle.is-refreshing .refresh-glyph{animation:ssRefreshSpin .55s linear infinite!important;transform-origin:50% 50%;will-change:transform;}
 #quickRefreshToggle.is-refreshing{opacity:1!important;}
-/* Give the attendance-rate column more room in an individual report on phones. */
-#reports #reportResult.individual-report-result table{}
-#reports #reportResult.individual-report-result th:last-child,#reports #reportResult.individual-report-result td:last-child{width:42%!important;min-width:132px!important;white-space:normal!important;line-height:1.35;}
-#reports #reportResult.individual-report-result th:first-child,#reports #reportResult.individual-report-result td:first-child{width:58%!important;}
 /* Modern alert dialog */
 #ssModernNotice{display:none;position:fixed;inset:0;z-index:100500;}
 #ssModernNotice.show{display:block;}
@@ -1804,10 +1822,6 @@ body>nav.no-print{z-index:2147482500!important;}
  html body.print-clean-sheet>*:not(#printCleanArea){display:none!important;visibility:hidden!important;}
  html body.print-clean-sheet #printCleanArea{display:block!important;visibility:visible!important;}
 }
-/* Individual-student report: fit the detail table to a phone screen instead of forcing sideways scrolling. */
-#reports #reportResult.individual-report-result{width:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important;}
-#reports #reportResult.individual-report-result table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important;}
-#reports #reportResult.individual-report-result th,#reports #reportResult.individual-report-result td{white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;padding:8px 5px!important;}
 #reports #reportResultCard{scroll-margin-top:88px;}
 @media(max-width:800px){#reports #reportResultCard{scroll-margin-top:78px;}}
 
@@ -1836,29 +1850,6 @@ body>nav.no-print{z-index:2147482500!important;}
     padding:5px 6px!important; white-space:normal!important; overflow-wrap:anywhere!important;
   }
   #printCleanArea th { background:#eee!important; }
-}
-/* Seven-column individual summary: give the attendance-rate label enough room. */
-#reports #reportResult.individual-report-result > table:first-of-type { width:100%!important; min-width:0!important; table-layout:fixed!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(1),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(1) { width:13%!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(2),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(2) { width:27%!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(3),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(3),
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(4),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(4),
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(5),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(5),
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(6),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(6) { width:7%!important; text-align:center!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th:nth-child(7),
-#reports #reportResult.individual-report-result > table:first-of-type td:nth-child(7) { width:25%!important; min-width:0!important; white-space:normal!important; line-height:1.35!important; text-align:center!important; }
-#reports #reportResult.individual-report-result > table:first-of-type th,
-#reports #reportResult.individual-report-result > table:first-of-type td { padding:7px 4px!important; overflow-wrap:anywhere!important; word-break:normal!important; }
-@media(max-width:480px){
- #reports #reportResult.individual-report-result > table:first-of-type { font-size:12px!important; }
- #reports #reportResult.individual-report-result > table:first-of-type th:nth-child(7),
- #reports #reportResult.individual-report-result > table:first-of-type td:nth-child(7) { font-size:11px!important; }
 }
 
 @media print {
@@ -1941,14 +1932,6 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
   #students .students-ref-table-wrap th:nth-child(5),#students .students-ref-table-wrap td:nth-child(5){min-width:100px;width:100px;}
   #students .students-ref-table-wrap th:nth-child(6),#students .students-ref-table-wrap td:nth-child(6){min-width:95px;width:95px;text-align:center;}
   #students .students-ref-actions{gap:6px;justify-content:flex-start;}
-  #reports #reportResult.individual-report-result{overflow-x:hidden!important;}
-  #reports #reportResult.individual-report-result table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse;}
-  #reports #reportResult.individual-report-result th,
-  #reports #reportResult.individual-report-result td{padding:9px 7px!important;font-size:12px!important;line-height:1.5!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;vertical-align:top;}
-  #reports #reportResult.individual-report-result table:last-of-type th:first-child,
-  #reports #reportResult.individual-report-result table:last-of-type td:first-child{width:38%!important;}
-  #reports #reportResult.individual-report-result table:last-of-type th:last-child,
-  #reports #reportResult.individual-report-result table:last-of-type td:last-child{width:62%!important;min-width:0!important;}
 }
 @media(max-width:380px){
   #attendance .attendance-reference-table{min-width:680px!important;}
@@ -1985,6 +1968,7 @@ body.app-dark-theme #appModalNotice .notice-icon{filter:brightness(1.08);}
 
 
 \n
+
 
 
 
@@ -2519,7 +2503,7 @@ function report(){
     rows.forEach(({st})=>{const status=(attendance[dailyIso]||{})[String(st.id)]||'—';html+=`<tr><td>${rows.indexOf(rows.find(r=>r.st===st))+1}</td><td>${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${esc(st.className||'')}</td><td>${esc(dailyReasonByClass(st.className))}</td><td><strong class="${['P','A','L','E'].includes(status)?status:''}">${status}</strong></td></tr>`;});
     if(!rows.length)html+='<tr><td colspan="6">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   }else{
-    html+='<table class="report-table"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>';
+    html+=`<table class="report-table${sid!=='__ALL__'?' individual-summary-table':''}"><thead><tr><th class="report-id-col">ተ.ቁ (ID)</th><th style="text-align:left">ተማሪ</th><th>ክፍል</th><th>P</th><th>A</th><th>L</th><th>E</th><th>የመገኘት መጠን</th></tr></thead><tbody>`;
     rows.forEach(({st,c,percent},i)=>{const pc=percent>=100?'high':percent>=75?'mid':'low';html+=`<tr><td class="report-id-col">${esc(st.id)}</td><td class="report-student-name">${esc(st.name)}</td><td>${esc(st.className||'')}</td>${['P','A','L','E'].map(k=>`<td><span class="report-circle-badge ${k.toLowerCase()}">${c[k]}</span></td>`).join('')}<td><span class="report-percent ${pc}">${percent}%</span></td></tr>`;});
     if(!rows.length)html+='<tr><td colspan="8">በዚህ ምርጫ ውስጥ ተማሪ አልተገኘም።</td></tr>';
   }
