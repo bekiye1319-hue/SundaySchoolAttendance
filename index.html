@@ -2356,9 +2356,9 @@ function renderStudents(){
  const source=isClassScoped()?students.filter(st=>st.className===assignedClass):students;
  const list=source.filter(st=>(selectedClass==='__ALL__'||st.className===selectedClass)&&(!q||[st.name,st.phone,st.className,st.id].some(x=>String(x||'').toLowerCase().includes(q))));
  $('totalStudentsCount').textContent=list.length;
- const headers='<th>#</th><th>ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>ስልክ</th><th>እርምጃ</th>';
- if(!list.length){box.innerHTML=`<table><thead><tr>${headers}</tr></thead><tbody><tr><td colspan="6" class="students-ref-empty">${q||selectedClass!=='__ALL__'?'በዚህ ማጣሪያ የተገኘ ተማሪ የለም።':'ገና ተማሪ አልተመዘገበም።'}</td></tr></tbody></table>`;return;}
- box.innerHTML='<table><thead><tr>'+headers+'</tr></thead><tbody>'+list.map((st,idx)=>`<tr><td>${idx+1}</td><td class="students-ref-id">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:isolate">${esc(st.name)}</td><td>${esc(st.className)}</td><td>${esc(st.phone||"-")}</td><td><div class="students-ref-actions">${role==='supervisor'?`<button type="button" class="students-ref-action" data-edit-student="${esc(st.id)}" title="አስተካክል" aria-label="${esc(st.name)} አስተካክል"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button><button type="button" class="students-ref-action" data-delete-student="${esc(st.id)}" title="ሰርዝ" aria-label="${esc(st.name)} ሰርዝ"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>`:'—'}</div></td></tr>`).join('')+'</tbody></table>';
+ const headers='<th>#</th><th>ID</th><th>ሙሉ ስም</th><th>ክፍል</th><th>ስልክ</th><th>የመመዝገቢያ ቀን</th><th>እርምጃ</th>';
+ if(!list.length){box.innerHTML=`<table><thead><tr>${headers}</tr></thead><tbody><tr><td colspan="7" class="students-ref-empty">${q||selectedClass!=='__ALL__'?'በዚህ ማጣሪያ የተገኘ ተማሪ የለም።':'ገና ተማሪ አልተመዘገበም።'}</td></tr></tbody></table>`;return;}
+ box.innerHTML='<table><thead><tr>'+headers+'</tr></thead><tbody>'+list.map((st,idx)=>`<tr><td>${idx+1}</td><td class="students-ref-id">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="direction:ltr;text-align:left;unicode-bidi:isolate">${esc(st.name)}</td><td>${esc(st.className)}</td><td>${esc(st.phone||'-')}</td><td>${esc(st.regDate||st.createdAt||'—')}</td><td><div class="students-ref-actions">${role==='supervisor'?`<button type="button" class="students-ref-action" data-edit-student="${esc(st.id)}" title="አስተካክል" aria-label="${esc(st.name)} አስተካክል"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button><button type="button" class="students-ref-action" data-delete-student="${esc(st.id)}" title="ሰርዝ" aria-label="${esc(st.name)} ሰርዝ"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>`:'—'}</div></td></tr>`).join('')+'</tbody></table>';
 }
 function renderClasses(){const visibleClasses=isClassScoped()?[assignedClass]:classes;const overview=$('classOverview');if(overview){overview.innerHTML=visibleClasses.map(c=>{const roster=students.filter(st=>st.className===c);let p=0,marked=0,last='—';Object.keys(attendance).sort().forEach(d=>{let any=false;roster.forEach(st=>{const v=(attendance[d]||{})[String(st.id)];if(['P','A','L','E'].includes(v)){marked++;if(v==='P')p++;any=true;}});if(any)last=d;});const active=roster.length;const pct=marked?Math.round(p/marked*100):0;return `<div class="class-overview-card"><h3>${esc(c)}</h3><div class="class-metrics"><div>👨‍🎓 <b>${active}</b><span>Total Students</span></div><div>🟢 <b>${active-inactiveForClass(c).length}</b><span>Active Students</span></div><div>🔴 <b>${inactiveForClass(c).length}</b><span>Inactive Students</span></div><div>📊 <b>${pct}%</b><span>Attendance Percentage</span></div><div>📅 <b>${esc(last==='—'?'—':dateET(last))}</b><span>የመጨረሻው Attendance ቀን</span></div></div></div>`}).join('');} $('classesTable').innerHTML='<table><thead><tr><th>ክፍል</th><th>Total Students</th><th>Active</th><th>Inactive</th><th>Attendance %</th><th>የመጨረሻ Attendance</th><th>እርምጃ</th></tr></thead><tbody>'+visibleClasses.map(c=>{const roster=students.filter(st=>st.className===c);let p=0,m=0,last='—';Object.keys(attendance).sort().forEach(d=>{let any=false;roster.forEach(st=>{const v=(attendance[d]||{})[String(st.id)];if(['P','A','L','E'].includes(v)){m++;if(v==='P')p++;any=true}});if(any)last=d});const inactive=inactiveForClass(c).length;return `<tr><td>${esc(c)}</td><td>${roster.length}</td><td>${roster.length-inactive}</td><td class="A">${inactive}</td><td>${m?Math.round(p/m*100):0}%</td><td>${last==='—'?'—':dateET(last)}</td><td>${role==='supervisor'?`<button class="class-delete-btn" data-delete-class="${esc(c)}">ሰርዝ</button>`:''}</td></tr>`}).join('')+'</tbody></table>'}
 function inactiveForClass(className){const threshold=Math.max(1,Number(appSettings.inactiveDays??4));return students.filter(st=>st.className===className&&consecutiveAbsentCount(st)>=threshold)}
@@ -2422,7 +2422,7 @@ function drawAttendance(){
  </tr></thead><tbody>${list.map((st,i)=>{const recorded=!!day[String(st.id)],unlocked=isAttendanceRecordUnlocked(iso,st.id);return `<tr>
  <td class="attendance-index">${i+1}</td><td class="student-id-cell">${esc(st.id)}</td><td class="student-name-cell" dir="ltr" style="text-align:left;unicode-bidi:isolate">${esc(st.name)}</td><td>${esc(st.className||'')}</td>
  ${['P','A','L','E'].map(code=>radioCell(st,code)).join('')}
- <td>${role==='supervisor'&&recorded&&!unlocked?`<button type="button" class="attendance-unlock-btn" data-attendance-unlock="${esc(st.id)}" title="Unlock this attendance" aria-label="Unlock this attendance">🔓</button>`:unlocked?'<span class="small" title="Unlocked" aria-label="Unlocked">🔓</span>':''}</td>
+ <td>${role==='supervisor'&&recorded&&!unlocked?`<button type="button" class="attendance-unlock-btn" data-attendance-unlock="${esc(st.id)}" title="Unlock this attendance">🔓 Unlock</button>`:unlocked?'<span class="small">Unlocked</span>':''}</td>
  </tr>`}).join('')||'<tr><td colspan="9" class="small">ተማሪ አልተገኘም።</td></tr>'}</tbody></table>`;
  renderAttendanceSummary(list,day,iso)
 }
@@ -2800,7 +2800,7 @@ $('lateCutoffClass').addEventListener('change',e=>{const cls=e.target.value,w=ge
 
 $('desktopNavbarLogout').addEventListener('click',()=>{const logout=$('topLogout');if(logout)logout.click()});const syncDesktopNavbar=()=>{const r=$('sidebarRole'),e=$('sidebarEmail');if(r)$('desktopNavbarRole').textContent=r.textContent;if(e)$('desktopNavbarEmail').textContent=e.textContent};syncDesktopNavbar();const navbarObserver=new MutationObserver(syncDesktopNavbar);['sidebarRole','sidebarEmail'].forEach(id=>{const el=$(id);if(el)navbarObserver.observe(el,{childList:true,subtree:true,characterData:true})});
 /* Mobile drawer events are handled once by mobile-sidebar-drawer-reliable-handler below. */
-setInterval(()=>{if(currentUser)runAttendanceClosingCatchUp();},300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentUser)runAttendanceClosingCatchUp();});window.addEventListener('focus',()=>{if(currentUser)runAttendanceClosingCatchUp();});
+setInterval(()=>{if(currentUser)runAttendanceClosingCatchUp();},60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentUser)runAttendanceClosingCatchUp();});window.addEventListener('focus',()=>{if(currentUser)runAttendanceClosingCatchUp();});
 $('attClass').onchange=()=>{if(isClassScoped())$('attClass').value=assignedClass;drawAttendance()};$('attendanceReason').addEventListener('change',()=>{$('attendanceReasonOtherWrap').classList.toggle('hidden',$('attendanceReason').value!=='ሌላ')});$('showComparativeAnalysis').addEventListener('change',e=>{$('comparativeAnalysisCard').classList.toggle('hidden',!e.target.checked)});$('reportReason').addEventListener('change',()=>{if(!$('reportResultCard').classList.contains('hidden'))report()});$('attDate').addEventListener('change',drawAttendance);if($('attendanceSearch'))$('attendanceSearch').addEventListener('input',drawAttendance);if($('attendanceStatusFilter'))$('attendanceStatusFilter').addEventListener('change',drawAttendance);$('studentSearch').oninput=renderStudents;if($('studentsClassFilter'))$('studentsClassFilter').onchange=renderStudents;$('attendanceTable').addEventListener('change',e=>{if(e.target.matches('input[type=radio]')){const iso=dateISO($('attDate').value);const c=isClassScoped()?assignedClass:$('attClass').value;const list=students.filter(st=>c==='__ALL__'||st.className===c);const day={...(attendance[iso]||{})};document.querySelectorAll('#attendanceTable input:checked').forEach(x=>day[x.name.slice(3)]=x.value);renderAttendanceSummary(list,day,iso)}});$('allPresent').onclick=()=>{const iso=dateISO($('attDate').value);if(!iso)return showModernNotification('ትክክለኛ ቀን ያስገቡ።','warning','Attendance Date Required');const c=isClassScoped()?assignedClass:$('attClass').value,list=students.filter(st=>c==='__ALL__'||st.className===c),day={...(attendance[iso]||{})};let changed=0,locked=0;list.forEach(st=>{const id=String(st.id);if(!day[id]&&!isAttendanceRecordUnlocked(iso,id)){day[id]='P';changed++;}else if(day[id]&&!isAttendanceRecordUnlocked(iso,id))locked++;});document.querySelectorAll('#attendanceTable input[type=radio]').forEach(x=>{const id=x.name.slice(3);x.checked=day[id]===x.value});renderAttendanceSummary(list,day,iso);if(changed)showModernNotification(`${changed} ተማሪዎች P ተመርጠዋል። ለማስቀመጥ Attendance አስቀምጥ ይጫኑ።`,'success','All Present Selected');else showModernNotification(locked?'ሁሉም የሚታዩ መዝገቦች አስቀድመው ተመዝግበዋል።':'ለመመዝገብ ተማሪ አልተገኘም።','info','No New Attendance');};
 $('attendanceTable').addEventListener('click',async e=>{const btn=e.target.closest('[data-attendance-unlock]');if(!btn)return;if(role!=='supervisor')return showModernNotification('Supervisor ብቻ Unlock ማድረግ ይችላል።');const iso=dateISO($('attDate').value),id=String(btn.dataset.attendanceUnlock),st=students.find(x=>String(x.id)===id);if(!attendance[iso]||!attendance[iso][id]||!st)return;btn.disabled=true;try{const docId=encodeURIComponent(iso+'_'+id);await db.collection('attendanceUnlocks').doc(docId).set({date:iso,studentId:id,className:String(st.className||''),unlockedBy:currentUser.uid,expiresAt:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+10*60*1000)),createdAt:firebase.firestore.FieldValue.serverTimestamp()});unlockedAttendanceRecords.add(attendanceRecordKey(iso,id));drawAttendance();}catch(error){console.error('Attendance unlock failed:',error);showModernNotification(friendlyFirebaseError(error,'save'));btn.disabled=false;}});
 $('saveAtt').onclick=async()=>{
@@ -3132,16 +3132,7 @@ $('backupBtn').onclick=async()=>{try{await exportBackup('json');setBackupMessage
 $('saveBackupPrefs').onclick=()=>{try{saveBackupPrefs();if(typeof window.showModernNotification==='function')window.showModernNotification('Backup Settings ተቀምጠዋል።','success')}catch(e){console.error('Backup preferences save failed:',e);setBackupMessage('Backup settings ማስቀመጥ አልተሳካም፦ '+(e.message||e),true)}};
 $('downloadSelectedBackup').onclick=async()=>{try{const format=$('backupFormat').value;await exportBackup(format);setBackupMessage(format.toUpperCase()+' Backup በDownloads ውስጥ ተቀምጧል።')}catch(e){console.error('Selected backup failed:',e);setBackupMessage('Backup failed: '+(e.message||e),true)}};
 $('downloadArchiveBackup').onclick=async()=>{try{if(role!=='supervisor')throw Error('Supervisor only.');const snap=await db.collection('classArchives').get();const archives=[];for(const doc of snap.docs){const rs=await doc.ref.collection('records').get();archives.push({id:doc.id,...doc.data(),records:rs.docs.map(x=>x.data())})}await triggerDownload('sunday-school-archives-backup.json',new Blob([JSON.stringify({app:'SundaySchoolArchiveBackup',createdAt:new Date().toISOString(),archives},null,2)],{type:'application/json'}));rememberBackup();setBackupMessage(`${archives.length} archives exported.`)}catch(e){console.error('Archive backup failed:',e);setBackupMessage('Archive export failed: '+(e.message||e),true)}};
-$('restoreFile').onchange=async e=>{if(role!=='supervisor'){showModernNotification('Backup Restore የሚያደርገው Supervisor ብቻ ነው።');e.target.value='';return;}const f=e.target.files[0];if(!f)return;try{let d;if(/\.csv$/i.test(f.name)){const text=await readBackupFileText(f),lines=text.replace(/^\ufeff/,'').trim().split(/\r?\n/),parse=line=>line.match(/("(?:[^"]|"")*"|[^,]*)(,|$)/g)?.map(x=>x.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"'))||[];const rows=lines.slice(1).map(parse);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const [date,id,name,cls,status]=r;if(!date||!id||!['P','A','L','E'].includes(status))return;d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name,className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)})}else if(/\.xlsx$/i.test(f.name)){if(typeof XLSX==='undefined')throw Error('Excel library unavailable.');const wb=XLSX.read(await readBackupFileArrayBuffer(f),{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const date=String(r.Date||''),id=String(r['Student ID']||r.StudentID||''),status=r.Status,cls=String(r.Class||'');if(date&&id&&['P','A','L','E'].includes(status)){d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name:String(r['Student Name']||r.StudentName||''),className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)}})}else{d=JSON.parse(await readBackupFileText(f));if(d.app==='SundaySchoolEncryptedBackup'){const pw=$('backupPassword').value;if(!pw)throw Error('Enter the backup password first.');d=await decryptBackupObject(d,pw)}}validateBackup(d);
-// Safety gate: take an in-memory rollback snapshot before any restore changes.
-const mode=$('restoreMode').value;
-if(!['overwrite','merge'].includes(mode))throw Error('Unknown restore mode.');
-const restoreCounts={students:d.students.length,classes:d.classes.length,attendance:Object.values(d.attendance).reduce((n,day)=>n+Object.keys(day||{}).length,0)};
-const warning=mode==='overwrite'?'OVERWRITE will replace current students, classes and attendance.':'MERGE adds missing records and keeps existing attendance statuses.';
-if(!confirm('RESTORE PREVIEW\n\n'+warning+'\n\nStudents: '+restoreCounts.students+'\nClasses: '+restoreCounts.classes+'\nAttendance records: '+restoreCounts.attendance+'\n\nMake a separate downloaded backup first. Continue?'))throw Error('Restore cancelled by user.');
-window.__restoreRollback={students:JSON.parse(JSON.stringify(students)),classes:JSON.parse(JSON.stringify(classes)),classPrefixes:JSON.parse(JSON.stringify(classPrefixes||{})),attendance:JSON.parse(JSON.stringify(attendance)),appSettings:JSON.parse(JSON.stringify(appSettings||{})),extendedSettings:JSON.parse(JSON.stringify(extendedSettings||{}))};
-try{localStorage.setItem('ss_pre_restore_safety_snapshot_v1',JSON.stringify({createdAt:new Date().toISOString(),...window.__restoreRollback}));}catch(snapshotError){throw Error('Could not create local safety snapshot; restore cancelled. '+snapshotError.message)}
-if(mode==='overwrite'){students=d.students;classes=d.classes;classPrefixes=d.classPrefixes||{};attendance=d.attendance}else{const sm=new Map(students.map(x=>[String(x.id),x]));d.students.forEach(x=>{if(!sm.has(String(x.id)))sm.set(String(x.id),x)});students=[...sm.values()];classes=[...new Set([...classes,...d.classes])];classPrefixes={...classPrefixes,...(d.classPrefixes||{})};Object.entries(d.attendance).forEach(([date,day])=>{attendance[date]=attendance[date]||{};Object.entries(day).forEach(([id,status])=>{if(attendance[date][id]===undefined)attendance[date][id]=status})})}
+$('restoreFile').onchange=async e=>{if(role!=='supervisor'){showModernNotification('Backup Restore የሚያደርገው Supervisor ብቻ ነው።');e.target.value='';return;}const f=e.target.files[0];if(!f)return;try{let d;if(/\.csv$/i.test(f.name)){const text=await readBackupFileText(f),lines=text.replace(/^\ufeff/,'').trim().split(/\r?\n/),parse=line=>line.match(/("(?:[^"]|"")*"|[^,]*)(,|$)/g)?.map(x=>x.replace(/,$/,'').replace(/^"|"$/g,'').replace(/""/g,'"'))||[];const rows=lines.slice(1).map(parse);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const [date,id,name,cls,status]=r;if(!date||!id||!['P','A','L','E'].includes(status))return;d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name,className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)})}else if(/\.xlsx$/i.test(f.name)){if(typeof XLSX==='undefined')throw Error('Excel library unavailable.');const wb=XLSX.read(await readBackupFileArrayBuffer(f),{type:'array'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);d={students:[],classes:[],classPrefixes:{},attendance:{}};rows.forEach(r=>{const date=String(r.Date||''),id=String(r['Student ID']||r.StudentID||''),status=r.Status,cls=String(r.Class||'');if(date&&id&&['P','A','L','E'].includes(status)){d.attendance[date]=d.attendance[date]||{};d.attendance[date][id]=status;if(!d.students.some(x=>String(x.id)===id))d.students.push({id,name:String(r['Student Name']||r.StudentName||''),className:cls});if(cls&&!d.classes.includes(cls))d.classes.push(cls)}})}else{d=JSON.parse(await readBackupFileText(f));if(d.app==='SundaySchoolEncryptedBackup'){const pw=$('backupPassword').value;if(!pw)throw Error('Enter the backup password first.');d=await decryptBackupObject(d,pw)}}validateBackup(d);const mode=$('restoreMode').value;if(mode==='overwrite'){students=d.students;classes=d.classes;classPrefixes=d.classPrefixes||{};attendance=d.attendance}else{const sm=new Map(students.map(x=>[String(x.id),x]));d.students.forEach(x=>{if(!sm.has(String(x.id)))sm.set(String(x.id),x)});students=[...sm.values()];classes=[...new Set([...classes,...d.classes])];classPrefixes={...classPrefixes,...(d.classPrefixes||{})};Object.entries(d.attendance).forEach(([date,day])=>{attendance[date]=attendance[date]||{};Object.entries(day).forEach(([id,status])=>{if(attendance[date][id]===undefined)attendance[date][id]=status})})}
 // Restore shared Supervisor settings from full JSON backups as well as student/class/attendance data.
 if(d.appSettings&&typeof d.appSettings==='object'&&!Array.isArray(d.appSettings)){
  const restoredGeneral=mode==='overwrite'?{...d.appSettings}:{...appSettings,...d.appSettings};
@@ -3159,11 +3150,7 @@ if(d.extendedSettings&&typeof d.extendedSettings==='object'&&!Array.isArray(d.ex
  extendedSettings={...extendedSettings,...restoredExtended};
  localStorage.setItem('ss_extended_settings',JSON.stringify(extendedSettings));
 }
-const ok=await cloudSave('all');if(!ok)throw Error('Firebase save failed.');saveLocal();applyTheme(appSettings.theme||'light');syncSettingsForm();fillExtendedSettingsForm();renderAll();renderQualifiedStudents();rememberBackup();await logActivity('Backup restored',mode);setBackupMessage('Restore successful. / መረጃው ተመልሷል።')}catch(err){
- console.error(err);
- if(window.__restoreRollback){students=window.__restoreRollback.students;classes=window.__restoreRollback.classes;classPrefixes=window.__restoreRollback.classPrefixes;attendance=window.__restoreRollback.attendance;appSettings=window.__restoreRollback.appSettings;extendedSettings=window.__restoreRollback.extendedSettings;try{saveLocal();applyTheme(appSettings.theme||'light');renderAll();renderQualifiedStudents();}catch(rollbackError){console.error('In-memory rollback failed:',rollbackError)}}
- setBackupMessage('Restore rejected: '+(err.message||'Invalid or damaged backup file.')+' If Firebase writes had already started, check cloud data and use the saved pre-restore backup if needed.',true);
-}finally{window.__restoreRollback=null;e.target.value=''}};
+const ok=await cloudSave('all');if(!ok)throw Error('Firebase save failed.');saveLocal();applyTheme(appSettings.theme||'light');syncSettingsForm();fillExtendedSettingsForm();renderAll();renderQualifiedStudents();rememberBackup();await logActivity('Backup restored',mode);setBackupMessage('Restore successful. / መረጃው ተመልሷል።')}catch(err){console.error(err);setBackupMessage('Restore rejected: '+(err.message||'Invalid or damaged backup file.'),true);}finally{e.target.value=''}};
 loadBackupPrefs();
 
 $('viewSupervisorStatus').addEventListener('click',renderSupervisorClassStatus);$('supervisorStatusClass').addEventListener('change',renderSupervisorClassStatus);$('supervisorStatusFilter').addEventListener('change',renderSupervisorClassStatus);$('supervisorStatusDate').addEventListener('change',renderSupervisorClassStatus);
@@ -3644,65 +3631,99 @@ renderAll();
 })();
 </script>
 
-<style id="requested-phone-table-readability">
-/* Keep table text legible on phones: scroll the table rather than overlap words. */
-#attendance .attendance-table-wrap,
-#students .students-ref-table-wrap,
-#reports #reportResult.individual-report-result{
-  width:100%!important;max-width:100%!important;min-width:0!important;
-  overflow-x:auto!important;overflow-y:hidden!important;
-  -webkit-overflow-scrolling:touch!important;overscroll-behavior-x:contain;
+
+/* 2026-11 mobile interaction and layout fixes (based on the supplied source). */
+/* Radio selection must be visually immediate; do not animate the checked state. */
+#attendance .attendance-radio-visual,
+#attendance .attendance-radio-visual i,
+#attendance .attendance-radio-option.status-P input:checked + .attendance-radio-visual,
+#attendance .attendance-radio-option.status-A input:checked + .attendance-radio-visual,
+#attendance .attendance-radio-option.status-L input:checked + .attendance-radio-visual,
+#attendance .attendance-radio-option.status-E input:checked + .attendance-radio-visual{
+  transition:none!important;
 }
-#attendance .attendance-reference-table{
-  width:max-content!important;min-width:680px!important;table-layout:auto!important;
-}
-#attendance .attendance-reference-table th,
-#attendance .attendance-reference-table td{
-  white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;
-  vertical-align:middle!important;padding:11px 12px!important;line-height:1.5!important;
-}
-#attendance .attendance-reference-table .student-name-cell{min-width:155px!important;}
-#attendance .attendance-reference-table .student-id-cell{min-width:90px!important;}
-#students .students-ref-table-wrap table{
-  width:max-content!important;min-width:650px!important;table-layout:auto!important;
-}
-#students .students-ref-table-wrap th,
-#students .students-ref-table-wrap td{
-  white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;
-  vertical-align:middle!important;line-height:1.5!important;padding:12px 13px!important;
-}
-#students .students-ref-table-wrap th:nth-child(1),
-#students .students-ref-table-wrap td:nth-child(1){min-width:54px!important;width:54px!important;text-align:center!important;}
-#students .students-ref-table-wrap th:nth-child(2),
-#students .students-ref-table-wrap td:nth-child(2){min-width:105px!important;}
-#students .students-ref-table-wrap th:nth-child(3),
-#students .students-ref-table-wrap td:nth-child(3){min-width:175px!important;}
-#students .students-ref-table-wrap th:nth-child(4),
-#students .students-ref-table-wrap td:nth-child(4){min-width:105px!important;}
-#students .students-ref-table-wrap th:nth-child(5),
-#students .students-ref-table-wrap td:nth-child(5){min-width:125px!important;}
-#students .students-ref-table-wrap th:nth-child(6),
-#students .students-ref-table-wrap td:nth-child(6){min-width:105px!important;text-align:center!important;}
-#reports #reportResult.individual-report-result table{
-  width:max-content!important;min-width:100%!important;max-width:none!important;
-  table-layout:auto!important;border-collapse:collapse!important;
-}
-#reports #reportResult.individual-report-result th,
-#reports #reportResult.individual-report-result td{
-  white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;
-  vertical-align:middle!important;line-height:1.5!important;padding:11px 13px!important;
-  min-width:95px!important;
-}
-#reports #reportResult.individual-report-result th:first-child,
-#reports #reportResult.individual-report-result td:first-child{min-width:155px!important;}
-@media(max-width:700px){
-  #attendance .attendance-reference-table th,#attendance .attendance-reference-table td,
-  #students .students-ref-table-wrap th,#students .students-ref-table-wrap td,
-  #reports #reportResult.individual-report-result th,#reports #reportResult.individual-report-result td{
-    font-size:13px!important;padding:10px 11px!important;
+#attendance .attendance-radio-option input{touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;}
+#attendance .attendance-radio-option input:checked + .attendance-radio-visual i{opacity:1!important;transform:none!important;}
+
+/* Keep the open drawer above its dimming backdrop and preserve readable contrast. */
+@media(max-width:800px){
+  html body>nav[aria-label="ዋና ምናሌ"],
+  html body>nav.no-print.sidebar-open{
+    z-index:2147483002!important;
+    background:#102d22!important;
+    color:#f1fff6!important;
+    opacity:1!important;
+    filter:none!important;
+  }
+  html body>nav[aria-label="ዋና ምናሌ"] .sidebar-user,
+  html body>nav[aria-label="ዋና ምናሌ"] .sidebar-section-label,
+  html body>nav[aria-label="ዋና ምናሌ"] button,
+  html body>nav[aria-label="ዋና ምናሌ"] button:before,
+  html body>nav[aria-label="ዋና ምናሌ"] button:after{
+    opacity:1!important;
+    filter:none!important;
+  }
+  html body>nav[aria-label="ዋና ምናሌ"] button[data-page]{
+    color:#e8f5ed!important;
+    background:transparent!important;
+  }
+  html body>nav[aria-label="ዋና ምናሌ"] button[data-page].active{
+    color:#fff!important;
+    background:#087a50!important;
+  }
+  html body>#sidebarBackdrop,
+  html body>.sidebar-backdrop{
+    z-index:2147483001!important;
+    background:rgba(4,18,12,.52)!important;
   }
 }
-</style>
+
+/* Individual report summary has EIGHT columns (ID, student, class, P/A/L/E, rate).
+   Give each a real share of the phone width; the old seven-column sizing caused overlap. */
+#reports #reportResult.individual-report-result>table:first-of-type{
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  table-layout:fixed!important;border-collapse:collapse!important;
+}
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(1),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(1){width:14%!important;}
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(2),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(2){width:22%!important;}
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(3),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(3){width:14%!important;}
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(4),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(4),
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(5),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(5),
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(6),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(6),
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(7),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(7){width:7%!important;text-align:center!important;}
+#reports #reportResult.individual-report-result>table:first-of-type th:nth-child(8),
+#reports #reportResult.individual-report-result>table:first-of-type td:nth-child(8){width:22%!important;text-align:center!important;}
+#reports #reportResult.individual-report-result>table:first-of-type th,
+#reports #reportResult.individual-report-result>table:first-of-type td{
+  min-width:0!important;padding:7px 3px!important;white-space:normal!important;
+  overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.3!important;
+}
+#reports #reportResult.individual-report-result>table:first-of-type .report-circle-badge{
+  max-width:100%!important;margin:0 auto!important;
+}
+/* The daily detail table remains a clean two-column table with readable labels. */
+#reports #reportResult.individual-report-result>table:last-of-type{
+  width:100%!important;min-width:0!important;table-layout:fixed!important;
+}
+#reports #reportResult.individual-report-result>table:last-of-type th,
+#reports #reportResult.individual-report-result>table:last-of-type td{
+  width:50%!important;padding:9px 7px!important;white-space:normal!important;
+  overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.45!important;
+}
+@media(max-width:480px){
+  #reports #reportResult.individual-report-result>table:first-of-type{font-size:11px!important;}
+  #reports #reportResult.individual-report-result>table:first-of-type th,
+  #reports #reportResult.individual-report-result>table:first-of-type td{padding:6px 2px!important;}
+  #reports #reportResult.individual-report-result>table:first-of-type th:nth-child(8),
+  #reports #reportResult.individual-report-result>table:first-of-type td:nth-child(8){font-size:10px!important;}
+}
 
 </body></html>
 
